@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import { format, isToday, isTomorrow, isPast, isSameDay } from 'date-fns';
 import { Plus, CheckSquare, Calendar, Flag, AlertCircle } from 'lucide-react';
 import { Task } from '../types';
+import { MagicTaskInput } from '../components/MagicTaskInput';
 
 export function Tasks() {
   const store = useStore();
@@ -47,6 +48,8 @@ export function Tasks() {
         <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All Pending</FilterButton>
         <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')}>Completed</FilterButton>
       </div>
+
+      <MagicTaskInput />
       
       {/* Quick Add */}
       <div className="relative">

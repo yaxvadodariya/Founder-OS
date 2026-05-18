@@ -5,6 +5,7 @@ import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes } 
 import { FirebaseProvider } from './FirebaseProvider';
 import { Login } from './components/Login';
 import { useStore } from './store/useStore';
+import { SlackPoller } from './components/SlackPoller';
 
 function AppContent() {
   const user = useStore(state => state.user);
@@ -15,6 +16,7 @@ function AppContent() {
 
   return (
     <BrowserRouter>
+      <SlackPoller />
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Dashboard />} />

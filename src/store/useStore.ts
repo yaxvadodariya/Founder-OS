@@ -107,6 +107,18 @@ export const useStore = create<StoreState>()(
         const userId = auth.currentUser.uid;
         try {
           await setDoc(doc(db, `users/${userId}/transactions`, ts.id), { ...ts, userId });
+          // Trigger WhatsApp notification via server API
+          fetch('/api/notify/transaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ts)
+          }).then(async (res) => {
+            if (!res.ok) {
+              const data = await res.json();
+              console.error('WhatsApp notify failed:', data.error);
+              useStore.getState().setLastError('WhatsApp Note: ' + data.error);
+            }
+          }).catch(console.error);
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/transactions`);
         }
