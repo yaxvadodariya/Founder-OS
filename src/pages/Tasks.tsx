@@ -58,7 +58,7 @@ export function Tasks() {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && e.currentTarget.value.trim()) {
               store.addTask({
-                id: Math.random().toString(),
+                id: Math.random().toString(36).substring(2, 11),
                 title: e.currentTarget.value.trim(),
                 priority: 'medium',
                 completed: false,

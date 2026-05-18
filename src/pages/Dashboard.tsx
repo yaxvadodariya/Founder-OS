@@ -61,16 +61,23 @@ export function Dashboard() {
   const upcomingPayments = store.recurringPayments.filter(rp => rp.active).slice(0, 3);
   const upcomingPaymentsAmount = upcomingPayments.reduce((acc, rp) => acc + rp.amount, 0);
   
-  // Fake chart data
-  const chartData = [
-    { name: 'Mon', value: 1200 },
-    { name: 'Tue', value: 3000 },
-    { name: 'Wed', value: 2500 },
-    { name: 'Thu', value: 4800 },
-    { name: 'Fri', value: 3900 },
-    { name: 'Sat', value: 6000 },
-    { name: 'Sun', value: 5500 },
-  ];
+  // Calculate chart data from transactions (last 7 days grouped by day)
+  const chartData = React.useMemo(() => {
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = addDays(today, -i);
+      const dayTransactions = store.transactions.filter(t => 
+        isToday(new Date(t.date)) || format(new Date(t.date), 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd')
+      );
+      // Let's use net balance or expenses for the chart, e.g. expenses
+      const expenseAmount = dayTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+      data.push({
+        name: format(d, 'EEE'),
+        value: expenseAmount
+      });
+    }
+    return data;
+  }, [store.transactions]);
 
   return (
     <div className="space-y-6 pb-20">
@@ -168,10 +175,10 @@ export function Dashboard() {
                   <p className="text-sm text-gray-500 mb-2">Income this month</p>
                   <div className="flex items-end gap-2">
                     <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
-                      {formatCurrency(85000)}
+                      <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
                     </p>
                     <span className="flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded leading-none">
-                      <ArrowUpRight className="h-3 w-3 mr-0.5" /> 8%
+                      <ArrowUpRight className="h-3 w-3 mr-0.5" /> 0%
                     </span>
                   </div>
                 </div>
@@ -180,10 +187,10 @@ export function Dashboard() {
                   <p className="text-sm text-gray-500 mb-2">Expenses this month</p>
                   <div className="flex items-end gap-2">
                     <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
-                      {formatCurrency(32000)}
+                      <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpenses)}</HiddenValue>
                     </p>
-                    <span className="flex items-center text-sm font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded leading-none">
-                      <ArrowDownRight className="h-3 w-3 mr-0.5" /> 2%
+                    <span className="flex items-center text-sm font-medium text-gray-600 bg-gray-50 px-1.5 py-0.5 rounded leading-none">
+                      <ArrowDownRight className="h-3 w-3 mr-0.5" /> 0%
                     </span>
                   </div>
                 </div>
@@ -250,13 +257,23 @@ export function Dashboard() {
             </div>
             <div className="design-card bg-gradient-to-br from-indigo-50/50 to-blue-50/50 p-5">
               <div className="space-y-3">
-                <p className="text-sm text-indigo-800 leading-relaxed text-balance">
-                  You've spent <span className="font-semibold">12% less</span> on personal expenses this month compared to the last. Keep it up!
-                </p>
-                <div className="h-px bg-indigo-100/50"></div>
-                <p className="text-sm text-indigo-800 leading-relaxed text-balance">
-                  Your <span className="font-semibold">"Fintech Dashboard UI"</span> project is nearing its deadline. You still have 1 milestone pending.
-                </p>
+                {store.transactions.length > 0 ? (
+                  <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                    You have <span className="font-semibold">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Keep tracking your expenses to get smarter insights!
+                  </p>
+                ) : (
+                  <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                    Start adding your income and expenses to unlock AI-powered insights about your spending habits.
+                  </p>
+                )}
+                {store.projects.filter(p => p.status === 'active').length > 0 && (
+                  <>
+                    <div className="h-px bg-indigo-100/50"></div>
+                    <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                      You have <span className="font-semibold">{store.projects.filter(p => p.status === 'active').length} active projects</span>. Keep pushing forward to hit your deadlines!
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -60,7 +60,7 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense', tra
       });
     } else {
       store.addTransaction({
-        id: Math.random().toString(),
+        id: Math.random().toString(36).substring(2, 11),
         type,
         category,
         amount: parseFloat(amount),

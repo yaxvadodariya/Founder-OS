@@ -12,7 +12,11 @@ export function Login() {
       setError(null);
       await signInWithGoogle();
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      if (err.code === 'auth/unauthorized-domain') {
+        setError('Domain not authorized. Please go to Firebase Console > Authentication > Settings > Authorized domains and add your Vercel domain.');
+      } else {
+        setError(err.message || 'Failed to login');
+      }
       setLoading(false);
     }
   };
