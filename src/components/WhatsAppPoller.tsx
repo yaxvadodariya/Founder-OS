@@ -28,7 +28,7 @@ export function WhatsAppPoller() {
           const transaction = change.doc.data();
           
           store.addTransaction({
-            id: Math.random().toString(36).substring(2, 11), // real id
+            id: change.doc.id, // match webhook queue id
             type: transaction.type,
             amount: transaction.amount,
             category: transaction.category,
@@ -36,7 +36,7 @@ export function WhatsAppPoller() {
             paymentMethod: transaction.paymentMethod || 'Unspecified',
             date: new Date().toISOString(),
             description: transaction.description || 'Added via WhatsApp'
-          });
+          }, true); // true = skipNotify
 
           toast.custom(
             (t) => (

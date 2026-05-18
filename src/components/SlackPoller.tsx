@@ -38,7 +38,7 @@ export function SlackPoller() {
               targetProjectId = existingProj.id;
             } else {
               // Create project
-              const newProjId = Math.random().toString(36).substring(2, 11);
+              const newProjId = `proj_${change.doc.id}`;
               targetProjectId = newProjId;
               useStore.getState().addProject({
                 id: newProjId,
@@ -61,7 +61,7 @@ export function SlackPoller() {
           }
 
           // 2. Create the task under this project
-          const newTaskId = Math.random().toString(36).substring(2, 11);
+          const newTaskId = change.doc.id; // use webhook id
           useStore.getState().addTask({
             id: newTaskId,
             projectId: targetProjectId,

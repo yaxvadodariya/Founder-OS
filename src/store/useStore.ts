@@ -56,7 +56,7 @@ interface StoreState {
   setPeeking: (peeking: boolean) => void;
   toggleDarkMode: () => void;
   
-  addTransaction: (ts: Transaction) => void;
+  addTransaction: (ts: Transaction, skipNotify?: boolean) => void;
   updateTransaction: (id: string, t: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
   
@@ -103,23 +103,26 @@ export const useStore = create<StoreState>()(
       setPeeking: (peeking) => set({ isPeeking: peeking }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       
-      addTransaction: async (ts) => {
+      addTransaction: async (ts, skipNotify) => {
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
           await setDoc(doc(db, `users/${userId}/transactions`, ts.id), { ...ts, userId });
-          // Trigger WhatsApp notification via server API
-          fetch('/api/notify/transaction', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(ts)
-          }).then(async (res) => {
-            if (!res.ok) {
-              const data = await res.json();
-              console.error('WhatsApp notify failed:', data.error);
-              useStore.getState().setLastError('WhatsApp Note: ' + data.error);
-            }
-          }).catch(console.error);
+          
+          if (!skipNotify) {
+            // Trigger WhatsApp notification via server API
+            fetch('/api/notify/transaction', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(ts)
+            }).then(async (res) => {
+              if (!res.ok) {
+                const data = await res.json();
+                console.error('WhatsApp notify failed:', data.error);
+                useStore.getState().setLastError('WhatsApp Note: ' + data.error);
+              }
+            }).catch(console.error);
+          }
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/transactions`, { ...ts, userId });
         }
