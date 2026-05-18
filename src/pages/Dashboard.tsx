@@ -185,7 +185,7 @@ export function Dashboard() {
                   <p className="text-sm text-gray-500 mb-2">Income this month</p>
                   <div className="flex items-end gap-2">
                     <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
-                      <HiddenValue isHidden={isHidden}>{formatCurrency(85000)}</HiddenValue>
+                      {formatCurrency(85000)}
                     </p>
                     <span className="flex items-center text-sm font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded leading-none">
                       <ArrowUpRight className="h-3 w-3 mr-0.5" /> 8%
@@ -197,7 +197,7 @@ export function Dashboard() {
                   <p className="text-sm text-gray-500 mb-2">Expenses this month</p>
                   <div className="flex items-end gap-2">
                     <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
-                      <HiddenValue isHidden={isHidden}>{formatCurrency(32000)}</HiddenValue>
+                      {formatCurrency(32000)}
                     </p>
                     <span className="flex items-center text-sm font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded leading-none">
                       <ArrowDownRight className="h-3 w-3 mr-0.5" /> 2%
@@ -341,7 +341,7 @@ export function Dashboard() {
                       </div>
                     </div>
                     <p className="text-sm font-semibold text-gray-900">
-                      <HiddenValue isHidden={isHidden} bulletCount={4}>{formatCurrency(payment.amount)}</HiddenValue>
+                      {formatCurrency(payment.amount)}
                     </p>
                   </div>
                 ))}
@@ -408,7 +408,7 @@ function StatCard({
               <div className="flex justify-between items-end">
                 <p className="text-xs font-medium text-gray-400">{subLabel}</p>
                  <span className="text-[14px] font-medium tracking-tight text-gray-700">
-                    {isHidden ? <HiddenValue isHidden={isHidden} bulletCount={4}>{subValue as any}</HiddenValue> : subValue}
+                    {subValue}
                  </span>
               </div>
               {subText && <p className="text-[10px] text-gray-400">{subText}</p>}

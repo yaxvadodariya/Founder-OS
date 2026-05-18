@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { formatCurrency, cn } from '../lib/utils';
 import { format } from 'date-fns';
@@ -8,7 +8,15 @@ import { ProjectStatus } from '../types';
 
 export function Projects() {
   const store = useStore();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<ProjectStatus | 'all'>('all');
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
   
   const projects = store.projects.filter(p => filter === 'all' ? true : p.status === filter);
 
@@ -46,7 +54,11 @@ export function Projects() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 content-start">
           {projects.map(project => (
-            <Link key={project.id} to={`/projects/${project.id}`} className="design-card transition-all hover:ring-2 hover:ring-gray-200 flex flex-col cursor-pointer group">
+            <div 
+              key={project.id} 
+              onClick={() => navigate(`/projects/${project.id}`)}
+              className="design-card transition-all hover:ring-2 hover:ring-gray-200 flex flex-col cursor-pointer group"
+            >
               <div className="p-5 border-b border-gray-100 flex-1">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex flex-col">
@@ -62,9 +74,45 @@ export function Projects() {
                     <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{project.name}</h3>
                     <p className="text-sm text-gray-500">{project.clientName}</p>
                   </div>
-                  <button className="text-gray-400 hover:text-gray-600" onClick={(e) => e.preventDefault()}>
-                    <MoreVertical className="h-5 w-5" />
-                  </button>
+                  <div className="relative">
+                    <button 
+                      className="text-gray-400 hover:text-gray-900 p-1 rounded-md hover:bg-gray-100 transition-colors" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === project.id ? null : project.id);
+                      }}
+                    >
+                      <MoreVertical className="h-5 w-5" />
+                    </button>
+                    
+                    {openMenuId === project.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            store.updateProject(project.id, { status: project.status === 'completed' ? 'active' : 'completed' });
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          {project.status === 'completed' ? 'Mark as Active' : 'Mark as Completed'}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            store.deleteProject(project.id);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Delete Project
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="mt-4 grid grid-cols-2 gap-4">
@@ -102,7 +150,7 @@ export function Projects() {
                   {project.milestones.filter(m => m.completed).length}/{project.milestones.length} Milestones
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
           {projects.length === 0 && (
             <div className="col-span-full py-12 text-center text-gray-500 border-2 border-dashed border-gray-200 rounded-xl bg-white/50">
