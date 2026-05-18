@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import { collection, onSnapshot, query, where, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
+const processedIds = new Set<string>();
+
 export function SlackPoller() {
   const store = useStore();
   const user = store.user;
@@ -19,6 +21,10 @@ export function SlackPoller() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
+          const docId = change.doc.id;
+          if (processedIds.has(docId)) return;
+          processedIds.add(docId);
+          
           const task = change.doc.data();
           
           // 1. Check if an active project exists or create one based on the matched name

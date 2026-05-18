@@ -6,6 +6,8 @@ import React from 'react';
 import { collection, onSnapshot, query, where, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
+const processedIds = new Set<string>();
+
 export function WhatsAppPoller() {
   const store = useStore();
 
@@ -19,6 +21,10 @@ export function WhatsAppPoller() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
+          const docId = change.doc.id;
+          if (processedIds.has(docId)) return;
+          processedIds.add(docId);
+          
           const transaction = change.doc.data();
           
           store.addTransaction({
