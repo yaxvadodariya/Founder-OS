@@ -21,8 +21,8 @@ interface FirestoreErrorInfo {
   authInfo: any;
 }
 
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo: FirestoreErrorInfo = {
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null, payload?: any) {
+  const errInfo: FirestoreErrorInfo & { payload?: any } = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
       userId: auth.currentUser?.uid,
@@ -31,7 +31,8 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
       isAnonymous: auth.currentUser?.isAnonymous,
     },
     operationType,
-    path
+    path,
+    payload
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
   useStore.getState().setLastError(JSON.stringify(errInfo, null, 2));
@@ -120,7 +121,7 @@ export const useStore = create<StoreState>()(
             }
           }).catch(console.error);
         } catch (err) {
-          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/transactions`);
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/transactions`, { ...ts, userId });
         }
       },
       updateTransaction: async (id, params) => {

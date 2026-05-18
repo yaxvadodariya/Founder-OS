@@ -226,7 +226,7 @@ Message: "${messageBody}"`,
               isTransaction: { type: Type.BOOLEAN, description: "True if this is an expense or income" },
               type: { type: Type.STRING, enum: ["income", "expense"], description: "Whether it's money coming in or going out" },
               amount: { type: Type.NUMBER, description: "The amount of money" },
-              category: { type: Type.STRING, description: "Category of the transaction, e.g., food, utilities, clothing, personal, etc. Keep it short." },
+              category: { type: Type.STRING, enum: ["personal", "business"], description: "Whether this is a personal or business transaction" },
               categoryDetail: { type: Type.STRING, description: "single word like Food, Transport, Salary, Shopping, Other" },
               paymentMethod: { type: Type.STRING, description: "e.g. Cash, UPI, Bank Transfer or Unspecified" },
               description: { type: Type.STRING, description: "Description or note for the transaction" }
