@@ -1,0 +1,8 @@
+{
+  "name": "Founder OS by Yax",
+  "description": "Personal & business management system combining finance tracking, project management, task organization, and memory management",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
