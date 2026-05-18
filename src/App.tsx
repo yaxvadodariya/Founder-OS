@@ -6,6 +6,7 @@ import { FirebaseProvider } from './FirebaseProvider';
 import { Login } from './components/Login';
 import { useStore } from './store/useStore';
 import { SlackPoller } from './components/SlackPoller';
+import { WhatsAppPoller } from './components/WhatsAppPoller';
 
 function AppContent() {
   const user = useStore(state => state.user);
@@ -17,6 +18,7 @@ function AppContent() {
   return (
     <BrowserRouter>
       <SlackPoller />
+      <WhatsAppPoller />
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Dashboard />} />

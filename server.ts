@@ -7,8 +7,9 @@ import twilio from 'twilio';
 // Initialize Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Memory store for recent tasks to be picked up by the client
+// Memory store for recent tasks and transactions to be picked up by the client
 export const recentTasks: any[] = [];
+export const pendingTransactions: any[] = [];
 
 async function startServer() {
   const app = express();
@@ -136,6 +137,23 @@ Message: "${text}"`,
     res.json({ success: true });
   });
 
+  // Polling endpoint for the React client to fetch new transactions that were captured via WhatsApp
+  app.get('/api/transactions/pending', (req, res) => {
+    res.json({ transactions: pendingTransactions });
+  });
+
+  // Endpoint for the client to mark a transaction as processed
+  app.post('/api/transactions/processed', (req, res) => {
+    const { id } = req.body;
+    if (id) {
+      const idx = pendingTransactions.findIndex(t => t.id === id);
+      if (idx !== -1) {
+        pendingTransactions.splice(idx, 1);
+      }
+    }
+    res.json({ success: true });
+  });
+
   app.post('/api/magic-parse', async (req, res) => {
     try {
       const { text } = req.body;
@@ -202,7 +220,7 @@ Message: "${text}"`,
       }
 
       const { type, amount, category, description } = req.body;
-      const formattedAmount = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+      const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
       const isIncome = type === 'income';
 
       await client.messages.create({
@@ -215,6 +233,79 @@ Message: "${text}"`,
     } catch (err: any) {
       console.error('Error sending WhatsApp notification:', err);
       res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Twilio WhatsApp Webhook for incoming messages
+  app.post('/api/twilio/webhook', async (req, res) => {
+    try {
+      // Twilio sends form-urlencoded data to the webhook
+      const messageBody = req.body.Body;
+      const fromNumber = req.body.From; // e.g. "whatsapp:+1234567890"
+
+      if (!messageBody) {
+        return res.status(200).send('<Response></Response>');
+      }
+
+      console.log(`Received incoming WhatsApp message from ${fromNumber}: ${messageBody}`);
+
+      // Ask Gemini to classify and parse the message
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: `Analyze this message. The user might be trying to log an expense, log an income, or create a task.
+Extract the relevant details if it's a financial transaction (expense/income).
+If it's an expense or income, provide amount, category, description, and type.
+If it's NOT a transaction but looks like a task, we will ignore it for now or set isTransaction to false.
+
+Message: "${messageBody}"`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              isTransaction: { type: Type.BOOLEAN, description: "True if this is an expense or income" },
+              type: { type: Type.STRING, enum: ["income", "expense"], description: "Whether it's money coming in or going out" },
+              amount: { type: Type.NUMBER, description: "The amount of money" },
+              category: { type: Type.STRING, description: "Category of the transaction, e.g., food, utilities, clothing, personal, etc. Keep it short." },
+              description: { type: Type.STRING, description: "Description or note for the transaction" }
+            },
+            required: ["isTransaction"]
+          }
+        }
+      });
+
+      const parsed = JSON.parse(response.text || '{}');
+
+      if (parsed.isTransaction && parsed.amount) {
+        console.log('Gemini detected a transaction:', parsed);
+        
+        const newTransaction = {
+          id: 'tmp_' + Date.now().toString(36),
+          type: parsed.type || 'expense',
+          amount: Number(parsed.amount),
+          category: (parsed.category || 'personal').toLowerCase(),
+          description: parsed.description || 'Added via WhatsApp',
+          date: new Date().toISOString()
+        };
+
+        pendingTransactions.push(newTransaction);
+
+        // Acknowledge the receipt back via WhatsApp
+        const twiml = new twilio.twiml.MessagingResponse();
+        const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(newTransaction.amount);
+        twiml.message(`Got it! I queued an ${newTransaction.type} of ${formattedAmount} for "${newTransaction.description}". It will be added to your dashboard shortly.`);
+        
+        res.type('text/xml').send(twiml.toString());
+      } else {
+        const twiml = new twilio.twiml.MessagingResponse();
+        twiml.message(`I'm sorry, I couldn't understand that as an expense or income. Try saying "Spent $50 on food".`);
+        res.type('text/xml').send(twiml.toString());
+      }
+    } catch (err) {
+      console.error('Error handling Twilio webhook:', err);
+      const twiml = new twilio.twiml.MessagingResponse();
+      twiml.message("Sorry, I encountered an error processing your message.");
+      res.type('text/xml').send(twiml.toString());
     }
   });
 
