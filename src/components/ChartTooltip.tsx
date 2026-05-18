@@ -11,18 +11,16 @@ export function ChartTooltip({ active, payload, label }: any) {
       >
         {/* Tooltip Body */}
         <div className="flex flex-row items-center justify-center px-[10px] py-[4px] gap-[6px] bg-[#21232D] rounded-[6px] min-w-[106px] min-h-[28px] z-10 relative">
-          <div className="flex flex-col">
-            <p className="text-[#FFFFFF] text-[14px] font-normal leading-[20px] tracking-[-0.006em] text-center w-full">
-              {label}
-            </p>
-            <p className="text-[#CED0D6] text-[12px] font-normal leading-[16px] text-center w-full">
+            <div className="flex flex-col mb-1 text-center">
+              <p className="text-[#FFFFFF] text-[14px] font-medium leading-[20px] tracking-[-0.006em]">
+                {label}
+              </p>
               {payload.map((entry: any, index: number) => (
-                <span key={index} className="block whitespace-nowrap">
-                  {entry.value.toLocaleString()}
-                </span>
+                <p key={index} className="text-[12px] font-medium leading-[16px] text-center mt-1" style={{ color: entry.color }}>
+                  {entry.name}: {entry.value.toLocaleString()}
+                </p>
               ))}
-            </p>
-          </div>
+            </div>
         </div>
         
         {/* Tail - V2 Style Triangle pointing down */}

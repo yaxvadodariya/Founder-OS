@@ -11,7 +11,8 @@ import {
   Menu,
   Moon,
   Sun,
-  LogOut
+  LogOut,
+  X
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
@@ -38,9 +39,10 @@ const mobileNav = [
 ];
 
 export function AppLayout() {
-  const user = useStore(state => state.user);
-  const togglePrivacyMode = useStore(state => state.togglePrivacyMode);
-  const isDarkMode = useStore(state => state.isDarkMode);
+  const store = useStore();
+  const user = store.user;
+  const togglePrivacyMode = store.togglePrivacyMode;
+  const isDarkMode = store.isDarkMode;
   const location = useLocation();
 
   useEffect(() => {
@@ -121,6 +123,18 @@ export function AppLayout() {
 
       {/* Main Content Box */}
       <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden relative">
+        {user?.email === 'yaxvadodariya@gmail.com' && store.lastError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded m-4 shadow text-sm relative z-50">
+            <strong className="font-bold">Last Firestore Error:</strong>
+            <pre className="mt-2 whitespace-pre-wrap">{store.lastError}</pre>
+            <button
+              onClick={() => store.setLastError(null)}
+              className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
           <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
             <Outlet />

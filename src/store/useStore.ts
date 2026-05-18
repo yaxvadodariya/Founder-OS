@@ -34,6 +34,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
     path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
+  useStore.getState().setLastError(JSON.stringify(errInfo, null, 2));
 }
 
 interface StoreState {
@@ -76,6 +77,8 @@ interface StoreState {
   deleteNote: (id: string) => void;
   
   resetData: () => void;
+  lastError: string | null;
+  setLastError: (err: string | null) => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -90,6 +93,8 @@ export const useStore = create<StoreState>()(
       isPrivacyMode: true,
       isPeeking: false,
       isDarkMode: false,
+      lastError: null,
+      setLastError: (err) => set({ lastError: err }),
 
       setUser: (user) => set({ user }),
       togglePrivacyMode: () => set((state) => ({ isPrivacyMode: !state.isPrivacyMode })),

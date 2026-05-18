@@ -17,7 +17,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { LineChart, Line, ResponsiveContainer, XAxis, Tooltip } from 'recharts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 
@@ -67,13 +67,15 @@ export function Dashboard() {
     for (let i = 6; i >= 0; i--) {
       const d = addDays(today, -i);
       const dayTransactions = store.transactions.filter(t => 
-        isToday(new Date(t.date)) || format(new Date(t.date), 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd')
+        format(new Date(t.date), 'yyyy-MM-dd') === format(d, 'yyyy-MM-dd')
       );
       // Let's use net balance or expenses for the chart, e.g. expenses
       const expenseAmount = dayTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+      const incomeAmount = dayTransactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
       data.push({
         name: format(d, 'EEE'),
-        value: expenseAmount
+        expense: expenseAmount,
+        income: incomeAmount
       });
     }
     return data;
@@ -196,15 +198,17 @@ export function Dashboard() {
                 </div>
               </div>
 
-              <div className="h-48 w-full mt-4">
+              <div className="h-64 w-full mt-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
+                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9CA3AF' }} dy={10} />
+                    <YAxis hide={true} domain={['dataMin - 100', 'dataMax + 100']} />
                     <Tooltip 
                       content={<ChartTooltip />}
                       cursor={{ stroke: '#E5E7EB', strokeWidth: 1, strokeDasharray: '4 4' }}
                     />
-                    <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#3B82F6', strokeWidth: 0 }} />
+                    <Line type="monotone" dataKey="income" name="Income" stroke="#10B981" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#10B981', strokeWidth: 0 }} />
+                    <Line type="monotone" dataKey="expense" name="Expense" stroke="#3B82F6" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#3B82F6', strokeWidth: 0 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

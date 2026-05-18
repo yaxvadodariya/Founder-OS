@@ -8,7 +8,13 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let unsubs: (() => void)[] = [];
+
     const unsubAuth = onAuthStateChanged(auth, (user) => {
+      // Clear previous listeners
+      unsubs.forEach(fn => fn());
+      unsubs = [];
+
       if (user) {
         useStore.getState().setUser({
           name: user.displayName || user.email || 'User',
@@ -19,33 +25,32 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
         // Setup Firestore listeners
         const userId = user.uid;
         
-        const unsubs = [
+        unsubs = [
           onSnapshot(collection(db, `users/${userId}/transactions`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            // Sort by date descending
+            data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
             useStore.setState({ transactions: data });
-          }),
+          }, (err) => console.error("Transactions snapshot error:", err)),
           onSnapshot(collection(db, `users/${userId}/projects`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ projects: data });
-          }),
+          }, (err) => console.error("Projects snapshot error:", err)),
           onSnapshot(collection(db, `users/${userId}/tasks`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ tasks: data });
-          }),
+          }, (err) => console.error("Tasks snapshot error:", err)),
           onSnapshot(collection(db, `users/${userId}/recurringPayments`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ recurringPayments: data });
-          }),
+          }, (err) => console.error("Recurring payments snapshot error:", err)),
           onSnapshot(collection(db, `users/${userId}/notes`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ notes: data });
-          }),
+          }, (err) => console.error("Notes snapshot error:", err)),
         ];
 
         setLoading(false);
-        return () => {
-          unsubs.forEach(fn => fn());
-        };
       } else {
         useStore.getState().setUser(null as any);
         useStore.setState({
@@ -59,7 +64,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubAuth();
+    return () => {
+      unsubAuth();
+      unsubs.forEach(fn => fn());
+    };
   }, []);
 
   if (loading) {
