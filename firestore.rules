@@ -113,6 +113,10 @@ service cloud.firestore {
         (data.keys().hasAll(['reminderDate']) ? (data.reminderDate is string && data.reminderDate.size() <= 100) : true);
     }
 
+    match /webhook_queue/{eventId} {
+      allow read, write: if true;
+    }
+
     match /users/{userId} {
       match /transactions/{transactionId} {
         allow read: if isOwner(userId);

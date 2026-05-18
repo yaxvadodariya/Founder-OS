@@ -3,20 +3,22 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type, Schema } from '@google/genai';
 import twilio from 'twilio';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+
+// Import config directly
+import firebaseConfig from './firebase-applet-config.json';
 
 // Initialize Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Memory store for recent tasks and transactions to be picked up by the client
-export const recentTasks: any[] = [];
-export const pendingTransactions: any[] = [];
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Use JSON middleware, but we need to verify Slack requests if needed
-  // For simplicity since the user just wants the flow, we'll parse JSON 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -33,23 +35,17 @@ async function startServer() {
 
   // Slack Events Webhook Endpoint
   app.post('/api/slack/events', async (req, res) => {
-    // 1. Respond to Slack url_verification challenge
     if (req.body.type === 'url_verification') {
       return res.status(200).json({ challenge: req.body.challenge });
     }
 
-    // 2. Handle incoming messages
     if (req.body.event && req.body.event.type === 'message' && !req.body.event.bot_id) {
-      // Respond to Slack immediately to prevent retries
       res.status(200).end();
 
       const text = req.body.event.text;
       const user = req.body.event.user;
 
-      console.log(`Received Slack message from ${user}: ${text}`);
-
       try {
-        // Use Gemini to determine if this is a task and extract project/task details
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
           contents: `Analyze the following message from a client on Slack. 
@@ -77,9 +73,6 @@ Message: "${text}"`,
         const parsed = JSON.parse(response.text || '{}');
         
         if (parsed.isTask) {
-          console.log('Gemini detected a task:', parsed);
-          
-          // Add to our memory store for the UI to pick up
           const newTask = {
             id: 'evt_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
             projectName: parsed.projectName || 'Uncategorized Slack Tasks',
@@ -87,12 +80,12 @@ Message: "${text}"`,
             description: parsed.taskDescription,
             priority: parsed.priority || 'medium',
             source: 'slack',
+            type: 'task',
             timestamp: new Date().toISOString()
           };
           
-          recentTasks.push(newTask);
+          await setDoc(doc(db, 'webhook_queue', newTask.id), newTask);
 
-          // Trigger WhatsApp reminder
           const client = getTwilio();
           const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
           const toNumber = process.env.USER_WHATSAPP_NUMBER;
@@ -103,55 +96,15 @@ Message: "${text}"`,
               from: `whatsapp:${fromNumber}`,
               to: `whatsapp:${toNumber}`
             });
-            console.log('WhatsApp notification sent successfully.');
-          } else {
-            console.log('Twilio credentials or numbers not fully configured; skipping WhatsApp notification.');
           }
-        } else {
-          console.log('Gemini determined message is not a task.');
         }
-
       } catch (err) {
-        console.error('Error processing Slack message with Gemini/Twilio:', err);
+        console.error('Error processing Slack message:', err);
       }
       return;
     }
 
     res.status(200).send('Event received');
-  });
-
-  // Polling endpoint for the React client to fetch new tasks that were captured
-  app.get('/api/tasks/pending', (req, res) => {
-    res.json({ tasks: recentTasks });
-  });
-
-  // Endpoint for the client to mark an event as processed so we can remove it from memory
-  app.post('/api/tasks/processed', (req, res) => {
-    const { id } = req.body;
-    if (id) {
-      const idx = recentTasks.findIndex(t => t.id === id);
-      if (idx !== -1) {
-        recentTasks.splice(idx, 1);
-      }
-    }
-    res.json({ success: true });
-  });
-
-  // Polling endpoint for the React client to fetch new transactions that were captured via WhatsApp
-  app.get('/api/transactions/pending', (req, res) => {
-    res.json({ transactions: pendingTransactions });
-  });
-
-  // Endpoint for the client to mark a transaction as processed
-  app.post('/api/transactions/processed', (req, res) => {
-    const { id } = req.body;
-    if (id) {
-      const idx = pendingTransactions.findIndex(t => t.id === id);
-      if (idx !== -1) {
-        pendingTransactions.splice(idx, 1);
-      }
-    }
-    res.json({ success: true });
   });
 
   app.post('/api/magic-parse', async (req, res) => {
@@ -183,11 +136,8 @@ Message: "${text}"`,
       });
 
       const parsed = JSON.parse(response.text || '{}');
-      
-      // We return the parsed data to the client so it can create the task in Firestore natively
       res.status(200).json(parsed);
 
-      // Async: Send WhatsApp notification via Twilio
       const client = getTwilio();
       const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
       const toNumber = process.env.USER_WHATSAPP_NUMBER;
@@ -206,15 +156,12 @@ Message: "${text}"`,
     }
   });
 
-  // Twilio WhatsApp Notification for Transactions
   app.post('/api/notify/transaction', async (req, res) => {
     try {
       const client = getTwilio();
       const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
       const toNumber = process.env.USER_WHATSAPP_NUMBER;
       
-      console.log('Sending transaction alert to WhatsApp:', { fromNumber, toNumber, hasClient: !!client });
-
       if (!client || !fromNumber || !toNumber) {
         return res.status(500).json({ error: 'Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER, and USER_WHATSAPP_NUMBER to Environment Variables.' });
       }
@@ -236,20 +183,15 @@ Message: "${text}"`,
     }
   });
 
-  // Twilio WhatsApp Webhook for incoming messages
   app.post('/api/twilio/webhook', async (req, res) => {
     try {
-      // Twilio sends form-urlencoded data to the webhook
       const messageBody = req.body.Body;
-      const fromNumber = req.body.From; // e.g. "whatsapp:+1234567890"
+      const fromNumber = req.body.From; 
 
       if (!messageBody) {
         return res.status(200).send('<Response></Response>');
       }
 
-      console.log(`Received incoming WhatsApp message from ${fromNumber}: ${messageBody}`);
-
-      // Ask Gemini to classify and parse the message
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: `Analyze this message. The user might be trying to log an expense, log an income, or create a task.
@@ -277,20 +219,18 @@ Message: "${messageBody}"`,
       const parsed = JSON.parse(response.text || '{}');
 
       if (parsed.isTransaction && parsed.amount) {
-        console.log('Gemini detected a transaction:', parsed);
-        
         const newTransaction = {
-          id: 'tmp_' + Date.now().toString(36),
+          id: 'evt_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
           type: parsed.type || 'expense',
+          actionType: 'transaction',
           amount: Number(parsed.amount),
           category: (parsed.category || 'personal').toLowerCase(),
           description: parsed.description || 'Added via WhatsApp',
-          date: new Date().toISOString()
+          timestamp: new Date().toISOString()
         };
 
-        pendingTransactions.push(newTransaction);
+        await setDoc(doc(db, 'webhook_queue', newTransaction.id), newTransaction);
 
-        // Acknowledge the receipt back via WhatsApp
         const twiml = new twilio.twiml.MessagingResponse();
         const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(newTransaction.amount);
         twiml.message(`Got it! I queued an ${newTransaction.type} of ${formattedAmount} for "${newTransaction.description}". It will be added to your dashboard shortly.`);
@@ -298,7 +238,7 @@ Message: "${messageBody}"`,
         res.type('text/xml').send(twiml.toString());
       } else {
         const twiml = new twilio.twiml.MessagingResponse();
-        twiml.message(`I'm sorry, I couldn't understand that as an expense or income. Try saying "Spent $50 on food".`);
+        twiml.message(`I'm sorry, I couldn't understand that as an expense or income. Try saying "Spent 500 on groceries".`);
         res.type('text/xml').send(twiml.toString());
       }
     } catch (err) {
@@ -309,7 +249,6 @@ Message: "${messageBody}"`,
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

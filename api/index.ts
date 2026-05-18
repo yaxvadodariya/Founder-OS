@@ -1,15 +1,20 @@
 import express from 'express';
 import { GoogleGenAI, Type } from '@google/genai';
 import twilio from 'twilio';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+
+// Import config directly so Vercel includes it in the build
+import firebaseConfig from '../firebase-applet-config.json';
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-export const recentTasks: any[] = [];
-export const pendingTransactions: any[] = [];
 
 const getTwilio = () => {
     let twilioClient = null;
@@ -18,7 +23,6 @@ const getTwilio = () => {
     }
     return twilioClient;
 };
-
 
 // Slack Events Webhook Endpoint
 app.post('/api/slack/events', async (req, res) => {
@@ -60,9 +64,11 @@ Message: "${text}"`,
         description: parsed.taskDescription,
         priority: parsed.priority || 'medium',
         source: 'slack',
+        type: 'task',
         timestamp: new Date().toISOString()
         };
-        recentTasks.push(newTask);
+        
+        await setDoc(doc(db, 'webhook_queue', newTask.id), newTask);
 
         const client = getTwilio();
         const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
@@ -79,28 +85,6 @@ Message: "${text}"`,
     return;
 }
 res.status(200).send('Event received');
-});
-
-app.get('/api/tasks/pending', (req, res) => res.json({ tasks: recentTasks }));
-
-app.post('/api/tasks/processed', (req, res) => {
-const { id } = req.body;
-if (id) {
-    const idx = recentTasks.findIndex(t => t.id === id);
-    if (idx !== -1) recentTasks.splice(idx, 1);
-}
-res.json({ success: true });
-});
-
-app.get('/api/transactions/pending', (req, res) => res.json({ transactions: pendingTransactions }));
-
-app.post('/api/transactions/processed', (req, res) => {
-const { id } = req.body;
-if (id) {
-    const idx = pendingTransactions.findIndex(t => t.id === id);
-    if (idx !== -1) pendingTransactions.splice(idx, 1);
-}
-res.json({ success: true });
 });
 
 app.post('/api/notify/transaction', async (req, res) => {
@@ -157,14 +141,16 @@ Message: "${messageBody}"`,
 
     if (parsed.isTransaction && parsed.amount) {
     const newTransaction = {
-        id: 'tmp_' + Date.now().toString(36),
+        id: 'evt_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         type: parsed.type || 'expense',
+        actionType: 'transaction',
         amount: Number(parsed.amount),
         category: (parsed.category || 'personal').toLowerCase(),
         description: parsed.description || 'Added via WhatsApp',
-        date: new Date().toISOString()
+        timestamp: new Date().toISOString()
     };
-    pendingTransactions.push(newTransaction);
+    
+    await setDoc(doc(db, 'webhook_queue', newTransaction.id), newTransaction);
 
     const twiml = new twilio.twiml.MessagingResponse();
     const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(newTransaction.amount);
@@ -172,7 +158,7 @@ Message: "${messageBody}"`,
     res.type('text/xml').send(twiml.toString());
     } else {
     const twiml = new twilio.twiml.MessagingResponse();
-    twiml.message(`I'm sorry, I couldn't understand that as an expense or income. Try saying "Spent $50 on food".`);
+    twiml.message(`I'm sorry, I couldn't understand that as an expense or income. Try saying "Spent 500 on groceries".`);
     res.type('text/xml').send(twiml.toString());
     }
 } catch (err) {
