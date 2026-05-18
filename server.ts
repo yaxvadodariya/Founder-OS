@@ -7,10 +7,17 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Import config directly
-import firebaseConfig from './firebase-applet-config.json';
+import firebaseConfig from './firebase-applet-config.json' with { type: 'json' };
 
-// Initialize Gemini
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Initialize Gemini safely
+let ai: GoogleGenAI | null = null;
+try {
+  if (process.env.GEMINI_API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  }
+} catch (err) {
+  console.warn('Could not initialize GoogleGenAI', err);
+}
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
@@ -41,6 +48,7 @@ async function startServer() {
 
     if (req.body.event && req.body.event.type === 'message' && !req.body.event.bot_id) {
       res.status(200).end();
+      if (!ai || !db) return;
 
       const text = req.body.event.text;
       const user = req.body.event.user;
@@ -112,6 +120,10 @@ Message: "${text}"`,
       const { text } = req.body;
       if (!text) {
         return res.status(400).json({ error: 'Text is required' });
+      }
+
+      if (!ai) {
+        return res.status(500).json({ error: 'GEMINI_API_KEY is not set.' });
       }
 
       const response = await ai.models.generateContent({
@@ -190,6 +202,12 @@ Message: "${text}"`,
 
       if (!messageBody) {
         return res.status(200).send('<Response></Response>');
+      }
+
+      if (!ai || !db) {
+        const twiml = new twilio.twiml.MessagingResponse();
+        twiml.message("Configuration error: Please set GEMINI_API_KEY and Firebase.");
+        return res.type('text/xml').send(twiml.toString());
       }
 
       const response = await ai.models.generateContent({

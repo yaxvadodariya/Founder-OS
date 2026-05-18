@@ -5,16 +5,29 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Import config directly so Vercel includes it in the build
-import firebaseConfig from '../firebase-applet-config.json';
+import firebaseConfig from '../firebase-applet-config.json' with { type: 'json' };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
+let firebaseApp: any = null;
+let db: any = null;
+try {
+  firebaseApp = initializeApp(firebaseConfig);
+  db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
+} catch (e) {
+  console.error("Firebase init failed", e);
+}
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let ai: GoogleGenAI | null = null;
+try {
+  if (process.env.GEMINI_API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  }
+} catch (e) {
+  console.error("Gemini init failed", e);
+}
 
 const getTwilio = () => {
     let twilioClient = null;
@@ -31,6 +44,7 @@ if (req.body.type === 'url_verification') {
 }
 if (req.body.event && req.body.event.type === 'message' && !req.body.event.bot_id) {
     res.status(200).end();
+    if (!ai || !db) return;
     const { text, user } = req.body.event;
     try {
     const response = await ai.models.generateContent({
@@ -114,6 +128,12 @@ try {
     const fromNumber = req.body.From;
 
     if (!messageBody) return res.status(200).send('<Response></Response>');
+
+    if (!ai || !db) {
+        const twiml = new twilio.twiml.MessagingResponse();
+        twiml.message("Configuration error: Please set GEMINI_API_KEY and Firebase.");
+        return res.type('text/xml').send(twiml.toString());
+    }
 
     const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
