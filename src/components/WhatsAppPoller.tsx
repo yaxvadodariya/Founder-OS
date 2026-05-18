@@ -14,6 +14,8 @@ export function WhatsAppPoller() {
       try {
         const res = await fetch('/api/transactions/pending');
         if (!res.ok) return;
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) return;
         const data = await res.json();
         
         if (data.transactions && data.transactions.length > 0) {

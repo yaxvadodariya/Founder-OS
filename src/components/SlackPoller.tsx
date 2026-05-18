@@ -15,9 +15,11 @@ export function SlackPoller() {
       try {
         const res = await fetch('/api/tasks/pending');
         if (res.ok) {
-          const data = await res.json();
-          if (data.tasks && data.tasks.length > 0) {
-            for (const task of data.tasks) {
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            if (data.tasks && data.tasks.length > 0) {
+              for (const task of data.tasks) {
               
               // 1. Check if an active project exists or create one based on the matched name
               let targetProjectId = '';
@@ -75,6 +77,7 @@ export function SlackPoller() {
               toast.success(`New Task: ${task.title} (from Slack)`);
             }
           }
+        }
         }
       } catch (err) {
         console.error('Error polling Slack tasks:', err);
