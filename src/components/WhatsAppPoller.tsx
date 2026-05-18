@@ -26,6 +26,8 @@ export function WhatsAppPoller() {
             type: transaction.type,
             amount: transaction.amount,
             category: transaction.category,
+            categoryDetail: transaction.categoryDetail || 'Other',
+            paymentMethod: transaction.paymentMethod || 'Unspecified',
             date: new Date().toISOString(),
             description: transaction.description || 'Added via WhatsApp'
           });

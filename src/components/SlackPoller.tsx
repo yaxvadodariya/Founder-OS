@@ -44,6 +44,7 @@ export function SlackPoller() {
                 amountReceived: 0,
                 amountPending: 0,
                 startDate: new Date().toISOString(),
+                deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                 progress: 0,
                 description: `Automatically created from Slack message.`,
                 deliverables: [],

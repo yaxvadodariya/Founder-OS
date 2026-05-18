@@ -214,7 +214,7 @@ Message: "${text}"`,
         model: 'gemini-2.5-flash',
         contents: `Analyze this message. The user might be trying to log an expense, log an income, or create a task.
 Extract the relevant details if it's a financial transaction (expense/income).
-If it's an expense or income, provide amount, category, description, and type.
+If it's an expense or income, provide amount, category, description, type, categoryDetail, and paymentMethod.
 If it's NOT a transaction but looks like a task, we will ignore it for now or set isTransaction to false.
 
 Message: "${messageBody}"`,
@@ -227,6 +227,8 @@ Message: "${messageBody}"`,
               type: { type: Type.STRING, enum: ["income", "expense"], description: "Whether it's money coming in or going out" },
               amount: { type: Type.NUMBER, description: "The amount of money" },
               category: { type: Type.STRING, description: "Category of the transaction, e.g., food, utilities, clothing, personal, etc. Keep it short." },
+              categoryDetail: { type: Type.STRING, description: "single word like Food, Transport, Salary, Shopping, Other" },
+              paymentMethod: { type: Type.STRING, description: "e.g. Cash, UPI, Bank Transfer or Unspecified" },
               description: { type: Type.STRING, description: "Description or note for the transaction" }
             },
             required: ["isTransaction"]
@@ -243,6 +245,8 @@ Message: "${messageBody}"`,
           actionType: 'transaction',
           amount: Number(parsed.amount),
           category: (parsed.category || 'personal').toLowerCase(),
+          categoryDetail: parsed.categoryDetail || 'Other',
+          paymentMethod: parsed.paymentMethod || 'Unspecified',
           description: parsed.description || 'Added via WhatsApp',
           timestamp: new Date().toISOString()
         };

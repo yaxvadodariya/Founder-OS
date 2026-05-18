@@ -139,7 +139,7 @@ try {
     model: 'gemini-2.5-flash',
     contents: `Analyze this message. The user might be trying to log an expense, log an income, or create a task.
 Extract the relevant details if it's a financial transaction (expense/income).
-If it's an expense or income, provide amount, category, description, and type.
+If it's an expense or income, provide amount, category, description, type, categoryDetail, and paymentMethod.
 Message: "${messageBody}"`,
     config: {
         responseMimeType: "application/json",
@@ -150,6 +150,8 @@ Message: "${messageBody}"`,
             type: { type: Type.STRING, enum: ["income", "expense"] },
             amount: { type: Type.NUMBER },
             category: { type: Type.STRING },
+            categoryDetail: { type: Type.STRING, description: "single word like Food, Transport, Salary, Shopping, Other" },
+            paymentMethod: { type: Type.STRING, description: "e.g. Cash, UPI, Bank Transfer or Unspecified" },
             description: { type: Type.STRING }
         },
         required: ["isTransaction"]
@@ -166,6 +168,8 @@ Message: "${messageBody}"`,
         actionType: 'transaction',
         amount: Number(parsed.amount),
         category: (parsed.category || 'personal').toLowerCase(),
+        categoryDetail: parsed.categoryDetail || 'Other',
+        paymentMethod: parsed.paymentMethod || 'Unspecified',
         description: parsed.description || 'Added via WhatsApp',
         timestamp: new Date().toISOString()
     };

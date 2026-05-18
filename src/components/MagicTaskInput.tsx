@@ -42,6 +42,7 @@ export function MagicTaskInput() {
               amountReceived: 0,
               amountPending: 0,
               startDate: new Date().toISOString(),
+              deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
               progress: 0,
               description: 'Created via Magic Paste',
               deliverables: [],
@@ -57,11 +58,11 @@ export function MagicTaskInput() {
           projectId: projectId,
           title: parsed.taskTitle,
           description: parsed.taskDescription || '(Generated from text)',
-          status: 'todo',
           priority: parsed.priority || 'medium',
           completed: false,
           subtasks: [],
-          tags: ['magic-paste']
+          tags: ['magic-paste'],
+          createdAt: new Date().toISOString()
         });
         
         toast.success(`Converted to task: ${parsed.taskTitle}`);
