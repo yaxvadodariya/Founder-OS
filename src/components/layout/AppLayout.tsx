@@ -8,11 +8,16 @@ import {
   BellRing, 
   BookOpen,
   Settings,
-  Menu
+  Menu,
+  Moon,
+  Sun,
+  LogOut
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
+import { DarkModeToggle } from '../DarkModeToggle';
+import { logOut } from '../../lib/firebase';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -35,7 +40,16 @@ const mobileNav = [
 export function AppLayout() {
   const user = useStore(state => state.user);
   const togglePrivacyMode = useStore(state => state.togglePrivacyMode);
+  const isDarkMode = useStore(state => state.isDarkMode);
   const location = useLocation();
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,10 +97,10 @@ export function AppLayout() {
           })}
         </div>
 
-        <div className="p-4 border-t border-gray-100">
-          <div className="flex items-center w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
+        <div className="p-4 border-t border-gray-100 flex gap-2">
+          <div className="flex items-center flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
             <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold overflow-hidden">
-              {user?.name.charAt(0) || 'U'}
+              {user?.name?.charAt(0) || 'U'}
             </div>
             <div className="ml-3 flex-1 overflow-hidden">
               <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
@@ -95,15 +109,25 @@ export function AppLayout() {
               </div>
             </div>
           </div>
+          <button 
+            onClick={() => logOut()}
+            className="flex items-center justify-center h-[50px] w-[50px] rounded-lg bg-gray-50 border border-gray-100 text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors shrink-0"
+            title="Log Out"
+          >
+            <LogOut className="h-5 w-5" />
+          </button>
         </div>
       </aside>
 
       {/* Main Content Box */}
-      <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden relative">
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
           <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
             <Outlet />
           </div>
+        </div>
+        <div className="fixed bottom-[80px] lg:bottom-6 right-6 z-50">
+          <DarkModeToggle />
         </div>
       </main>
 

@@ -1,0 +1,153 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global constraints
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isMap(data) { return data is map; }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Transaction
+    function isValidTransaction(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'type', 'category', 'amount', 'categoryDetail', 'date', 'description', 'paymentMethod']) &&
+        data.userId == userId &&
+        data.type in ['income', 'expense'] &&
+        data.category in ['personal', 'business'] &&
+        data.amount is number &&
+        data.categoryDetail is string && data.categoryDetail.size() <= 200 &&
+        data.date is string && data.date.size() <= 100 &&
+        data.description is string && data.description.size() <= 1000 &&
+        data.paymentMethod is string && data.paymentMethod.size() <= 100 &&
+        (data.keys().hasAll(['receiptImage']) ? (data.receiptImage is string) : true);
+    }
+
+    // Project
+    function isValidProject(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'name', 'clientName', 'clientEmail', 'status', 'value', 'amountReceived', 'amountPending', 'startDate', 'deadline', 'progress', 'description', 'deliverables', 'notes', 'milestones']) &&
+        data.userId == userId &&
+        data.name is string && data.name.size() <= 200 &&
+        data.clientName is string && data.clientName.size() <= 200 &&
+        data.clientEmail is string && data.clientEmail.size() <= 200 &&
+        data.status in ['active', 'completed', 'on-hold', 'cancelled'] &&
+        data.value is number &&
+        data.amountReceived is number &&
+        data.amountPending is number &&
+        data.startDate is string && data.startDate.size() <= 100 &&
+        data.deadline is string && data.deadline.size() <= 100 &&
+        data.progress is number &&
+        data.description is string && data.description.size() <= 5000 &&
+        data.deliverables is list && data.deliverables.size() <= 100 &&
+        data.notes is string && data.notes.size() <= 5000 &&
+        data.milestones is list && data.milestones.size() <= 100;
+    }
+
+    // Task
+    function isValidTask(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'title', 'priority', 'completed', 'tags', 'subtasks', 'createdAt']) &&
+        data.userId == userId &&
+        data.title is string && data.title.size() <= 500 &&
+        data.priority in ['high', 'medium', 'low'] &&
+        data.completed is bool &&
+        data.tags is list && data.tags.size() <= 50 &&
+        data.subtasks is list && data.subtasks.size() <= 50 &&
+        data.createdAt is string && data.createdAt.size() <= 100 &&
+        (data.keys().hasAll(['description']) ? (data.description is string && data.description.size() <= 5000) : true) &&
+        (data.keys().hasAll(['dueDate']) ? (data.dueDate is string && data.dueDate.size() <= 100) : true) &&
+        (data.keys().hasAll(['projectId']) ? (data.projectId is string && data.projectId.size() <= 128) : true) &&
+        (data.keys().hasAll(['completedAt']) ? (data.completedAt is string && data.completedAt.size() <= 100) : true);
+    }
+
+    // Recurring Payment
+    function isValidRecurringPayment(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'name', 'amount', 'frequency', 'category', 'startDate', 'active', 'reminderDays']) &&
+        data.userId == userId &&
+        data.name is string && data.name.size() <= 200 &&
+        data.amount is number &&
+        data.frequency in ['daily', 'weekly', 'monthly', 'yearly'] &&
+        data.category is string && data.category.size() <= 100 &&
+        data.startDate is string && data.startDate.size() <= 100 &&
+        data.active is bool &&
+        data.reminderDays is list && data.reminderDays.size() <= 10 &&
+        (data.keys().hasAll(['dayOfMonth']) ? (data.dayOfMonth is number) : true) &&
+        (data.keys().hasAll(['dayOfWeek']) ? (data.dayOfWeek is number) : true) &&
+        (data.keys().hasAll(['endDate']) ? (data.endDate is string && data.endDate.size() <= 100) : true);
+    }
+
+    // Note
+    function isValidNote(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'title', 'content', 'category', 'tags', 'pinned', 'createdAt', 'updatedAt']) &&
+        data.userId == userId &&
+        data.title is string && data.title.size() <= 200 &&
+        data.content is string && data.content.size() <= 10000 &&
+        data.category in ['idea', 'important', 'remember', 'quote', 'learning', 'contact'] &&
+        data.tags is list && data.tags.size() <= 50 &&
+        data.pinned is bool &&
+        data.createdAt is string && data.createdAt.size() <= 100 &&
+        data.updatedAt is string && data.updatedAt.size() <= 100 &&
+        (data.keys().hasAll(['reminderDate']) ? (data.reminderDate is string && data.reminderDate.size() <= 100) : true);
+    }
+
+    match /users/{userId} {
+      match /transactions/{transactionId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(transactionId);
+      }
+      
+      match /projects/{projectId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(projectId);
+      }
+
+      match /tasks/{taskId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(taskId) && isValidTask(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(taskId) && isValidTask(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+
+      match /recurringPayments/{paymentId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(paymentId) && isValidRecurringPayment(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(paymentId) && isValidRecurringPayment(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(paymentId);
+      }
+
+      match /notes/{noteId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(noteId) && isValidNote(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(noteId) && isValidNote(incoming(), userId) && incoming().userId == existing().userId && incoming().createdAt == existing().createdAt;
+        allow delete: if isOwner(userId) && isValidId(noteId);
+      }
+    }
+  }
+}

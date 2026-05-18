@@ -2,8 +2,17 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes } from './pages';
+import { FirebaseProvider } from './FirebaseProvider';
+import { Login } from './components/Login';
+import { useStore } from './store/useStore';
 
-export default function App() {
+function AppContent() {
+  const user = useStore(state => state.user);
+
+  if (!user) {
+    return <Login />;
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,5 +31,13 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+  );
+}
+
+export default function App() {
+  return (
+    <FirebaseProvider>
+      <AppContent />
+    </FirebaseProvider>
   );
 }

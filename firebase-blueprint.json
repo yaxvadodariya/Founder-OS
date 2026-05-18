@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A financial transaction",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "category": { "type": "string", "enum": ["personal", "business"] },
+        "amount": { "type": "number" },
+        "categoryDetail": { "type": "string" },
+        "date": { "type": "string" },
+        "description": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "receiptImage": { "type": "string" }
+      },
+      "required": ["userId", "type", "category", "amount", "categoryDetail", "date", "description", "paymentMethod"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A user project",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientEmail": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "completed", "on-hold", "cancelled"] },
+        "value": { "type": "number" },
+        "amountReceived": { "type": "number" },
+        "amountPending": { "type": "number" },
+        "startDate": { "type": "string" },
+        "deadline": { "type": "string" },
+        "completedDate": { "type": "string" },
+        "progress": { "type": "number" },
+        "description": { "type": "string" },
+        "deliverables": { "type": "array" },
+        "notes": { "type": "string" },
+        "milestones": { "type": "array" }
+      },
+      "required": ["userId", "name", "clientName", "clientEmail", "status", "value", "amountReceived", "amountPending", "startDate", "deadline", "progress", "description", "deliverables", "notes", "milestones"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A task",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+        "dueDate": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "projectId": { "type": "string" },
+        "tags": { "type": "array" },
+        "subtasks": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "completedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "priority", "completed", "tags", "subtasks", "createdAt"]
+    },
+    "RecurringPayment": {
+      "title": "Recurring Payment",
+      "description": "A recurring payment",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "frequency": { "type": "string", "enum": ["daily", "weekly", "monthly", "yearly"] },
+        "dayOfMonth": { "type": "number" },
+        "dayOfWeek": { "type": "number" },
+        "category": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "active": { "type": "boolean" },
+        "reminderDays": { "type": "array" }
+      },
+      "required": ["userId", "name", "amount", "frequency", "category", "startDate", "active", "reminderDays"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "A text note",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string", "enum": ["idea", "important", "remember", "quote", "learning", "contact"] },
+        "tags": { "type": "array" },
+        "pinned": { "type": "boolean" },
+        "reminderDate": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "title", "content", "category", "tags", "pinned", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "User transactions"
+    },
+    "/users/{userId}/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "User projects"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "User tasks"
+    },
+    "/users/{userId}/recurringPayments/{paymentId}": {
+      "schema": { "$ref": "#/entities/RecurringPayment" },
+      "description": "User recurring payments"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" },
+      "description": "User notes"
+    }
+  }
+}

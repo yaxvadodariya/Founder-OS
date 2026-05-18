@@ -1,7 +1,40 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { doc, setDoc, deleteDoc, collection, onSnapshot } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
 import { Transaction, Project, Task, RecurringPayment, Note, User } from '../types';
-import { sampleUser, sampleTransactions, sampleProjects, sampleTasks, samplePayments, sampleNotes } from '../data/sample';
+// We'll keep sample data available but not loaded by default for authenticated users.
+
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: any;
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+}
 
 interface StoreState {
   user: User | null;
@@ -11,13 +44,18 @@ interface StoreState {
   recurringPayments: RecurringPayment[];
   notes: Note[];
   isPrivacyMode: boolean;
+  isPeeking: boolean;
+  isDarkMode: boolean;
   
   // Actions
   setUser: (user: User) => void;
   togglePrivacyMode: () => void;
   setPrivacyMode: (enabled: boolean) => void;
+  setPeeking: (peeking: boolean) => void;
+  toggleDarkMode: () => void;
   
   addTransaction: (ts: Transaction) => void;
+  updateTransaction: (id: string, t: Partial<Transaction>) => void;
   deleteTransaction: (id: string) => void;
   
   addProject: (p: Project) => void;
@@ -43,61 +81,196 @@ interface StoreState {
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
-      user: sampleUser,
-      transactions: sampleTransactions,
-      projects: sampleProjects,
-      tasks: sampleTasks,
-      recurringPayments: samplePayments,
-      notes: sampleNotes,
+      user: null as User | null,
+      transactions: [],
+      projects: [],
+      tasks: [],
+      recurringPayments: [],
+      notes: [],
       isPrivacyMode: true,
+      isPeeking: false,
+      isDarkMode: false,
 
       setUser: (user) => set({ user }),
       togglePrivacyMode: () => set((state) => ({ isPrivacyMode: !state.isPrivacyMode })),
       setPrivacyMode: (enabled) => set({ isPrivacyMode: enabled }),
+      setPeeking: (peeking) => set({ isPeeking: peeking }),
+      toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       
-      addTransaction: (ts) => set((state) => ({ transactions: [ts, ...state.transactions] })),
-      deleteTransaction: (id) => set((state) => ({ transactions: state.transactions.filter(t => t.id !== id) })),
+      addTransaction: async (ts) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await setDoc(doc(db, `users/${userId}/transactions`, ts.id), { ...ts, userId });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/transactions`);
+        }
+      },
+      updateTransaction: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().transactions.find(t => t.id === id);
+        if (!current) return;
+        try {
+          await setDoc(doc(db, `users/${userId}/transactions`, id), { ...current, ...params, userId }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/transactions`);
+        }
+      },
+      deleteTransaction: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await deleteDoc(doc(db, `users/${userId}/transactions`, id));
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `users/${userId}/transactions`);
+        }
+      },
       
-      addProject: (p) => set((state) => ({ projects: [p, ...state.projects] })),
-      updateProject: (id, params) => set((state) => ({
-        projects: state.projects.map(p => p.id === id ? { ...p, ...params } : p)
-      })),
-      deleteProject: (id) => set((state) => ({ projects: state.projects.filter(p => p.id !== id) })),
+      addProject: async (p) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await setDoc(doc(db, `users/${userId}/projects`, p.id), { ...p, userId });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/projects`);
+        }
+      },
+      updateProject: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().projects.find(p => p.id === id);
+        if (!current) return;
+        try {
+          await setDoc(doc(db, `users/${userId}/projects`, id), { ...current, ...params, userId }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/projects`);
+        }
+      },
+      deleteProject: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await deleteDoc(doc(db, `users/${userId}/projects`, id));
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `users/${userId}/projects`);
+        }
+      },
       
-      addTask: (t) => set((state) => ({ tasks: [t, ...state.tasks] })),
-      updateTask: (id, params) => set((state) => ({
-        tasks: state.tasks.map(t => t.id === id ? { ...t, ...params } : t)
-      })),
-      deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter(t => t.id !== id) })),
-      toggleTaskCompletion: (id) => set((state) => ({
-        tasks: state.tasks.map(t => {
-          if (t.id === id) {
-             const now = new Date().toISOString();
-             return { ...t, completed: !t.completed, completedAt: !t.completed ? now : undefined };
-          }
-          return t;
-        })
-      })),
+      addTask: async (t) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await setDoc(doc(db, `users/${userId}/tasks`, t.id), { ...t, userId });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/tasks`);
+        }
+      },
+      updateTask: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().tasks.find(t => t.id === id);
+        if (!current) return;
+        try {
+          await setDoc(doc(db, `users/${userId}/tasks`, id), { ...current, ...params, userId }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/tasks`);
+        }
+      },
+      deleteTask: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await deleteDoc(doc(db, `users/${userId}/tasks`, id));
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `users/${userId}/tasks`);
+        }
+      },
+      toggleTaskCompletion: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const t = useStore.getState().tasks.find(t => t.id === id);
+        if (!t) return;
+        const now = new Date().toISOString();
+        try {
+          await setDoc(doc(db, `users/${userId}/tasks`, id), { 
+            ...t, 
+            completed: !t.completed, 
+            completedAt: !t.completed ? now : undefined,
+            userId
+          }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/tasks`);
+        }
+      },
       
-      addRecurringPayment: (rp) => set((state) => ({ recurringPayments: [rp, ...state.recurringPayments] })),
-      updateRecurringPayment: (id, params) => set((state) => ({
-        recurringPayments: state.recurringPayments.map(rp => rp.id === id ? { ...rp, ...params } : rp)
-      })),
-      deleteRecurringPayment: (id) => set((state) => ({ recurringPayments: state.recurringPayments.filter(rp => rp.id !== id) })),
+      addRecurringPayment: async (rp) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await setDoc(doc(db, `users/${userId}/recurringPayments`, rp.id), { ...rp, userId });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/recurringPayments`);
+        }
+      },
+      updateRecurringPayment: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().recurringPayments.find(rp => rp.id === id);
+        if (!current) return;
+        try {
+          await setDoc(doc(db, `users/${userId}/recurringPayments`, id), { ...current, ...params, userId }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/recurringPayments`);
+        }
+      },
+      deleteRecurringPayment: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await deleteDoc(doc(db, `users/${userId}/recurringPayments`, id));
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `users/${userId}/recurringPayments`);
+        }
+      },
       
-      addNote: (n) => set((state) => ({ notes: [n, ...state.notes] })),
-      updateNote: (id, params) => set((state) => ({
-        notes: state.notes.map(n => n.id === id ? { ...n, ...params, updatedAt: new Date().toISOString() } : n)
-      })),
-      deleteNote: (id) => set((state) => ({ notes: state.notes.filter(n => n.id !== id) })),
+      addNote: async (n) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await setDoc(doc(db, `users/${userId}/notes`, n.id), { ...n, userId });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, `users/${userId}/notes`);
+        }
+      },
+      updateNote: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().notes.find(n => n.id === id);
+        if (!current) return;
+        try {
+          await setDoc(doc(db, `users/${userId}/notes`, id), { ...current, ...params, updatedAt: new Date().toISOString(), userId }, { merge: true });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/notes`);
+        }
+      },
+      deleteNote: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try {
+          await deleteDoc(doc(db, `users/${userId}/notes`, id));
+        } catch (err) {
+          handleFirestoreError(err, OperationType.DELETE, `users/${userId}/notes`);
+        }
+      },
       
       resetData: () => set({
-        user: sampleUser,
-        transactions: sampleTransactions,
-        projects: sampleProjects,
-        tasks: sampleTasks,
-        recurringPayments: samplePayments,
-        notes: sampleNotes,
+        user: null,
+        transactions: [],
+        projects: [],
+        tasks: [],
+        recurringPayments: [],
+        notes: [],
       }),
     }),
     {

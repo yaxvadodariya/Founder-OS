@@ -4,12 +4,12 @@ import { cn, formatCurrency } from '../lib/utils';
 import { Plus, BellRing, Calendar as CalendarIcon, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { HiddenValue } from '../components/HiddenValue';
+import { PrivacyToggle } from '../components/PrivacyToggle';
 
 export function Payments() {
   const store = useStore();
   const isPrivacyMode = store.isPrivacyMode;
-  const [isPeeking, setIsPeeking] = useState(false);
-  const isHidden = isPrivacyMode && !isPeeking;
+  const isHidden = isPrivacyMode && !store.isPeeking;
   
   const payments = store.recurringPayments.sort((a, b) => {
     if (!a.active && b.active) return 1;
@@ -33,23 +33,7 @@ export function Payments() {
           </div>
         </div>
         <div className="flex gap-2 items-center">
-           <div 
-             className="relative group"
-             onMouseEnter={() => setIsPeeking(true)}
-             onMouseLeave={() => setIsPeeking(false)}
-           >
-             <button 
-               onClick={() => store.togglePrivacyMode()}
-               className="inline-flex items-center justify-center p-2 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 hover:text-gray-900 hover:bg-gray-100 hover:shadow-sm focus:outline-none transition-all duration-200"
-               title="Toggle Privacy Mode (⌘⇧H)"
-             >
-              {store.isPrivacyMode ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-            <div className="absolute top-12 right-0 hidden group-hover:block w-32 bg-gray-900 text-white text-xs font-medium py-1.5 px-2 rounded-md shadow-xl text-center z-50">
-              {store.isPrivacyMode ? "Privacy Mode On" : "Privacy Mode Off"}
-              <div className="text-[#888] mt-0.5" style={{fontSize: '9px'}}>CMD+Shift+H</div>
-            </div>
-           </div>
+           <PrivacyToggle />
           <button className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
             <Plus className="h-[16px] w-[16px]" />
             <span>Add Payment</span>

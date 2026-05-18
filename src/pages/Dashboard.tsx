@@ -22,19 +22,18 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 
 import { TransactionModal } from '../components/TransactionModal';
-
+import { PrivacyToggle } from '../components/PrivacyToggle';
 import { HiddenValue } from '../components/HiddenValue';
+import { ChartTooltip } from '../components/ChartTooltip';
 
 export function Dashboard() {
   const store = useStore();
   const user = store.user;
   const isPrivacyMode = store.isPrivacyMode;
-  const togglePrivacyMode = store.togglePrivacyMode;
   
   const [isQuickAddOpen, setIsQuickAddOpen] = React.useState(false);
-  const [isPeeking, setIsPeeking] = React.useState(false);
   
-  const isHidden = isPrivacyMode && !isPeeking;
+  const isHidden = isPrivacyMode && !store.isPeeking;
   
   const today = new Date();
   
@@ -90,23 +89,7 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex gap-2">
-           <div 
-             className="relative group"
-             onMouseEnter={() => setIsPeeking(true)}
-             onMouseLeave={() => setIsPeeking(false)}
-           >
-             <button 
-               onClick={() => togglePrivacyMode()}
-               className="inline-flex items-center justify-center p-2 rounded-lg bg-gray-50 border border-gray-100 text-gray-400 hover:text-gray-900 hover:bg-gray-100 hover:shadow-sm focus:outline-none transition-all duration-200"
-               title="Toggle Privacy Mode (⌘⇧H)"
-             >
-              {isPrivacyMode ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-            </button>
-            <div className="absolute top-12 right-0 hidden group-hover:block w-32 bg-gray-900 text-white text-xs font-medium py-1.5 px-2 rounded-md shadow-xl text-center z-50">
-              {isPrivacyMode ? "Privacy Mode On" : "Privacy Mode Off"}
-              <div className="text-[#888] mt-0.5" style={{fontSize: '9px'}}>CMD+Shift+H</div>
-            </div>
-           </div>
+           <PrivacyToggle />
            <button 
              onClick={() => setIsQuickAddOpen(true)}
              className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
@@ -211,7 +194,7 @@ export function Dashboard() {
                   <LineChart data={chartData}>
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9CA3AF' }} dy={10} />
                     <Tooltip 
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      content={<ChartTooltip />}
                       cursor={{ stroke: '#E5E7EB', strokeWidth: 1, strokeDasharray: '4 4' }}
                     />
                     <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={3} dot={false} activeDot={{ r: 6, fill: '#3B82F6', strokeWidth: 0 }} />

@@ -21,6 +21,7 @@ export function Finance() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPeeking, setIsPeeking] = useState(false);
+  const [transactionToEdit, setTransactionToEdit] = useState<any>(null);
   
   const isHidden = false;
   
@@ -150,7 +151,14 @@ export function Finance() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {transactions.length > 0 ? (
                   transactions.map((t) => (
-                    <tr key={t.id} className="hover:bg-gray-50 transition-colors">
+                    <tr 
+                      key={t.id} 
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        setTransactionToEdit(t);
+                        setIsModalOpen(true);
+                      }}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {format(new Date(t.date), 'MMM dd, yyyy')}
                       </td>
@@ -199,8 +207,12 @@ export function Finance() {
       
       <TransactionModal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setTransactionToEdit(null);
+        }}
         defaultType="expense"
+        transactionToEdit={transactionToEdit}
       />
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { TransactionType, FinanceCategory } from '../types';
+import { Transaction, TransactionType, FinanceCategory } from '../types';
 import { X } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -8,9 +8,10 @@ interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultType?: TransactionType;
+  transactionToEdit?: Transaction | null;
 }
 
-export function TransactionModal({ isOpen, onClose, defaultType = 'expense' }: TransactionModalProps) {
+export function TransactionModal({ isOpen, onClose, defaultType = 'expense', transactionToEdit = null }: TransactionModalProps) {
   const store = useStore();
   
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -21,36 +22,63 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense' }: T
   const [description, setDescription] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
 
+  useEffect(() => {
+    if (transactionToEdit) {
+      setType(transactionToEdit.type);
+      setCategory(transactionToEdit.category);
+      setAmount(transactionToEdit.amount.toString());
+      setCategoryDetail(transactionToEdit.categoryDetail);
+      setDate(format(new Date(transactionToEdit.date), 'yyyy-MM-dd'));
+      setDescription(transactionToEdit.description);
+      setPaymentMethod(transactionToEdit.paymentMethod || '');
+    } else {
+      setType(defaultType);
+      setCategory('personal');
+      setAmount('');
+      setCategoryDetail('');
+      setDate(format(new Date(), 'yyyy-MM-dd'));
+      setDescription('');
+      setPaymentMethod('');
+    }
+  }, [transactionToEdit, isOpen, defaultType]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || !categoryDetail || !description) return;
     
-    store.addTransaction({
-      id: Math.random().toString(),
-      type,
-      category,
-      amount: parseFloat(amount),
-      categoryDetail,
-      date: new Date(date).toISOString(),
-      description,
-      paymentMethod: paymentMethod || 'Unspecified'
-    });
+    if (transactionToEdit) {
+      store.updateTransaction(transactionToEdit.id, {
+        type,
+        category,
+        amount: parseFloat(amount),
+        categoryDetail,
+        date: new Date(date).toISOString(),
+        description,
+        paymentMethod: paymentMethod || 'Unspecified'
+      });
+    } else {
+      store.addTransaction({
+        id: Math.random().toString(),
+        type,
+        category,
+        amount: parseFloat(amount),
+        categoryDetail,
+        date: new Date(date).toISOString(),
+        description,
+        paymentMethod: paymentMethod || 'Unspecified'
+      });
+    }
     
-    // Reset and close
-    setAmount('');
-    setCategoryDetail('');
-    setDescription('');
-    setPaymentMethod('');
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
         <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Add Transaction</h2>
+          <h2 className="text-lg font-bold text-gray-900">{transactionToEdit ? 'Edit Transaction' : 'Add Transaction'}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
             <X className="h-5 w-5" />
           </button>
@@ -175,20 +203,34 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense' }: T
             />
           </div>
 
-          <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-            >
-              Save Transaction
-            </button>
+          <div className="pt-4 border-t border-gray-100 flex justify-between gap-3">
+            {transactionToEdit ? (
+              <button
+                type="button"
+                onClick={() => {
+                  store.deleteTransaction(transactionToEdit.id);
+                  onClose();
+                }}
+                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+              >
+                Delete
+              </button>
+            ) : <div />}
+            <div className="flex gap-3">
+              <button 
+                type="button" 
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                Save Transaction
+              </button>
+            </div>
           </div>
         </form>
       </div>
