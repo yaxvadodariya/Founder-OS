@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
-import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes } from './pages';
+import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes, More } from './pages';
 import { FirebaseProvider } from './FirebaseProvider';
 import { Login } from './components/Login';
 import { useStore } from './store/useStore';
@@ -31,7 +31,7 @@ function AppContent() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="payments" element={<Payments />} />
           <Route path="notes" element={<Notes />} />
-          <Route path="more" element={<div className="p-6">More options on mobile (Coming soon)</div>} />
+          <Route path="more" element={<More />} />
         </Route>
       </Routes>
     </BrowserRouter>

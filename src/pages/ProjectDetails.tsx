@@ -20,9 +20,9 @@ export function ProjectDetails() {
         <p className="text-gray-500 mb-6">The project you are looking for does not exist or has been removed.</p>
         <button 
           onClick={() => navigate('/projects')}
-          className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <ArrowLeft className="h-[16px] w-[16px]" />
+          <ArrowLeft className="h-4 w-4" />
           <span>Back to Projects</span>
         </button>
       </div>

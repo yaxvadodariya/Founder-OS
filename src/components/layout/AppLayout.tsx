@@ -66,6 +66,33 @@ export function AppLayout() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePrivacyMode]);
 
+  useEffect(() => {
+    // Sync to server for WhatsApp cron job
+    const incompleteTasks = store.tasks.filter(t => !t.completed);
+    const rememberNotes = store.notes.filter(n => n.category === 'remember');
+    
+    const syncReminders = async () => {
+      try {
+        await fetch('/api/sync-reminders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            tasks: incompleteTasks,
+            notes: rememberNotes
+          })
+        });
+      } catch (err) {
+        console.error('Failed to sync reminders:', err);
+      }
+    };
+
+    if (incompleteTasks.length > 0 || rememberNotes.length > 0) {
+      syncReminders();
+    }
+  }, [store.tasks, store.notes]);
+
   return (
     <div className="flex min-h-screen bg-[#F5F5F5] text-gray-900 font-sans">
       {/* Desktop Sidebar */}
@@ -122,7 +149,7 @@ export function AppLayout() {
       </aside>
 
       {/* Main Content Box */}
-      <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden relative">
+      <main className="flex-1 lg:pl-64 flex flex-col h-screen overflow-hidden relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {user?.email === 'yaxvadodariya@gmail.com' && store.lastError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded m-4 shadow text-sm relative z-50">
             <strong className="font-bold">Last Firestore Error:</strong>
@@ -135,18 +162,21 @@ export function AppLayout() {
             </button>
           </div>
         )}
-        <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+        <div className="flex-1 overflow-y-auto pb-0">
           <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
             <Outlet />
           </div>
         </div>
-        <div className="fixed bottom-[80px] lg:bottom-6 right-6 z-50">
+        <div className="fixed bottom-[90px] lg:bottom-6 right-6 z-50">
           <DarkModeToggle />
         </div>
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center h-16 px-2 pb-safe z-50">
+      <nav 
+        className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center z-50"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)', height: 'calc(64px + env(safe-area-inset-bottom))' }}
+      >
         {mobileNav.map((item) => {
            const isActive = location.pathname === item.href || 
            (item.href !== '/' && item.href !== '/more' && location.pathname.startsWith(item.href));
@@ -156,11 +186,11 @@ export function AppLayout() {
               key={item.name}
               to={item.href}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full space-y-1",
+                "flex flex-col items-center justify-center w-full h-[64px] space-y-1 transition-colors",
                 isActive ? "text-blue-600" : "text-gray-500 hover:text-gray-900"
               )}
             >
-              <item.icon className={cn("h-5 w-5", isActive ? "fill-blue-50 text-blue-600" : "")} />
+              <item.icon className={cn("h-5 w-5 mb-0.5", isActive ? "fill-blue-50 text-blue-600" : "")} />
               <span className="text-[10px] font-medium leading-none">{item.name}</span>
             </NavLink>
           );

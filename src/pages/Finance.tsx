@@ -48,10 +48,11 @@ export function Finance() {
         </div>
         <div className="flex gap-2 items-center">
           <button 
+            type="button"
             onClick={() => setIsModalOpen(true)}
-            className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
           >
-            <Plus className="h-[16px] w-[16px]" />
+            <Plus className="h-4 w-4" />
             <span>Add Transaction</span>
           </button>
         </div>
@@ -214,6 +215,15 @@ export function Finance() {
         defaultType="expense"
         transactionToEdit={transactionToEdit}
       />
+      
+      {/* Mobile FAB */}
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
     </div>
   );
 }

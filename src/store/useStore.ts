@@ -1,9 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { doc, setDoc, deleteDoc, collection, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, collection, onSnapshot, deleteField } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { Transaction, Project, Task, RecurringPayment, Note, User } from '../types';
 // We'll keep sample data available but not loaded by default for authenticated users.
+
+const sanitizeDoc = (obj: any, isUpdate = false) => {
+  if (!obj) return obj;
+  const clean = { ...obj };
+  Object.keys(clean).forEach(key => {
+    if (clean[key] === undefined) {
+      if (isUpdate) {
+        clean[key] = deleteField();
+      } else {
+        delete clean[key];
+      }
+    }
+  });
+  return clean;
+};
 
 enum OperationType {
   CREATE = 'create',
@@ -107,7 +122,7 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/transactions`, ts.id), { ...ts, userId });
+          await setDoc(doc(db, `users/${userId}/transactions`, ts.id), sanitizeDoc({ ...ts, userId }));
           
           if (!skipNotify) {
             // Trigger WhatsApp notification via server API
@@ -133,7 +148,7 @@ export const useStore = create<StoreState>()(
         const current = useStore.getState().transactions.find(t => t.id === id);
         if (!current) return;
         try {
-          await setDoc(doc(db, `users/${userId}/transactions`, id), { ...current, ...params, userId }, { merge: true });
+          await setDoc(doc(db, `users/${userId}/transactions`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/transactions`);
         }
@@ -152,7 +167,7 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/projects`, p.id), { ...p, userId });
+          await setDoc(doc(db, `users/${userId}/projects`, p.id), sanitizeDoc({ ...p, userId }));
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/projects`);
         }
@@ -163,7 +178,7 @@ export const useStore = create<StoreState>()(
         const current = useStore.getState().projects.find(p => p.id === id);
         if (!current) return;
         try {
-          await setDoc(doc(db, `users/${userId}/projects`, id), { ...current, ...params, userId }, { merge: true });
+          await setDoc(doc(db, `users/${userId}/projects`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/projects`);
         }
@@ -182,7 +197,7 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/tasks`, t.id), { ...t, userId });
+          await setDoc(doc(db, `users/${userId}/tasks`, t.id), sanitizeDoc({ ...t, userId }));
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/tasks`);
         }
@@ -193,7 +208,7 @@ export const useStore = create<StoreState>()(
         const current = useStore.getState().tasks.find(t => t.id === id);
         if (!current) return;
         try {
-          await setDoc(doc(db, `users/${userId}/tasks`, id), { ...current, ...params, userId }, { merge: true });
+          await setDoc(doc(db, `users/${userId}/tasks`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/tasks`);
         }
@@ -214,12 +229,12 @@ export const useStore = create<StoreState>()(
         if (!t) return;
         const now = new Date().toISOString();
         try {
-          await setDoc(doc(db, `users/${userId}/tasks`, id), { 
+          await setDoc(doc(db, `users/${userId}/tasks`, id), sanitizeDoc({ 
             ...t, 
             completed: !t.completed, 
             completedAt: !t.completed ? now : undefined,
             userId
-          }, { merge: true });
+          }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/tasks`);
         }
@@ -229,7 +244,7 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/recurringPayments`, rp.id), { ...rp, userId });
+          await setDoc(doc(db, `users/${userId}/recurringPayments`, rp.id), sanitizeDoc({ ...rp, userId }));
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/recurringPayments`);
         }
@@ -240,7 +255,7 @@ export const useStore = create<StoreState>()(
         const current = useStore.getState().recurringPayments.find(rp => rp.id === id);
         if (!current) return;
         try {
-          await setDoc(doc(db, `users/${userId}/recurringPayments`, id), { ...current, ...params, userId }, { merge: true });
+          await setDoc(doc(db, `users/${userId}/recurringPayments`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/recurringPayments`);
         }
@@ -259,7 +274,7 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/notes`, n.id), { ...n, userId });
+          await setDoc(doc(db, `users/${userId}/notes`, n.id), sanitizeDoc({ ...n, userId }));
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/notes`);
         }
@@ -270,7 +285,7 @@ export const useStore = create<StoreState>()(
         const current = useStore.getState().notes.find(n => n.id === id);
         if (!current) return;
         try {
-          await setDoc(doc(db, `users/${userId}/notes`, id), { ...current, ...params, updatedAt: new Date().toISOString(), userId }, { merge: true });
+          await setDoc(doc(db, `users/${userId}/notes`, id), sanitizeDoc({ ...current, ...params, updatedAt: new Date().toISOString(), userId }, true), { merge: true });
         } catch (err) {
           handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/notes`);
         }

@@ -5,12 +5,16 @@ import { formatCurrency, cn } from '../lib/utils';
 import { format } from 'date-fns';
 import { Plus, MoreVertical, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { ProjectStatus } from '../types';
+import { ProjectModal } from '../components/ProjectModal';
 
 export function Projects() {
   const store = useStore();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<ProjectStatus | 'all'>('all');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<any>(null);
 
   React.useEffect(() => {
     const handleClickOutside = () => setOpenMenuId(null);
@@ -27,10 +31,18 @@ export function Projects() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Projects</h1>
           <p className="text-sm text-gray-500">Manage client projects and deliverables</p>
         </div>
-        <button className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-          <Plus className="h-[16px] w-[16px]" />
-          <span>New Project</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => {
+              setProjectToEdit(null);
+              setIsModalOpen(true);
+            }}
+            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Project</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit overflow-x-auto max-w-full">
@@ -159,6 +171,24 @@ export function Projects() {
           )}
         </div>
       </div>
+
+      {/* Mobile FAB */}
+      <button
+        type="button"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        onClick={() => {
+          setProjectToEdit(null);
+          setIsModalOpen(true);
+        }}
+      >
+        <Plus className="h-6 w-6" />
+      </button>
+
+      <ProjectModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        projectToEdit={projectToEdit}
+      />
     </div>
   );
 }

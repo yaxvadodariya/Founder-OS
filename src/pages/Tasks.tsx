@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
 import { format, isToday, isTomorrow, isPast, isSameDay } from 'date-fns';
-import { Plus, CheckSquare, Calendar, Flag, AlertCircle } from 'lucide-react';
+import { Plus, CheckSquare, Calendar, Flag, AlertCircle, Briefcase } from 'lucide-react';
 import { Task } from '../types';
-import { MagicTaskInput } from '../components/MagicTaskInput';
+import { TaskModal } from '../components/TaskModal';
 
 export function Tasks() {
   const store = useStore();
   const [filter, setFilter] = useState<'all' | 'today' | 'upcoming' | 'completed'>('today');
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
   const today = new Date();
   
   const tasks = store.tasks.filter(t => {
@@ -40,6 +43,20 @@ export function Tasks() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Tasks</h1>
           <p className="text-sm text-gray-500">Manage your to-dos and daily focus</p>
         </div>
+        
+        <div className="flex items-center gap-2">
+          <button 
+            type="button"
+            onClick={() => {
+              setTaskToEdit(null);
+              setIsModalOpen(true);
+            }}
+            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Task</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit overflow-x-auto max-w-full">
@@ -47,33 +64,6 @@ export function Tasks() {
         <FilterButton active={filter === 'upcoming'} onClick={() => setFilter('upcoming')}>Upcoming</FilterButton>
         <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All Pending</FilterButton>
         <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')}>Completed</FilterButton>
-      </div>
-
-      <MagicTaskInput />
-      
-      {/* Quick Add */}
-      <div className="relative">
-        <Plus className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-        <input 
-          type="text" 
-          placeholder="Quick add task... (Press Enter)" 
-          className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-medium"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-              store.addTask({
-                id: Math.random().toString(36).substring(2, 11),
-                title: e.currentTarget.value.trim(),
-                priority: 'medium',
-                completed: false,
-                tags: [],
-                subtasks: [],
-                createdAt: new Date().toISOString(),
-                dueDate: filter === 'today' ? new Date().toISOString() : undefined
-              });
-              e.currentTarget.value = '';
-            }
-          }}
-        />
       </div>
 
       <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 overflow-hidden flex flex-col">
@@ -84,7 +74,11 @@ export function Tasks() {
           <div className="overflow-y-auto flex-1 p-2">
             {tasks.length > 0 ? (
               <div className="space-y-1">
-                {tasks.map(task => <TaskItem key={task.id} task={task} />)}
+                {tasks.map(task => 
+                  <div key={task.id} onClick={() => { setTaskToEdit(task); setIsModalOpen(true); }} className="cursor-pointer">
+                    <TaskItem task={task} />
+                  </div>
+                )}
               </div>
             ) : (
                <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200 my-4 mx-2">
@@ -96,6 +90,24 @@ export function Tasks() {
           </div>
         </div>
       </div>
+      
+      <TaskModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        taskToEdit={taskToEdit}
+      />
+      
+      {/* Mobile FAB */}
+      <button
+        type="button"
+        onClick={() => {
+          setTaskToEdit(null);
+          setIsModalOpen(true);
+        }}
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
     </div>
   );
 }
