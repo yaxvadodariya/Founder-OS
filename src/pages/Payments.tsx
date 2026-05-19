@@ -5,12 +5,16 @@ import { Plus, BellRing, Calendar as CalendarIcon, RefreshCw, Eye, EyeOff } from
 import { format } from 'date-fns';
 import { HiddenValue } from '../components/HiddenValue';
 import { PrivacyToggle } from '../components/PrivacyToggle';
+import { PaymentModal } from '../components/PaymentModal';
 
 export function Payments() {
   const store = useStore();
   const isPrivacyMode = store.isPrivacyMode;
   const isHidden = isPrivacyMode && !store.isPeeking;
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [paymentToEdit, setPaymentToEdit] = useState<any>(null);
+
   const payments = store.recurringPayments.sort((a, b) => {
     if (!a.active && b.active) return 1;
     if (a.active && !b.active) return -1;
@@ -34,7 +38,13 @@ export function Payments() {
         </div>
         <div className="flex gap-2 items-center">
            <PrivacyToggle />
-          <button className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+          <button 
+            onClick={() => {
+              setPaymentToEdit(null);
+              setIsModalOpen(true);
+            }}
+            className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
             <Plus className="h-[16px] w-[16px]" />
             <span>Add Payment</span>
           </button>
@@ -60,7 +70,14 @@ export function Payments() {
               <tbody className="bg-white divide-y divide-gray-100">
                 {payments.length > 0 ? (
                   payments.map(payment => (
-                    <tr key={payment.id} className={cn("hover:bg-gray-50 transition-colors", !payment.active && "opacity-60")}>
+                    <tr 
+                      key={payment.id} 
+                      className={cn("hover:bg-gray-50 transition-colors cursor-pointer", !payment.active && "opacity-60")}
+                      onClick={() => {
+                        setPaymentToEdit(payment);
+                        setIsModalOpen(true);
+                      }}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
@@ -114,6 +131,12 @@ export function Payments() {
           </div>
         </div>
       </div>
+      
+      <PaymentModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        paymentToEdit={paymentToEdit}
+      />
     </div>
   );
 }

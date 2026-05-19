@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import { format } from 'date-fns';
 import { Plus, Search, Pin, Lightbulb, AlertTriangle, Bookmark, Quote, BookOpen, Users, MoreHorizontal } from 'lucide-react';
 import { NoteCategory } from '../types';
+import { NoteModal } from '../components/NoteModal';
 
 const categoryIcons: Record<NoteCategory, React.ElementType> = {
   idea: Lightbulb,
@@ -28,6 +29,9 @@ export function Notes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<NoteCategory | 'all'>('all');
   
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState<any>(null);
+
   const notes = store.notes
     .filter(n => filter === 'all' || n.category === filter)
     .filter(n => 
@@ -48,7 +52,13 @@ export function Notes() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Remember Book</h1>
           <p className="text-sm text-gray-500">Your second brain for ideas and information</p>
         </div>
-        <button className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+        <button 
+          onClick={() => {
+            setNoteToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="btn-quick-add focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        >
           <Plus className="h-[16px] w-[16px]" />
           <span>New Note</span>
         </button>
@@ -85,7 +95,14 @@ export function Notes() {
           {notes.map(note => {
             const Icon = categoryIcons[note.category];
             return (
-              <div key={note.id} className="design-card transition-shadow relative overflow-hidden group flex flex-col">
+              <div 
+                key={note.id} 
+                className="design-card transition-shadow relative overflow-hidden group flex flex-col cursor-pointer hover:shadow-md"
+                onClick={() => {
+                  setNoteToEdit(note);
+                  setIsModalOpen(true);
+                }}
+              >
                 {note.pinned && (
                   <div className="absolute top-3 right-3 text-blue-600 bg-blue-50 p-1.5 rounded-full z-10">
                     <Pin className="h-3 w-3 fill-current" />
@@ -133,6 +150,12 @@ export function Notes() {
           </div>
         )}
       </div>
+      
+      <NoteModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        noteToEdit={noteToEdit}
+      />
     </div>
   );
 }
