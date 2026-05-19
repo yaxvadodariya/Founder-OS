@@ -274,7 +274,22 @@ export const useStore = create<StoreState>()(
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
         try {
-          await setDoc(doc(db, `users/${userId}/notes`, n.id), sanitizeDoc({ ...n, userId }));
+          const noteObj = {
+            id: n.id,
+            title: n.title || '',
+            content: n.content || '',
+            category: n.category || 'idea',
+            tags: n.tags || [],
+            pinned: n.pinned !== undefined ? n.pinned : false,
+            createdAt: n.createdAt || new Date().toISOString(),
+            updatedAt: n.updatedAt || new Date().toISOString(),
+            userId
+          };
+          if (n.reminderDate !== undefined) {
+            // @ts-ignore
+            noteObj.reminderDate = n.reminderDate;
+          }
+          await setDoc(doc(db, `users/${userId}/notes`, n.id), sanitizeDoc(noteObj));
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, `users/${userId}/notes`);
         }

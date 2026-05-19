@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Note, NoteCategory } from '../types';
-import { X, Pinned } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface NoteModalProps {
   isOpen: boolean;

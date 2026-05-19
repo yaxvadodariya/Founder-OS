@@ -88,6 +88,7 @@ export function WhatsAppPoller() {
               content: rawData.content,
               category: 'remember',
               tags: ['whatsapp'],
+              pinned: false,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString()
             });
