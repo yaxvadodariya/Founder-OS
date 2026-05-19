@@ -5,10 +5,57 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
+@layer base {
+  html.dark {
+    /* Re-map background colors */
+    --color-white: #1f2937;
+    --color-gray-50: #111827;
+    --color-gray-100: #374151;
+    --color-gray-200: #4b5563;
+    
+    /* Re-map text and border colors */
+    --color-gray-900: #f9fafb;
+    --color-gray-800: #f3f4f6;
+    --color-gray-700: #e5e7eb;
+    --color-gray-600: #d1d5db;
+    --color-gray-500: #9ca3af;
+    --color-gray-400: #6b7280;
+    --color-gray-300: #4b5563;
+    
+    /* Re-map brand colors if needed */
+    --color-blue-50: #172554;
+    --color-blue-100: #1e3a8a;
+    --color-blue-600: #60a5fa;
+    --color-blue-700: #93c5fd;
+    --color-blue-800: #bfdbfe;
+    --color-emerald-50: #022c22;
+    --color-emerald-100: #064e3b;
+    --color-emerald-600: #34d399;
+    --color-purple-50: #2e1065;
+    --color-purple-500: #a855f7;
+    --color-purple-600: #c084fc;
+    --color-red-50: #450a0a;
+    --color-red-100: #7f1d1d;
+    --color-red-600: #f87171;
+    --color-red-700: #fca5a5;
+    --color-orange-100: #431407;
+    --color-orange-800: #fdba74;
+    
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-900);
+  }
+}
+
 @layer utilities {
   .design-card {
-    background: #FFFFFF;
+    background: var(--color-white);
     border-radius: 15.8px;
+  }
+  .bg-\[\#F5F5F5\] {
+    background-color: var(--color-gray-50) !important;
+  }
+  .bg-\[\#272625\]\/\[0\.03\] {
+    background-color: var(--color-gray-100) !important;
   }
 }
 

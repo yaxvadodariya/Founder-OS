@@ -94,7 +94,7 @@ export function AppLayout() {
   }, [store.tasks, store.notes]);
 
   return (
-    <div className="flex min-h-screen bg-[#F5F5F5] text-gray-900 font-sans">
+    <div className="flex min-h-screen bg-gray-50 text-gray-900 font-sans">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 bg-white border-r border-gray-200 z-50">
         <div className="flex h-16 items-center px-6 border-b border-gray-100">
@@ -167,7 +167,7 @@ export function AppLayout() {
             <Outlet />
           </div>
         </div>
-        <div className="fixed bottom-[90px] lg:bottom-6 right-6 z-50">
+        <div className="hidden lg:block fixed bottom-6 right-6 z-50">
           <DarkModeToggle />
         </div>
       </main>

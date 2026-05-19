@@ -11,7 +11,6 @@ import {
   User
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { DarkModeToggle } from '../components/DarkModeToggle';
 
 export function More() {
   const store = useStore();
@@ -73,12 +72,17 @@ export function More() {
           <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Settings</h2>
         </div>
         <div className="design-card overflow-hidden">
-           <div className="w-full flex items-center justify-between p-4 border-b border-gray-100">
+           <button
+             onClick={() => store.toggleDarkMode()}
+             className="w-full flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+           >
              <div className="flex items-center gap-3">
                 <span className="text-sm font-medium text-gray-900">Dark Mode</span>
              </div>
-             <DarkModeToggle />
-           </div>
+             <div className="text-gray-500">
+               {store.isDarkMode ? "On" : "Off"}
+             </div>
+           </button>
            <button
              onClick={() => logOut()}
              className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-red-600"
