@@ -1,10 +1,10 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI, Type, Schema } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import twilio from 'twilio';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import cron from 'node-cron';
 
 // Import config directly
@@ -22,10 +22,6 @@ try {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp, firebaseConfig.firestoreDatabaseId || '(default)');
-
-// In-Memory store for reminders
-let pendingTasks: any[] = [];
-let pendingNotes: any[] = [];
 
 async function startServer() {
   const app = express();
@@ -45,42 +41,71 @@ async function startServer() {
     return twilioClient;
   };
 
-  // Schedule cron for morning (8:00 AM) and night (8:00 PM) everyday
+  // Scheduled Reminders Builder function
   const sendReminders = async (timeOfDay: 'Morning' | 'Night') => {
     const client = getTwilio();
     const fromNumber = process.env.TWILIO_WHATSAPP_NUMBER;
     const toNumber = process.env.USER_WHATSAPP_NUMBER;
     
-    if (!client || !fromNumber || !toNumber) return;
+    if (!client || !fromNumber || !toNumber) {
+      console.warn('Twilio credentials or user number missing for reminders');
+      return;
+    }
 
-    if (pendingTasks.length === 0 && pendingNotes.length === 0) {
+    let syncedTasks: any[] = [];
+    let syncedNotes: any[] = [];
+
+    try {
+      const snap = await getDoc(doc(db, 'webhook_queue', 'reminders'));
+      if (snap.exists()) {
+        const data = snap.data();
+        syncedTasks = data.tasks || [];
+        syncedNotes = data.notes || [];
+      }
+    } catch (err) {
+      console.error('Failed to get synced reminders from Firestore:', err);
+    }
+
+    if (syncedTasks.length === 0 && syncedNotes.length === 0) {
+      console.log('No pending tasks or remember notes to remind.');
       return; 
     }
 
     let rawData = `Pending Tasks:\n`;
-    pendingTasks.slice(0, 10).forEach(t => rawData += `- ${t.title} ${t.priority === 'high' ? '(🔥 High)' : ''}\n`);
+    syncedTasks.slice(0, 10).forEach(t => rawData += `- ${t.title} ${t.priority === 'high' ? '(🔥 High)' : ''}\n`);
     rawData += `\nRemember Notes:\n`;
-    pendingNotes.slice(0, 5).forEach(n => rawData += `- ${n.title}\n`);
+    syncedNotes.slice(0, 5).forEach(n => rawData += `- ${n.title || n.content}\n`);
 
     let messageBody = '';
 
-    if (ai && timeOfDay === 'Morning') {
+    if (ai) {
       try {
-        const response = await ai.models.generateContent({
-           model: 'gemini-2.5-flash',
-           contents: `Write a beautiful, inspiring, and concise morning message for Yaksh. Start with something like "Good morning Yaksh, I hope you have a great day ahead!"
-Then weave in these pending tasks and things to remember, highlighting what needs action today:
+        if (timeOfDay === 'Morning') {
+          const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `Write a beautiful, inspiring, and concise morning message for Yaksh. Start with something lovely like "Good morning Yaksh, i hope you'll have good day!" or "Hello Yaksh, have a fantastic morning!".
+Based on the current projects and tasks, specify what needs action today or what is scheduled.
+Weave in these pending tasks and things to remember in a natural, positive, and motivating way:
 ${rawData}
-Keep it structured, easy to read for WhatsApp, and encouraging.`
-        });
-        messageBody = response.text || '';
+Keep it structured, visual with emojis, easy to read for WhatsApp, and encouraging.`
+          });
+          messageBody = response.text || '';
+        } else {
+          const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `Write a structured and concise evening reminder message for Yaksh. Review these remaining tasks and notes:
+${rawData}
+Kindly remind him of any pending tasks that need attention tomorrow, end on an encouraging note, and keep it formatted beautifully for WhatsApp.`
+          });
+          messageBody = response.text || '';
+        }
       } catch (e) {
-        console.error('AI generation failed for morning reminder:', e);
+        console.error('AI generation failed for scheduled reminder:', e);
       }
     }
 
     if (!messageBody) {
-      messageBody = `*${timeOfDay} Reminder:*\n\n${rawData}`;
+      messageBody = `*${timeOfDay} Reminder for Yaksh:*\n\n${rawData}`;
     }
 
     try {
@@ -89,25 +114,41 @@ Keep it structured, easy to read for WhatsApp, and encouraging.`
         from: `whatsapp:${fromNumber}`,
         to: `whatsapp:${toNumber}`
       });
+      console.log(`WhatsApp digest sent successfully for ${timeOfDay}`);
     } catch (err) {
       console.error('Failed to send scheduled reminders:', err);
     }
   };
 
-  // 8:00 AM
+  // 8:00 AM everyday
   cron.schedule('0 8 * * *', () => sendReminders('Morning'));
-  // 8:00 PM
+  // 8:00 PM everyday
   cron.schedule('0 20 * * *', () => sendReminders('Night'));
 
-  // Sync Reminders API
-  app.post('/api/sync-reminders', (req, res) => {
+  // Sync Reminders API (stores in Firestore)
+  app.post('/api/sync-reminders', async (req, res) => {
     try {
       const { tasks = [], notes = [] } = req.body;
-      pendingTasks = tasks;
-      pendingNotes = notes;
-      res.status(200).json({ success: true, tasksCount: pendingTasks.length, notesCount: pendingNotes.length });
+      await setDoc(doc(db, 'webhook_queue', 'reminders'), {
+        tasks,
+        notes,
+        updatedAt: new Date().toISOString()
+      });
+      res.status(200).json({ success: true, tasksCount: tasks.length, notesCount: notes.length });
     } catch (err: any) {
-      console.error('Error syncing reminders:', err);
+      console.error('Error syncing reminders to Firestore in server.ts:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // Test Reminder routing trigger
+  app.post('/api/test-reminder', async (req, res) => {
+    try {
+      const { timeOfDay = 'Morning' } = req.body;
+      await sendReminders(timeOfDay === 'Night' ? 'Night' : 'Morning');
+      res.status(200).json({ success: true, message: `Test WhatsApp reminder sent for ${timeOfDay}` });
+    } catch (err: any) {
+      console.error('Error in test-reminder route in server.ts:', err);
       res.status(500).json({ error: err.message });
     }
   });
@@ -132,7 +173,6 @@ Keep it structured, easy to read for WhatsApp, and encouraging.`
 Does it contain a request for a new task or a new project?
 If it does, extract the project name (if applicable, or invent a concise one based on context), the task title, description, and status.
 If it doesn't clearly request work, set isTask to false.
-
 Message: "${text}"`,
           config: {
             responseMimeType: "application/json",
@@ -187,6 +227,7 @@ Message: "${text}"`,
     res.status(200).send('Event received');
   });
 
+  // Magic Parse API
   app.post('/api/magic-parse', async (req, res) => {
     try {
       const { text } = req.body;
@@ -247,15 +288,14 @@ Message: "${text}"`,
       const toNumber = process.env.USER_WHATSAPP_NUMBER;
       
       if (!client || !fromNumber || !toNumber) {
-        return res.status(500).json({ error: 'Twilio credentials not configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_NUMBER, and USER_WHATSAPP_NUMBER to Environment Variables.' });
+        return res.status(500).json({ error: 'Twilio setup missing.' });
       }
 
       const { type, amount, category, description } = req.body;
       const formattedAmount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
-      const isIncome = type === 'income';
 
       await client.messages.create({
-        body: `*New ${isIncome ? 'Income' : 'Expense'} Recorded!*\n\n*Amount:* ${formattedAmount}\n*Category:* ${category}\n*Description:* ${description}\n\nBalance updated on your dashboard.`,
+        body: `*New ${type === 'income' ? 'Income' : 'Expense'} Recorded!*\n\n*Amount:* ${formattedAmount}\n*Category:* ${category}\n*Description:* ${description}\n\nBalance updated on your dashboard.`,
         from: `whatsapp:${fromNumber}`,
         to: `whatsapp:${toNumber}`
       });
@@ -270,7 +310,6 @@ Message: "${text}"`,
   app.post('/api/twilio/webhook', async (req, res) => {
     try {
       const messageBody = req.body.Body;
-      const fromNumber = req.body.From; 
 
       if (!messageBody) {
         return res.status(200).send('<Response></Response>');
@@ -284,10 +323,15 @@ Message: "${text}"`,
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `Analyze this message. The user might be trying to log an expense, log an income, create a task, or create a note (for Remember Book).
-If they say "remember X" or the message starts with "remember", it's a note.
-If they say "task X" or it starts with "task", it's a task.
-Extract the relevant details based on the detected type.
+        contents: `Analyze this message. The user wants to:
+1. Log a financial transaction (if they describe spent/received money, cash, expense, income, e.g., "500 for groceries", "1000 received").
+2. Create a task (if the message starts with "task", "new task", or includes "task", e.g., "task get up early", "new task study", etc.).
+3. Create a note in the Remember Book (if the message starts with "remember", "remeber", or contains "remember info", "remember X", e.g. "Remember ipdc needs to study", "remember buy milk").
+
+Rules for matching:
+- If the message has word "remember", "remeber", "rember" as a command or prefix, detectedType MUST be "note".
+- If the message has word "task" or starts with "task", detectedType MUST be "task".
+- Otherwise, if it has financial context (spent, earned, etc.), detectedType is "transaction".
 
 Message: "${messageBody}"`,
         config: {
@@ -368,7 +412,7 @@ Message: "${messageBody}"`,
         await setDoc(doc(db, 'webhook_queue', newNote.id), newNote);
 
         const twiml = new twilio.twiml.MessagingResponse();
-        twiml.message(`Saved! Note "${newNote.title}" added to your Remember Book.`);
+        twiml.message(`Saved! Note "${newNote.content}" added to your Remember Book.`);
         res.type('text/xml').send(twiml.toString());
       } else {
         const twiml = new twilio.twiml.MessagingResponse();
@@ -376,7 +420,7 @@ Message: "${messageBody}"`,
         res.type('text/xml').send(twiml.toString());
       }
     } catch (err) {
-      console.error('Error handling Twilio webhook:', err);
+      console.error('Error handling Twilio webhook in server.ts:', err);
       const twiml = new twilio.twiml.MessagingResponse();
       twiml.message("Sorry, I encountered an error processing your message.");
       res.type('text/xml').send(twiml.toString());

@@ -2,13 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { logOut } from '../lib/firebase';
+import { toast } from 'react-hot-toast';
 import { 
   Briefcase, 
   BellRing, 
   BookOpen, 
   LogOut, 
   ChevronRight,
-  User
+  User,
+  Wand2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -16,6 +18,32 @@ export function More() {
   const store = useStore();
   const navigate = useNavigate();
   const user = store.user;
+
+  const [testingMorning, setTestingMorning] = React.useState(false);
+  const [testingNight, setTestingNight] = React.useState(false);
+
+  const testReminder = async (time: 'Morning' | 'Night', setter: (val: boolean) => void) => {
+    setter(true);
+    try {
+      const res = await fetch('/api/test-reminder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ timeOfDay: time })
+      });
+      if (res.ok) {
+        toast.success(`Success! Sent test ${time.toLowerCase()} reminder to WhatsApp.`);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || `Failed to trigger ${time.toLowerCase()} reminder. Please make sure TWILIO environment variables are set up.`);
+      }
+    } catch (err) {
+      toast.error('Network error triggering reminder.');
+    } finally {
+      setter(false);
+    }
+  };
 
   const menuItems = [
     { name: 'Business Finance', icon: Briefcase, path: '/finance/business', color: 'text-blue-500', bg: 'bg-blue-50' },
@@ -50,7 +78,7 @@ export function More() {
           <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Features</h2>
         </div>
         
-        <div className="design-card divide-y divide-gray-100 overflow-hidden">
+        <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
           {menuItems.map((item) => (
             <button
               key={item.name}
@@ -66,6 +94,38 @@ export function More() {
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
           ))}
+        </div>
+
+        <div className="flex justify-between items-center mb-2 px-1 mt-6">
+          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Test Integrations</h2>
+        </div>
+        <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
+           <button
+             disabled={testingMorning}
+             onClick={() => testReminder('Morning', setTestingMorning)}
+             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors disabled:opacity-50"
+           >
+             <div className="flex flex-col items-start gap-0.5">
+               <span className="text-sm font-medium text-gray-900">Trigger Morning Digest</span>
+               <span className="text-xs text-gray-500 text-left">Sends a personalized morning WhatsApp greet and list</span>
+             </div>
+             <div className="text-blue-600 text-xs font-medium min-w-[80px] text-right">
+               {testingMorning ? 'Sending...' : 'Send Test'}
+             </div>
+           </button>
+           <button
+             disabled={testingNight}
+             onClick={() => testReminder('Night', setTestingNight)}
+             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors disabled:opacity-50"
+           >
+             <div className="flex flex-col items-start gap-0.5">
+               <span className="text-sm font-medium text-gray-900">Trigger Evening Reflection</span>
+               <span className="text-xs text-gray-500 text-left">Sends a review and encourages completion of pending tasks</span>
+             </div>
+             <div className="text-blue-600 text-xs font-medium min-w-[80px] text-right">
+               {testingNight ? 'Sending...' : 'Send Test'}
+             </div>
+           </button>
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
