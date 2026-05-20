@@ -47,6 +47,9 @@
 }
 
 @layer utilities {
+  html.dark .text-white {
+    color: #ffffff !important;
+  }
   .design-card {
     background: var(--color-white);
     border-radius: 15.8px;

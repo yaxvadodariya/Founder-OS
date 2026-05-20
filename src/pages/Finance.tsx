@@ -89,7 +89,7 @@ export function Finance() {
           <div className="design-card p-5">
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Net Balance</p>
-              <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+              <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
                 <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
               </p>
             </div>
@@ -98,7 +98,7 @@ export function Finance() {
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Total Income</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
                 </p>
                 <ArrowUpRight className="h-5 w-5 text-emerald-500" />
@@ -109,7 +109,7 @@ export function Finance() {
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Total Expenses</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
                 </p>
                 <ArrowDownRight className="h-5 w-5 text-red-500" />

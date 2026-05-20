@@ -69,7 +69,7 @@ export function ProjectDetails() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-gray-100">
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium text-gray-500">Total Value</p>
-                  <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">{formatCurrency(project.value)}</p>
+                  <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">{formatCurrency(project.value)}</p>
                 </div>
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium text-gray-500">Received</p>
@@ -81,7 +81,7 @@ export function ProjectDetails() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <p className="text-xs font-medium text-gray-500">Start Date</p>
-                  <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">{format(new Date(project.startDate), 'MMM dd, yyyy')}</p>
+                  <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">{format(new Date(project.startDate), 'MMM dd, yyyy')}</p>
                 </div>
               </div>
             </div>

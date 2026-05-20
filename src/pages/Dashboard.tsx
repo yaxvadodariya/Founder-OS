@@ -260,21 +260,21 @@ export function Dashboard() {
             <div className="flex justify-between items-center mb-4 px-1">
               <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Smart Insights</h2>
             </div>
-            <div className="design-card bg-gradient-to-br from-indigo-50/50 to-blue-50/50 p-5">
+            <div className="design-card bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/30 dark:to-blue-900/30 p-5">
               <div className="space-y-3">
                 {store.transactions.length > 0 ? (
-                  <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                  <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
                     You have <span className="font-semibold">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Keep tracking your expenses to get smarter insights!
                   </p>
                 ) : (
-                  <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                  <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
                     Start adding your income and expenses to unlock AI-powered insights about your spending habits.
                   </p>
                 )}
                 {store.projects.filter(p => p.status === 'active').length > 0 && (
                   <>
-                    <div className="h-px bg-indigo-100/50"></div>
-                    <p className="text-sm text-indigo-800 leading-relaxed text-balance">
+                    <div className="h-px bg-indigo-100/50 dark:bg-indigo-800/50"></div>
+                    <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
                       You have <span className="font-semibold">{store.projects.filter(p => p.status === 'active').length} active projects</span>. Keep pushing forward to hit your deadlines!
                     </p>
                   </>
