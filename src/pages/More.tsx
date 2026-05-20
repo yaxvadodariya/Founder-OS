@@ -10,9 +10,13 @@ import {
   LogOut, 
   ChevronRight,
   User,
-  Wand2
+  Wand2,
+  Globe,
+  Moon,
+  Sun,
+  Shield
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, CURRENCIES } from '../lib/utils';
 
 export function More() {
   const store = useStore();
@@ -129,20 +133,63 @@ export function More() {
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Settings</h2>
+          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Preferences</h2>
         </div>
-        <div className="design-card overflow-hidden">
+        <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
+           <div className="w-full flex items-center justify-between p-4 transition-colors">
+             <div className="flex items-center gap-3">
+               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+                 <Globe className="w-5 h-5" />
+               </div>
+               <span className="text-sm font-medium text-gray-900">Currency</span>
+             </div>
+             <select
+               value={store.currency}
+               onChange={(e) => store.setCurrency(e.target.value)}
+               className="text-sm font-medium text-gray-700 bg-transparent border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+             >
+               {CURRENCIES.map(c => (
+                 <option key={c.code} value={c.code}>
+                   {c.flag} {c.code} - {c.name}
+                 </option>
+               ))}
+             </select>
+           </div>
+           
            <button
              onClick={() => store.toggleDarkMode()}
-             className="w-full flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
            >
              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gray-900">Dark Mode</span>
+               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+                 {store.isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+               </div>
+               <span className="text-sm font-medium text-gray-900">Dark Mode</span>
              </div>
-             <div className="text-gray-500">
+             <div className="text-gray-500 font-medium text-sm">
                {store.isDarkMode ? "On" : "Off"}
              </div>
            </button>
+           <button
+             onClick={() => store.togglePrivacyMode()}
+             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+           >
+             <div className="flex items-center gap-3">
+               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+                 <Shield className="w-5 h-5" />
+               </div>
+               <span className="text-sm font-medium text-gray-900">Privacy Mode</span>
+             </div>
+             <div className="text-gray-500 font-medium text-sm">
+               {store.isPrivacyMode ? "On" : "Off"}
+             </div>
+           </button>
+        </div>
+
+        <div className="flex justify-between items-center mb-2 px-1 mt-6">
+          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Settings</h2>
+        </div>
+        <div className="design-card overflow-hidden">
            <button
              onClick={() => logOut()}
              className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-red-600"

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency, cn, CURRENCIES } from '../lib/utils';
 import { format } from 'date-fns';
 import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText, Eye, EyeOff } from 'lucide-react';
 import { TransactionType, FinanceCategory } from '../types';
@@ -14,6 +14,8 @@ export function Finance() {
   const store = useStore();
   
   const currentCategory: FinanceCategory = type === 'business' ? 'business' : 'personal';
+  const currencyCode = store.currency || 'USD';
+  const currencySymbol = CURRENCIES.find(c => c.code === currencyCode)?.symbol || '$';
   
   // As requested, always show numbers on the Finance page tab, even if privacy mode is on globally
   const isPrivacyMode = false;
@@ -89,7 +91,7 @@ export function Finance() {
           <div className="design-card p-5">
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Net Balance</p>
-              <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
+              <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
                 <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
               </p>
             </div>
@@ -98,7 +100,7 @@ export function Finance() {
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Total Income</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
+                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
                 </p>
                 <ArrowUpRight className="h-5 w-5 text-emerald-500" />
@@ -109,7 +111,7 @@ export function Finance() {
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-gray-500">Total Expenses</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-gray-900">
+                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
                 </p>
                 <ArrowDownRight className="h-5 w-5 text-red-500" />
@@ -186,7 +188,7 @@ export function Finance() {
                         "px-6 py-4 whitespace-nowrap text-right text-sm font-semibold",
                         t.type === 'income' ? "text-emerald-600" : "text-gray-900"
                       )}>
-                        <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? '+ ₹ ' : '- ₹ '}>
+                        <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+ ${currencySymbol} ` : `- ${currencySymbol} `}>
                           {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
                         </HiddenValue>
                       </td>

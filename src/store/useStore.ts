@@ -63,6 +63,7 @@ interface StoreState {
   isPrivacyMode: boolean;
   isPeeking: boolean;
   isDarkMode: boolean;
+  currency: string;
   
   // Actions
   setUser: (user: User) => void;
@@ -70,6 +71,7 @@ interface StoreState {
   setPrivacyMode: (enabled: boolean) => void;
   setPeeking: (peeking: boolean) => void;
   toggleDarkMode: () => void;
+  setCurrency: (currency: string) => void;
   
   addTransaction: (ts: Transaction, skipNotify?: boolean) => void;
   updateTransaction: (id: string, t: Partial<Transaction>) => void;
@@ -97,6 +99,22 @@ interface StoreState {
   setLastError: (err: string | null) => void;
 }
 
+const getBrowserCurrency = (): string => {
+  try {
+    if (typeof navigator !== 'undefined') {
+      const locale = navigator.language;
+      if (locale.includes('IN')) return 'INR';
+      if (locale.includes('GB')) return 'GBP';
+      if (locale.includes('DE') || locale.includes('FR') || locale.includes('IT') || locale.includes('ES') || locale.includes('NL')) return 'EUR';
+      if (locale.includes('AU')) return 'AUD';
+      if (locale.includes('CA')) return 'CAD';
+      if (locale.includes('SG')) return 'SGD';
+      if (locale.includes('AE')) return 'AED';
+    }
+  } catch(e) {}
+  return 'USD';
+};
+
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
@@ -109,6 +127,7 @@ export const useStore = create<StoreState>()(
       isPrivacyMode: true,
       isPeeking: false,
       isDarkMode: false,
+      currency: getBrowserCurrency(),
       lastError: null,
       setLastError: (err) => set({ lastError: err }),
 
@@ -117,6 +136,7 @@ export const useStore = create<StoreState>()(
       setPrivacyMode: (enabled) => set({ isPrivacyMode: enabled }),
       setPeeking: (peeking) => set({ isPeeking: peeking }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+      setCurrency: (currency) => set({ currency }),
       
       addTransaction: async (ts, skipNotify) => {
         if (!auth.currentUser) return;

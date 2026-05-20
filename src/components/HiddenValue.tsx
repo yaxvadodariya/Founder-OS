@@ -1,5 +1,6 @@
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn, CURRENCIES } from '../lib/utils';
+import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HiddenValueProps {
@@ -10,7 +11,11 @@ interface HiddenValueProps {
   prefix?: string;
 }
 
-export function HiddenValue({ children, isHidden, className, bulletCount = 6, prefix = "₹ " }: HiddenValueProps) {
+export function HiddenValue({ children, isHidden, className, bulletCount = 6, prefix }: HiddenValueProps) {
+  const currencyCode = useStore((state) => state.currency) || 'USD';
+  const currencySymbol = CURRENCIES.find(c => c.code === currencyCode)?.symbol || '$';
+  const finalPrefix = prefix !== undefined ? prefix : `${currencySymbol} `;
+
   return (
     <span className={cn("relative inline-block overflow-hidden", className)}>
       <AnimatePresence mode="wait" initial={false}>
@@ -34,7 +39,7 @@ export function HiddenValue({ children, isHidden, className, bulletCount = 6, pr
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="inline-flex items-center tracking-widest text-[#B3B3B3]"
           >
-            {prefix}{'•'.repeat(bulletCount)}
+            {finalPrefix}{'•'.repeat(bulletCount)}
           </motion.span>
         )}
       </AnimatePresence>

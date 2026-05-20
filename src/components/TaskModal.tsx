@@ -8,9 +8,10 @@ interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   taskToEdit?: Task | null;
+  defaultProjectId?: string;
 }
 
-export function TaskModal({ isOpen, onClose, taskToEdit = null }: TaskModalProps) {
+export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId }: TaskModalProps) {
   const store = useStore();
   
   const [title, setTitle] = useState('');
@@ -36,11 +37,11 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null }: TaskModalProps
       setTitle('');
       setDescription('');
       setPriority('medium');
-      setProjectId('');
+      setProjectId(defaultProjectId || '');
       setDueDate(format(new Date(), 'yyyy-MM-dd'));
       setHasDueDate(true);
     }
-  }, [taskToEdit, isOpen]);
+  }, [taskToEdit, isOpen, defaultProjectId]);
 
   if (!isOpen) return null;
 

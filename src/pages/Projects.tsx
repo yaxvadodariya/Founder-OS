@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Plus, MoreVertical, Calendar, CheckCircle2, Clock } from 'lucide-react';
 import { ProjectStatus } from '../types';
 import { ProjectModal } from '../components/ProjectModal';
+import { TaskModal } from '../components/TaskModal';
 
 export function Projects() {
   const store = useStore();
@@ -14,7 +15,9 @@ export function Projects() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<any>(null);
+  const [selectedProjectIdForTask, setSelectedProjectIdForTask] = useState<string>('');
 
   React.useEffect(() => {
     const handleClickOutside = () => setOpenMenuId(null);
@@ -104,6 +107,30 @@ export function Projects() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            setSelectedProjectIdForTask(project.id);
+                            setIsTaskModalOpen(true);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                        >
+                          Add Task
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setProjectToEdit(project);
+                            setIsModalOpen(true);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          Edit Project
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             store.updateProject(project.id, { status: project.status === 'completed' ? 'active' : 'completed' });
                             setOpenMenuId(null);
                           }}
@@ -188,6 +215,12 @@ export function Projects() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         projectToEdit={projectToEdit}
+      />
+      
+      <TaskModal 
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+        defaultProjectId={selectedProjectIdForTask}
       />
     </div>
   );

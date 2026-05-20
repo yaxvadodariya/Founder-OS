@@ -6,3 +6,4 @@ export { Tasks } from './Tasks';
 export { Payments } from './Payments';
 export { Notes } from './Notes';
 export { More } from './More';
+export { Settings } from './Settings';

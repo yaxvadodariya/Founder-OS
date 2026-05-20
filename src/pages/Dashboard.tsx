@@ -260,22 +260,22 @@ export function Dashboard() {
             <div className="flex justify-between items-center mb-4 px-1">
               <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Smart Insights</h2>
             </div>
-            <div className="design-card bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/30 dark:to-blue-900/30 p-5">
-              <div className="space-y-3">
+            <div className="design-card bg-blue-50 dark:bg-blue-900/20 border-blue-100 p-6">
+              <div className="space-y-4">
                 {store.transactions.length > 0 ? (
-                  <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
-                    You have <span className="font-semibold">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Keep tracking your expenses to get smarter insights!
+                  <p className="text-sm font-medium text-[#0064d6] dark:text-blue-300 leading-relaxed text-balance">
+                    You have <span className="font-bold text-[#0068ff] dark:text-blue-100">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Keep tracking your expenses to get smarter insights!
                   </p>
                 ) : (
-                  <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
+                  <p className="text-sm font-medium text-[#0064d6] dark:text-blue-300 leading-relaxed text-balance">
                     Start adding your income and expenses to unlock AI-powered insights about your spending habits.
                   </p>
                 )}
                 {store.projects.filter(p => p.status === 'active').length > 0 && (
                   <>
-                    <div className="h-px bg-indigo-100/50 dark:bg-indigo-800/50"></div>
-                    <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed text-balance">
-                      You have <span className="font-semibold">{store.projects.filter(p => p.status === 'active').length} active projects</span>. Keep pushing forward to hit your deadlines!
+                    <div className="h-px bg-blue-200 dark:bg-blue-800"></div>
+                    <p className="text-sm font-medium text-[#4da4ff] bg-[#ffffff] dark:bg-transparent dark:text-blue-300 leading-relaxed text-balance">
+                      You have <span className="font-bold text-[#0068ff] dark:text-blue-100">{store.projects.filter(p => p.status === 'active').length} active projects</span>. Keep pushing forward to hit your deadlines!
                     </p>
                   </>
                 )}

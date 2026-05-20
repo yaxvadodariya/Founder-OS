@@ -28,6 +28,7 @@ const navigation = [
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
   { name: 'Payments', href: '/payments', icon: BellRing },
   { name: 'Remember Book', href: '/notes', icon: BookOpen },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 const mobileNav = [
