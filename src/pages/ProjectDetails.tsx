@@ -175,8 +175,8 @@ export function ProjectDetails() {
             <ChevronRight className="h-4 w-4" />
             <span className="text-gray-900 font-medium">{project.name}</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">{project.name}</h1>
-          <p className="text-sm text-gray-500">Client: {project.clientName} ({project.clientEmail})</p>
+          <h1 className="page-title">{project.name}</h1>
+          <p className="page-subtitle">Client: {project.clientName} ({project.clientEmail})</p>
         </div>
         <div className="flex items-center gap-2">
           <span className={cn(
@@ -202,9 +202,9 @@ export function ProjectDetails() {
         {/* Left Column - Details & Milestones */}
         <div className="lg:col-span-2 space-y-6">
           {/* Overview */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Overview</h2>
+              <h2 className="section-label">Overview</h2>
             </div>
             <div className="design-card p-6">
               <p className="text-gray-700 leading-relaxed mb-6">{project.description}</p>
@@ -231,9 +231,9 @@ export function ProjectDetails() {
           </div>
 
           {/* Milestones */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Milestones ({project.milestones.filter(m => m.completed).length}/{project.milestones.length})</h2>
+              <h2 className="section-label">Milestones ({project.milestones.filter(m => m.completed).length}/{project.milestones.length})</h2>
             </div>
             <div className="design-card p-6 space-y-4">
               <div className="mb-6">
@@ -243,7 +243,7 @@ export function ProjectDetails() {
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2.5">
                   <div 
-                    className={cn("h-2.5 rounded-full transition-all duration-500", project.progress === 100 ? "bg-emerald-500" : "bg-blue-600")}
+                    className={cn("h-2.5 rounded-full transition-all duration-500", project.progress === 100 ? "bg-emerald-500" : "bg-[var(--color-ink)]")}
                     style={{ width: `${project.progress}%` }}
                   ></div>
                 </div>
@@ -359,7 +359,7 @@ export function ProjectDetails() {
                     </button>
                     <button 
                       type="submit" 
-                      className="flex-1 py-2 px-4 shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 btn-primary !text-sm"
                     >
                       Save Milestone
                     </button>
@@ -370,9 +370,9 @@ export function ProjectDetails() {
           </div>
           
           {/* Related Tasks */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Related Tasks</h2>
+              <h2 className="section-label">Related Tasks</h2>
               <button 
                  onClick={() => setIsTaskModalOpen(true)}
                  className="flex items-center gap-1 text-[11px] font-medium text-blue-600 hover:text-blue-700 tracking-tight"
@@ -428,9 +428,9 @@ export function ProjectDetails() {
         {/* Right Column - Side Info */}
         <div className="space-y-6">
           {/* Deliverables */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Deliverables</h2>
+              <h2 className="section-label">Deliverables</h2>
             </div>
             <div className="design-card p-6">
               <ul className="space-y-3 mb-4">
@@ -475,9 +475,9 @@ export function ProjectDetails() {
           </div>
 
           {/* Notes */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Notes</h2>
+              <h2 className="section-label">Notes</h2>
             </div>
             <div className="design-card p-6">
               <textarea 
@@ -491,9 +491,9 @@ export function ProjectDetails() {
           </div>
           
           {/* Quick Actions */}
-          <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+          <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
-              <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Actions</h2>
+              <h2 className="section-label">Actions</h2>
             </div>
             <div className="design-card p-4 space-y-2">
               <button onClick={handleEmailClient} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">

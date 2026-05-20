@@ -22,20 +22,20 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] flex flex-col items-center justify-center p-4 font-['Inter']">
-      <div className="max-w-md w-full design-card p-8 text-center">
-        <div className="flex justify-center mb-6">
-          <div className="h-14 w-14 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center shadow-lg">
+    <div className="min-h-screen bg-[var(--color-canvas)] flex flex-col items-center justify-center p-6 font-sans">
+      <div className="max-w-md w-full design-card p-10 text-center">
+        <div className="flex justify-center mb-8">
+          <div className="h-14 w-14 rounded-2xl bg-[var(--color-ink)] flex items-center justify-center shadow-[var(--shadow-card)]">
             <LayoutDashboard className="h-7 w-7 text-white" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Welcome to Founder OS</h1>
-        <p className="text-gray-500 mb-8 text-sm">Sign in to securely access your data.</p>
+        <h1 className="page-title mb-2">Welcome to Founder OS</h1>
+        <p className="page-subtitle mb-8">Sign in to securely access your data.</p>
         
         <button 
           onClick={handleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 text-gray-700 px-4 py-3 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-gray-200 font-medium"
+          className="w-full flex items-center justify-center gap-3 bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-ink)] px-4 py-3.5 rounded-full hover:bg-[var(--color-surface-muted)] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ink-muted)] font-medium disabled:opacity-60"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -47,7 +47,7 @@ export function Login() {
         </button>
 
         {error && (
-          <p className="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>
+          <p className="mt-4 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-100 dark:border-red-900/50">{error}</p>
         )}
       </div>
     </div>

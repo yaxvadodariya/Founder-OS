@@ -68,7 +68,7 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
       <div className="bg-white rounded-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
         <div className="flex justify-between items-center p-5 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900">{noteToEdit ? 'Edit Note' : 'Add Note'}</h2>
@@ -77,7 +77,7 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto flex-1 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 flex flex-col gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
             <input 
@@ -85,7 +85,7 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-medium"
+              className="input-field text-lg font-medium"
               placeholder="Note Title"
             />
           </div>
@@ -96,7 +96,7 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
               required
               value={category}
               onChange={(e) => setCategory(e.target.value as NoteCategory)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="idea">Idea</option>
               <option value="important">Important</option>
@@ -124,7 +124,7 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
               type="text" 
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="e.g. work, personal, references"
             />
           </div>
@@ -159,13 +159,13 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
               <button 
                 type="button" 
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="btn-secondary !text-sm"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="btn-primary !text-sm"
               >
                 Save Note
               </button>

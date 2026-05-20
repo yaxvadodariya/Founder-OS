@@ -75,52 +75,56 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense', tra
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{transactionToEdit ? 'Edit Transaction' : 'Add Transaction'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-            <X className="h-5 w-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+      <div className="modal-panel w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="modal-header flex justify-between items-start gap-4">
+          <div>
+            <h2 className="modal-title">{transactionToEdit ? 'Edit Transaction' : 'Add Transaction'}</h2>
+            <p className="modal-meta">{transactionToEdit ? `Last updated ${format(new Date(transactionToEdit.date), 'MMM d, yyyy')}` : 'Record income or expense'}</p>
+          </div>
+          <button type="button" onClick={onClose} className="btn-secondary !p-2 shrink-0">
+            <X className="h-4 w-4" />
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto flex-1 space-y-4">
-          <div className="flex p-1 bg-gray-100 rounded-lg">
+        <form id="transaction-form" onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <div className="modal-body overflow-y-auto flex-1 space-y-4">
+          <div className="segmented-control w-full">
             <button
               type="button"
               onClick={() => setType('expense')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${type === 'expense' ? 'bg-white text-gray-900' : 'text-gray-500'}`}
+              className={`flex-1 segmented-item ${type === 'expense' ? 'segmented-item-active' : ''}`}
             >
               Expense
             </button>
             <button
               type="button"
               onClick={() => setType('income')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${type === 'income' ? 'bg-white text-gray-900' : 'text-gray-500'}`}
+              className={`flex-1 segmented-item ${type === 'income' ? 'segmented-item-active' : ''}`}
             >
               Income
             </button>
           </div>
 
-          <div className="flex p-1 bg-gray-100 rounded-lg">
+          <div className="segmented-control w-full">
             <button
               type="button"
               onClick={() => setCategory('personal')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${category === 'personal' ? 'bg-white text-gray-900' : 'text-gray-500'}`}
+              className={`flex-1 segmented-item ${category === 'personal' ? 'segmented-item-active' : ''}`}
             >
               Personal
             </button>
             <button
               type="button"
               onClick={() => setCategory('business')}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${category === 'business' ? 'bg-white text-gray-900' : 'text-gray-500'}`}
+              className={`flex-1 segmented-item ${category === 'business' ? 'segmented-item-active' : ''}`}
             >
               Business
             </button>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (INR) *</label>
+            <label className="form-label">Amount (INR) *</label>
             <input 
               type="number" 
               required
@@ -128,41 +132,41 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense', tra
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="0.00"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+            <label className="form-label">Date *</label>
             <input 
               type="date" 
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+            <label className="form-label">Description *</label>
             <input 
               type="text" 
               required
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="What was this for?"
             />
           </div>
 
           <div>
-             <label className="block text-sm font-medium text-gray-700 mb-1">Category Detail *</label>
+             <label className="form-label">Category Detail *</label>
              <select 
                required
                value={categoryDetail}
                onChange={(e) => setCategoryDetail(e.target.value)}
-               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+               className="input-field"
              >
                <option value="" disabled>Select category...</option>
                {type === 'expense' ? (
@@ -193,45 +197,35 @@ export function TransactionModal({ isOpen, onClose, defaultType = 'expense', tra
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+            <label className="form-label">Payment Method</label>
             <input 
               type="text" 
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="e.g., Bank Transfer, UPI, Cash"
             />
           </div>
 
-          <div className="pt-4 border-t border-gray-100 flex justify-between gap-3">
-            {transactionToEdit ? (
-              <button
-                type="button"
-                onClick={() => {
-                  store.deleteTransaction(transactionToEdit.id);
-                  onClose();
-                }}
-                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-              >
-                Delete
-              </button>
-            ) : <div />}
-            <div className="flex gap-3">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-              >
-                Save Transaction
-              </button>
-            </div>
+        </div>
+        <div className="modal-footer justify-between">
+          {transactionToEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                store.deleteTransaction(transactionToEdit.id);
+                onClose();
+              }}
+              className="text-sm font-medium text-red-600 hover:text-red-700"
+            >
+              Delete
+            </button>
+          ) : <div />}
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary">Save Transaction</button>
           </div>
+        </div>
         </form>
       </div>
     </div>

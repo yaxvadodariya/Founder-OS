@@ -78,8 +78,8 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
   const projects = store.projects;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+      <div className="modal-panel w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-5 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900">{taskToEdit ? 'Edit Task' : 'Add Task'}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
@@ -87,7 +87,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto flex-1 space-y-4">
+        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
             <input 
@@ -95,7 +95,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="What needs to be done?"
             />
           </div>
@@ -105,7 +105,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
             <textarea 
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+              className="input-field resize-vertical"
               placeholder="Add more details..."
               rows={3}
             />
@@ -119,7 +119,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
               <select 
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -134,7 +134,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
               <select 
                 value={projectId}
                 onChange={(e) => setProjectId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="">Personal (None)</option>
                 {projects.map(p => (
@@ -162,7 +162,7 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
                 type="date" 
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               />
             )}
           </div>
@@ -184,13 +184,13 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
               <button 
                 type="button" 
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="btn-secondary !text-sm"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="btn-primary !text-sm"
               >
                 Save Task
               </button>

@@ -20,12 +20,12 @@ export function Settings() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
       <div className="flex flex-col justify-between items-start gap-4 mb-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Settings</h1>
-          <p className="text-sm text-gray-500">Manage your account and preferences</p>
+          <h1 className="page-title">Settings</h1>
+          <p className="page-subtitle">Manage your account and preferences</p>
         </div>
       </div>
 
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+      <div className="section-panel">
         {/* Profile Section */}
         <div className="design-card p-4 flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -42,7 +42,7 @@ export function Settings() {
 
         {/* Preferences */}
         <div className="flex justify-between items-center mb-2 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Preferences</h2>
+          <h2 className="section-label">Preferences</h2>
         </div>
         <div className="design-card divide-y divide-gray-100 overflow-hidden mb-6">
            <div className="w-full flex items-center justify-between p-4 transition-colors">
@@ -96,7 +96,7 @@ export function Settings() {
 
         {/* Account Actions */}
         <div className="flex justify-between items-center mb-2 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Account actions</h2>
+          <h2 className="section-label">Account actions</h2>
         </div>
         <div className="design-card overflow-hidden">
            <button

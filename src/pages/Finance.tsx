@@ -43,16 +43,16 @@ export function Finance() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Finance</h1>
+          <h1 className="page-title">Finance</h1>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm text-gray-500">Manage your {currentCategory} finances</p>
+            <p className="page-subtitle">Manage your {currentCategory} finances</p>
           </div>
         </div>
         <div className="flex gap-2 items-center">
           <button 
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+            className="hidden sm:inline-flex btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>Add Transaction</span>
@@ -61,12 +61,12 @@ export function Finance() {
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 p-1 bg-gray-100 rounded-lg w-full sm:w-fit">
+      <div className="segmented-control w-full sm:w-fit">
         <button
           onClick={() => navigate('/finance/personal')}
           className={cn(
-            "flex-1 sm:px-6 py-2 text-sm font-medium rounded-md transition-all",
-            currentCategory === 'personal' ? "bg-white text-gray-900" : "text-gray-500 hover:text-gray-700"
+            "segmented-item flex-1 sm:px-6",
+            currentCategory === 'personal' && "segmented-item-active"
           )}
         >
           Personal
@@ -74,8 +74,8 @@ export function Finance() {
         <button
           onClick={() => navigate('/finance/business')}
           className={cn(
-            "flex-1 sm:px-6 py-2 text-sm font-medium rounded-md transition-all",
-            currentCategory === 'business' ? "bg-white text-gray-900" : "text-gray-500 hover:text-gray-700"
+            "segmented-item flex-1 sm:px-6",
+            currentCategory === 'business' && "segmented-item-active"
           )}
         >
           Business
@@ -83,24 +83,24 @@ export function Finance() {
       </div>
 
       {/* Summary Cards */}
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+      <div className="section-panel">
         <div className="flex items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Summary</h2>
+          <h2 className="section-label">Summary</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-[4px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="design-card p-5">
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-gray-500">Net Balance</p>
-              <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+              <p className="metric-label">Net Balance</p>
+              <p className="metric-value">
                 <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
               </p>
             </div>
           </div>
           <div className="design-card p-5">
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-gray-500">Total Income</p>
+              <p className="metric-label">Total Income</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+                <p className="metric-value">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
                 </p>
                 <ArrowUpRight className="h-5 w-5 text-emerald-500" />
@@ -109,9 +109,9 @@ export function Finance() {
           </div>
           <div className="design-card p-5">
             <div className="flex flex-col gap-4">
-              <p className="text-sm font-medium text-gray-500">Total Expenses</p>
+              <p className="metric-label">Total Expenses</p>
               <div className="flex items-center gap-2">
-                <p className="text-[20px] font-medium leading-none tracking-[-0.011em] text-black">
+                <p className="metric-value">
                   <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
                 </p>
                 <ArrowDownRight className="h-5 w-5 text-red-500" />
@@ -122,41 +122,41 @@ export function Finance() {
       </div>
 
       {/* Transactions List */}
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 min-h-[400px] flex flex-col">
+      <div className="section-panel flex-1 min-h-[400px] flex flex-col">
         <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">History</h2>
+          <h2 className="section-label">History</h2>
         </div>
         <div className="design-card flex flex-col flex-1">
-          <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <div className="p-5 border-b border-[var(--color-border-soft)] flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h2 className="text-base font-semibold text-[var(--color-ink)]">Recent Transactions</h2>
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-ink-muted)]" />
               <input 
                 type="text" 
                 placeholder="Search transactions..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field !pl-10 !rounded-full"
               />
             </div>
           </div>
           
-          <div className="overflow-x-auto flex-1 rounded-b-[24px]">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-[#F8F9FA]">
+          <div className="overflow-x-auto flex-1">
+            <table className="data-table min-w-full">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Category</th>
+                  <th scope="col" className="!text-right">Amount</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody>
                 {transactions.length > 0 ? (
                   transactions.map((t) => (
                     <tr 
                       key={t.id} 
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
                       onClick={() => {
                         setTransactionToEdit(t);
                         setIsModalOpen(true);
@@ -222,7 +222,7 @@ export function Finance() {
       <button
         type="button"
         onClick={() => setIsModalOpen(true)}
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
       >
         <Plus className="h-6 w-6" />
       </button>

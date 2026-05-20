@@ -40,8 +40,8 @@ export function Tasks() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Tasks</h1>
-          <p className="text-sm text-gray-500">Manage your to-dos and daily focus</p>
+          <h1 className="page-title">Tasks</h1>
+          <p className="page-subtitle">Manage your to-dos and daily focus</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -51,7 +51,7 @@ export function Tasks() {
               setTaskToEdit(null);
               setIsModalOpen(true);
             }}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+            className="hidden sm:inline-flex btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>Add Task</span>
@@ -59,16 +59,16 @@ export function Tasks() {
         </div>
       </div>
 
-      <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit overflow-x-auto max-w-full">
+      <div className="segmented-control w-fit overflow-x-auto max-w-full">
         <FilterButton active={filter === 'today'} onClick={() => setFilter('today')}>Today</FilterButton>
         <FilterButton active={filter === 'upcoming'} onClick={() => setFilter('upcoming')}>Upcoming</FilterButton>
         <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All Pending</FilterButton>
         <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')}>Completed</FilterButton>
       </div>
 
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 overflow-hidden flex flex-col">
+      <div className="section-panel flex-1 overflow-hidden flex flex-col">
         <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Task List</h2>
+          <h2 className="section-label">Task List</h2>
         </div>
         <div className="design-card flex-1 overflow-hidden flex flex-col">
           <div className="overflow-y-auto flex-1 p-2">
@@ -84,7 +84,7 @@ export function Tasks() {
                <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200 my-4 mx-2">
                 <CheckSquare className="h-12 w-12 text-gray-300 mb-3" />
                 <p className="text-gray-900 font-medium">All caught up!</p>
-                <p className="text-sm text-gray-500 mt-1">No tasks in this view. Enjoy your day.</p>
+                <p className="page-subtitle mt-1">No tasks in this view. Enjoy your day.</p>
               </div>
             )}
           </div>
@@ -104,7 +104,7 @@ export function Tasks() {
           setTaskToEdit(null);
           setIsModalOpen(true);
         }}
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
       >
         <Plus className="h-6 w-6" />
       </button>
@@ -117,8 +117,8 @@ export const FilterButton: React.FC<{ active: boolean; onClick: () => void; chil
     <button
       onClick={onClick}
       className={cn(
-        "px-4 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-all",
-        active ? "bg-white text-gray-900" : "text-gray-500 hover:text-gray-700"
+        "segmented-item",
+        active && "segmented-item-active"
       )}
     >
       {children}
@@ -132,8 +132,8 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   
   return (
     <div className={cn(
-      "flex items-start gap-3 p-3 rounded-lg group transition-colors border",
-      task.completed ? "bg-gray-50/50 border-transparent" : "bg-white hover:border-gray-300 border-transparent hover:bg-gray-50"
+      "flex items-start gap-3 p-3 rounded-xl group transition-colors",
+      task.completed ? "opacity-60" : "hover:bg-[var(--color-surface-muted)]"
     )}>
       <button 
         onClick={() => store.toggleTaskCompletion(task.id)}

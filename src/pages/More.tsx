@@ -59,12 +59,12 @@ export function More() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
       <div className="flex flex-col justify-between items-start gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Menu</h1>
-          <p className="text-sm text-gray-500">More settings and features</p>
+          <h1 className="page-title">Menu</h1>
+          <p className="page-subtitle">More settings and features</p>
         </div>
       </div>
 
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px]">
+      <div className="section-panel">
         <div className="design-card p-4 flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl overflow-hidden">
@@ -79,7 +79,7 @@ export function More() {
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Features</h2>
+          <h2 className="section-label">Features</h2>
         </div>
         
         <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
@@ -101,7 +101,7 @@ export function More() {
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Test Integrations</h2>
+          <h2 className="section-label">Test Integrations</h2>
         </div>
         <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
            <button
@@ -133,7 +133,7 @@ export function More() {
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Preferences</h2>
+          <h2 className="section-label">Preferences</h2>
         </div>
         <div className="design-card divide-y divide-gray-100 overflow-hidden mb-4">
            <div className="w-full flex items-center justify-between p-4 transition-colors">
@@ -187,7 +187,7 @@ export function More() {
         </div>
 
         <div className="flex justify-between items-center mb-2 px-1 mt-6">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Settings</h2>
+          <h2 className="section-label">Settings</h2>
         </div>
         <div className="design-card overflow-hidden">
            <button

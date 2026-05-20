@@ -75,8 +75,8 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+      <div className="modal-panel w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         <div className="flex justify-between items-center p-5 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-900">{paymentToEdit ? 'Edit Payment' : 'Add Payment'}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
@@ -84,7 +84,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto flex-1 space-y-4">
+        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
             <input 
@@ -92,7 +92,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="e.g. Netflix Subscription"
             />
           </div>
@@ -106,7 +106,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="0.00"
             />
           </div>
@@ -117,7 +117,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               required
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as PaymentFrequency)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="monthly">Monthly</option>
               <option value="yearly">Yearly</option>
@@ -134,7 +134,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
                 max="31"
                 value={dayOfMonth}
                 onChange={(e) => setDayOfMonth(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
                 placeholder="1-31"
               />
             </div>
@@ -147,7 +147,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               required
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
@@ -158,7 +158,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               required
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               placeholder="e.g. Subscriptions, Utilities"
             />
           </div>
@@ -191,13 +191,13 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
               <button 
                 type="button" 
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="btn-secondary !text-sm"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="btn-primary !text-sm"
               >
                 Save Payment
               </button>

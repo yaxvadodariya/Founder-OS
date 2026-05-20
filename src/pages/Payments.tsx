@@ -25,9 +25,9 @@ export function Payments() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Payments & Bills</h1>
+          <h1 className="page-title">Payments & Bills</h1>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm text-gray-500">Track recurring subscriptions and scheduled payments</p>
+            <p className="page-subtitle">Track recurring subscriptions and scheduled payments</p>
             {store.isPrivacyMode && (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500">
                 <EyeOff className="h-3 w-3 mr-1" />
@@ -44,7 +44,7 @@ export function Payments() {
               setPaymentToEdit(null);
               setIsModalOpen(true);
             }}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+            className="hidden sm:inline-flex btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>Add Payment</span>
@@ -52,9 +52,9 @@ export function Payments() {
         </div>
       </div>
 
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 overflow-hidden flex flex-col">
+      <div className="section-panel flex-1 overflow-hidden flex flex-col">
         <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Scheduled Payments</h2>
+          <h2 className="section-label">Scheduled Payments</h2>
         </div>
         <div className="design-card flex-1 overflow-hidden">
           <div className="overflow-x-auto min-h-[400px]">
@@ -146,7 +146,7 @@ export function Payments() {
           setPaymentToEdit(null);
           setIsModalOpen(true);
         }}
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
       >
         <Plus className="h-6 w-6" />
       </button>

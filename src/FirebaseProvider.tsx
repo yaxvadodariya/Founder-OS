@@ -71,7 +71,7 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (loading) {
-    return <div className="min-h-screen bg-[#FDFCFB] flex items-center justify-center font-['Inter']">Loading...</div>;
+    return <div className="min-h-screen bg-[var(--color-canvas)] flex items-center justify-center font-sans text-[var(--color-ink-muted)]">Loading...</div>;
   }
 
   return <>{children}</>;

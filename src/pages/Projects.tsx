@@ -31,8 +31,8 @@ export function Projects() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Projects</h1>
-          <p className="text-sm text-gray-500">Manage client projects and deliverables</p>
+          <h1 className="page-title">Projects</h1>
+          <p className="page-subtitle">Manage client projects and deliverables</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -40,7 +40,7 @@ export function Projects() {
               setProjectToEdit(null);
               setIsModalOpen(true);
             }}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+            className="hidden sm:inline-flex btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>New Project</span>
@@ -48,14 +48,14 @@ export function Projects() {
         </div>
       </div>
 
-      <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit overflow-x-auto max-w-full">
+      <div className="segmented-control w-fit overflow-x-auto max-w-full">
         {(['all', 'active', 'completed', 'on-hold'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={cn(
-              "px-4 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-all",
-              filter === f ? "bg-white text-gray-900" : "text-gray-500 hover:text-gray-700"
+              "segmented-item",
+              filter === f && "segmented-item-active"
             )}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -63,31 +63,31 @@ export function Projects() {
         ))}
       </div>
 
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 flex flex-col">
+      <div className="section-panel flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Project List</h2>
+          <h2 className="section-label">Project List</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 content-start">
           {projects.map(project => (
             <div 
               key={project.id} 
               onClick={() => navigate(`/projects/${project.id}`)}
-              className="design-card transition-all hover:ring-2 hover:ring-gray-200 flex flex-col cursor-pointer group"
+              className="design-card flex flex-col cursor-pointer group"
             >
-              <div className="p-5 border-b border-gray-100 flex-1">
+              <div className="p-5 border-b border-[var(--color-border-soft)] flex-1">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex flex-col">
                     <span className={cn(
-                      "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mb-2 w-fit",
-                      project.status === 'active' && "bg-emerald-100 text-emerald-800",
-                      project.status === 'completed' && "bg-gray-100 text-gray-800",
-                      project.status === 'on-hold' && "bg-orange-100 text-orange-800",
-                      project.status === 'cancelled' && "bg-red-100 text-red-800",
+                      "status-badge mb-2 w-fit uppercase",
+                      project.status === 'active' && "status-badge-success",
+                      project.status === 'completed' && "status-badge-neutral",
+                      project.status === 'on-hold' && "status-badge-warning",
+                      project.status === 'cancelled' && "status-badge-warning",
                     )}>
-                      {project.status.toUpperCase()}
+                      {project.status}
                     </span>
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{project.name}</h3>
-                    <p className="text-sm text-gray-500">{project.clientName}</p>
+                    <h3 className="text-lg font-semibold text-[var(--color-ink)] transition-colors">{project.name}</h3>
+                    <p className="page-subtitle">{project.clientName}</p>
                   </div>
                   <div className="relative">
                     <button 
@@ -172,7 +172,7 @@ export function Projects() {
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2">
                     <div 
-                      className={cn("h-2 rounded-full", project.progress === 100 ? "bg-emerald-500" : "bg-blue-600")}
+                      className={cn("h-2 rounded-full", project.progress === 100 ? "bg-emerald-500" : "bg-[var(--color-ink)]")}
                       style={{ width: `${project.progress}%` }}
                     ></div>
                   </div>
@@ -202,7 +202,7 @@ export function Projects() {
       {/* Mobile FAB */}
       <button
         type="button"
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
         onClick={() => {
           setProjectToEdit(null);
           setIsModalOpen(true);

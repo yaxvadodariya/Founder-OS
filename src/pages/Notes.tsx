@@ -49,8 +49,8 @@ export function Notes() {
     <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Remember Book</h1>
-          <p className="text-sm text-gray-500">Your second brain for ideas and information</p>
+          <h1 className="page-title">Remember Book</h1>
+          <p className="page-subtitle">Your second brain for ideas and information</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -59,7 +59,7 @@ export function Notes() {
               setNoteToEdit(null);
               setIsModalOpen(true);
             }}
-            className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors gap-2"
+            className="hidden sm:inline-flex btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>New Note</span>
@@ -90,9 +90,9 @@ export function Notes() {
       </div>
 
       {/* Masonry or Grid Layout */}
-      <div className="bg-[#272625]/[0.03] p-[17px] rounded-[19px] flex-1 flex flex-col">
+      <div className="section-panel flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="text-[#8C8684] text-xs font-medium tracking-tight uppercase">Notes Library</h2>
+          <h2 className="section-label">Notes Library</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
           {notes.map(note => {
@@ -149,7 +149,7 @@ export function Notes() {
           <div className="design-card flex-1 flex flex-col items-center justify-center p-12 text-center mt-2 bg-white/50">
             <BookOpen className="h-12 w-12 text-gray-300 mb-3" />
             <p className="text-gray-900 font-medium">No notes found</p>
-            <p className="text-sm text-gray-500 mt-1">Try adjusting your search or create a new note.</p>
+            <p className="page-subtitle mt-1">Try adjusting your search or create a new note.</p>
           </div>
         )}
       </div>
@@ -167,7 +167,7 @@ export function Notes() {
           setNoteToEdit(null);
           setIsModalOpen(true);
         }}
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 z-40 transition-transform active:scale-95"
+        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
       >
         <Plus className="h-6 w-6" />
       </button>
