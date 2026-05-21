@@ -17,7 +17,7 @@ export function Settings() {
   const user = store.user;
 
   return (
-    <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
+    <div className="mobile-page lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
       <div className="flex flex-col justify-between items-start gap-4 mb-4">
         <div>
           <h1 className="page-title">Settings</h1>

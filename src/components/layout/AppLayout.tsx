@@ -94,7 +94,7 @@ export function AppLayout() {
               </div>
             )}
             <div className="flex-1 overflow-y-auto">
-              <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+              <div className="mx-auto max-w-[1200px] px-5 sm:px-6 lg:px-8 py-5 lg:py-8">
                 <Outlet />
               </div>
             </div>
@@ -109,7 +109,7 @@ export function AppLayout() {
         className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-3"
         style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
       >
-        <div className="flex justify-around items-center rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)]/95 backdrop-blur-md shadow-[var(--shadow-elevated)] py-2">
+        <div className="flex justify-around items-center rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] py-2.5 shadow-[var(--shadow-card)]">
           {mobileNav.map((item) => {
             const isActive = location.pathname === item.href || 
             (item.href !== '/' && item.href !== '/more' && location.pathname.startsWith(item.href));
@@ -120,11 +120,11 @@ export function AppLayout() {
                 to={item.href}
                 className={cn(
                   "flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-xl transition-colors",
-                  isActive ? "text-[var(--color-ink)]" : "text-[var(--color-ink-muted)]"
+                  isActive ? "text-[var(--color-ink)] font-medium" : "text-[var(--color-ink-muted)] font-normal"
                 )}
               >
-                <item.icon className={cn("h-5 w-5 mb-0.5 stroke-[1.75]", isActive && "text-[var(--color-ink)]")} />
-                <span className="text-[10px] font-medium leading-none">{item.name}</span>
+                <item.icon className={cn("h-5 w-5 mb-0.5 stroke-[1.5]", isActive ? "text-[var(--color-ink)]" : "text-[var(--color-ink-muted)]")} />
+                <span className="text-[10px] leading-none">{item.name}</span>
               </NavLink>
             );
           })}

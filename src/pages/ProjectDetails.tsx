@@ -166,7 +166,7 @@ export function ProjectDetails() {
   }
 
   return (
-    <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
+    <div className="mobile-page lg:pb-0 h-full flex flex-col">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>

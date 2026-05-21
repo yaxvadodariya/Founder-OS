@@ -105,8 +105,8 @@ export function Dashboard() {
   const showTaskAlert = pendingTasksToday > 0;
 
   return (
-    <div className="space-y-6 pb-24 lg:pb-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+    <div className="mobile-page">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
         <div>
           <h1 className="page-title">Hey {user?.name.split(' ')[0]} 👋</h1>
           <div className="flex items-center gap-2 mt-1">
@@ -130,8 +130,8 @@ export function Dashboard() {
 
       {showTaskAlert && (
         <div className="alert-banner">
-          <div className="mt-0.5 h-5 w-5 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-            <span className="text-red-600 text-xs font-bold">!</span>
+          <div className="alert-banner-icon mt-0.5 h-5 w-5 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <span className="text-red-600 text-xs font-medium">!</span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="alert-banner-title">{pendingTasksToday} task{pendingTasksToday > 1 ? 's' : ''} due today</p>
@@ -142,10 +142,8 @@ export function Dashboard() {
       )}
 
       <section className="section-panel">
-        <div className="flex items-center mb-4">
-          <h2 className="section-label">Quick Access</h2>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <h2 className="section-label">Quick Access</h2>
+        <div className="quick-access-grid grid grid-cols-1 lg:grid-cols-4 lg:gap-3 mt-3 lg:mt-4">
           <DualBalanceCard personalBalance={personalBalance} currentBalance={currentBalance} isHidden={isHidden} />
           <StatCard 
             title="Active Projects" 
@@ -179,9 +177,9 @@ export function Dashboard() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <section className="section-panel">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-6">
+        <div className="lg:col-span-2 space-y-7 lg:space-y-6">
+          <section className="section-panel section-panel-flat lg:!p-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center justify-between sm:justify-start gap-4">
                 <h2 className="section-label">Financial Overview</h2>
@@ -231,21 +229,21 @@ export function Dashboard() {
             </div>
           </section>
 
-          <section className="section-panel">
-            <div className="flex justify-between items-center mb-4">
+          <section className="section-panel section-panel-nested">
+            <div className="flex justify-between items-center mb-3 lg:mb-4">
               <h2 className="section-label">Active Projects</h2>
               <Link to="/projects" className="section-link">View all →</Link>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-0 lg:space-y-3">
               {store.projects.filter(p => p.status === 'active').map(project => (
-                <div key={project.id} className="design-card p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-[var(--color-ink)]">{project.name}</h3>
+                <div key={project.id} className="design-card p-4 lg:p-5 first:pt-0">
+                  <div className="flex justify-between items-start mb-3 gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-medium text-[var(--color-ink)] truncate">{project.name}</h3>
                       <p className="text-sm text-[var(--color-ink-secondary)] mt-0.5">{project.clientName}</p>
                     </div>
-                    <span className="text-xs font-semibold text-[var(--color-ink-secondary)] bg-[var(--color-surface-muted)] px-2.5 py-1 rounded-md border border-[var(--color-border-subtle)] tabular-nums">
+                    <span className="text-xs font-medium text-[var(--color-ink-secondary)] bg-[var(--color-surface-muted)] px-2 py-0.5 rounded-md shrink-0 tabular-nums">
                       {formatCurrency(project.value)}
                     </span>
                   </div>
@@ -271,21 +269,21 @@ export function Dashboard() {
           </section>
         </div>
 
-        <div className="space-y-6">
-          <section className="section-panel !p-0 overflow-hidden">
-            <div className="insight-banner !border-0 !rounded-none">
+        <div className="space-y-7 lg:space-y-6">
+          <section className="section-panel !p-0 overflow-hidden rounded-[14px] lg:rounded-[var(--radius-panel)]">
+            <div className="insight-banner !border-0 !rounded-[14px] lg:!rounded-none">
               <div className="flex-1 min-w-0">
                 <span className="insight-badge"><Sparkles className="h-3 w-3" /> Recommended by AI</span>
                 {store.transactions.length > 0 ? (
                   <>
-                    <p className="text-sm font-semibold text-[var(--color-ink)] mt-1">Keep tracking for smarter insights</p>
+                    <p className="text-sm font-medium text-[var(--color-ink)] mt-1">Keep tracking for smarter insights</p>
                     <p className="text-xs text-[var(--color-ink-secondary)] mt-1 leading-relaxed">
-                      You have <span className="font-semibold text-[var(--color-ink)]">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Consistent logging unlocks spending pattern analysis.
+                      You have <span className="font-medium text-[var(--color-ink)]">{store.transactions.length} recorded {store.transactions.length === 1 ? 'transaction' : 'transactions'}</span>. Consistent logging unlocks spending pattern analysis.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm font-semibold text-[var(--color-ink)] mt-1">Start logging transactions</p>
+                    <p className="text-sm font-medium text-[var(--color-ink)] mt-1">Start logging transactions</p>
                     <p className="text-xs text-[var(--color-ink-secondary)] mt-1 leading-relaxed">
                       Add your income and expenses to unlock AI-powered insights about your spending habits.
                     </p>
@@ -293,7 +291,7 @@ export function Dashboard() {
                 )}
                 {store.projects.filter(p => p.status === 'active').length > 0 && (
                   <p className="text-xs text-[var(--color-ink-secondary)] mt-2">
-                    <span className="font-semibold text-[var(--color-insight-accent)]">{store.projects.filter(p => p.status === 'active').length} active projects</span> — keep pushing toward your deadlines.
+                    <span className="font-medium text-[var(--color-insight-accent)]">{store.projects.filter(p => p.status === 'active').length} active projects</span> — keep pushing toward your deadlines.
                   </p>
                 )}
               </div>
@@ -301,13 +299,13 @@ export function Dashboard() {
             </div>
           </section>
 
-          <section className="section-panel">
-            <div className="flex justify-between items-center mb-4">
+          <section className="section-panel section-panel-flat">
+            <div className="flex justify-between items-center mb-3">
               <h2 className="section-label">Today&apos;s Focus</h2>
               <Link to="/tasks" className="section-link">View all →</Link>
             </div>
             
-            <div className="design-card p-4">
+            <div className="design-card p-0 lg:p-4">
               <div className="space-y-0.5">
                 {store.tasks
                   .filter(t => !t.completed)
@@ -329,7 +327,7 @@ export function Dashboard() {
                       {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
                     </button>
                     <div>
-                      <p className={cn("text-sm font-medium", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
+                      <p className={cn("text-sm font-normal", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
                         {task.title}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
@@ -343,12 +341,12 @@ export function Dashboard() {
             </div>
           </section>
 
-          <section className="section-panel">
-            <div className="flex justify-between items-center mb-4">
+          <section className="section-panel section-panel-flat">
+            <div className="flex justify-between items-center mb-3">
               <h2 className="section-label">Upcoming Bills</h2>
               <Link to="/payments" className="section-link">View all →</Link>
             </div>
-            <div className="design-card p-4">
+            <div className="design-card p-0 lg:p-4">
               <div className="space-y-4">
                 {upcomingPayments.map(payment => (
                   <div key={payment.id} className="flex items-center justify-between">
@@ -361,7 +359,7 @@ export function Dashboard() {
                         <p className="text-xs text-[var(--color-ink-muted)]">Due on {payment.dayOfMonth}th</p>
                       </div>
                     </div>
-                    <p className="text-sm font-semibold text-[var(--color-ink)] tabular-nums">
+                    <p className="text-sm font-medium text-[var(--color-ink)] tabular-nums">
                       {formatCurrency(payment.amount)}
                     </p>
                   </div>
@@ -374,8 +372,13 @@ export function Dashboard() {
       
       <TransactionModal isOpen={isQuickAddOpen} onClose={() => setIsQuickAddOpen(false)} defaultType="expense" />
       
-      <button type="button" onClick={() => setIsQuickAddOpen(true)} className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40">
-        <Plus className="h-6 w-6" />
+      <button
+        type="button"
+        onClick={() => setIsQuickAddOpen(true)}
+        className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
+        aria-label="Quick add"
+      >
+        <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
     </div>
   );
@@ -469,7 +472,7 @@ function DualBalanceCard({ personalBalance, currentBalance, isHidden }: { person
       <div className="mt-auto pt-3 border-t border-[var(--color-border-soft)]">
         <div className="flex justify-between items-center">
           <span className="text-xs text-[var(--color-ink-muted)]">Liquid Cash</span>
-          <span className="text-sm font-semibold text-[var(--color-ink)] tabular-nums">
+          <span className="text-sm font-medium text-[var(--color-ink)] tabular-nums">
             <HiddenValue isHidden={isHidden} bulletCount={4}>{formatCurrency(personalBalance)}</HiddenValue>
           </span>
         </div>

@@ -22,7 +22,7 @@ export function Payments() {
   });
 
   return (
-    <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
+    <div className="mobile-page lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="page-title">Payments & Bills</h1>
@@ -146,7 +146,7 @@ export function Payments() {
           setPaymentToEdit(null);
           setIsModalOpen(true);
         }}
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
+        className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
       >
         <Plus className="h-6 w-6" />
       </button>

@@ -28,7 +28,7 @@ export function Projects() {
   const projects = store.projects.filter(p => filter === 'all' ? true : p.status === filter);
 
   return (
-    <div className="space-y-6 pb-20 lg:pb-0 h-full flex flex-col">
+    <div className="mobile-page lg:pb-0 h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="page-title">Projects</h1>
@@ -202,7 +202,7 @@ export function Projects() {
       {/* Mobile FAB */}
       <button
         type="button"
-        className="sm:hidden fixed bottom-[88px] right-6 p-4 fab-mobile z-40"
+        className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
         onClick={() => {
           setProjectToEdit(null);
           setIsModalOpen(true);
