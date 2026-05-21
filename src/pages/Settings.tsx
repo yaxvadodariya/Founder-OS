@@ -1,4 +1,5 @@
 import React from 'react';
+import { PageShell } from '../components/layout/PageShell';
 import { useStore } from '../store/useStore';
 import { logOut } from '../lib/firebase';
 import { 
@@ -17,7 +18,7 @@ export function Settings() {
   const user = store.user;
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
+    <PageShell className="lg:pb-0 max-w-2xl mx-auto w-full">
       <div className="flex flex-col justify-between items-start gap-4 mb-4">
         <div>
           <h1 className="page-title">Settings</h1>
@@ -108,6 +109,6 @@ export function Settings() {
            </button>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { PageShell } from '../components/layout/PageShell';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { logOut } from '../lib/firebase';
@@ -56,7 +57,7 @@ export function More() {
   ];
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col max-w-2xl mx-auto">
+    <PageShell className="lg:pb-0 max-w-2xl mx-auto w-full">
       <div className="flex flex-col justify-between items-start gap-4">
         <div>
           <h1 className="page-title">Menu</h1>
@@ -199,6 +200,6 @@ export function More() {
            </button>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

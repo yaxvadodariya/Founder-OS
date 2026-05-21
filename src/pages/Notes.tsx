@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PageShell } from '../components/layout/PageShell';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
 import { format } from 'date-fns';
@@ -46,7 +47,7 @@ export function Notes() {
     });
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col">
+    <PageShell className="lg:pb-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="page-title">Remember Book</h1>
@@ -169,9 +170,9 @@ export function Notes() {
         }}
         className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
       >
-        <Plus className="h-6 w-6" />
+        <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
-    </div>
+    </PageShell>
   );
 }
 

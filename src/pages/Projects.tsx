@@ -7,6 +7,7 @@ import { Plus, MoreVertical, Calendar, CheckCircle2, Clock } from 'lucide-react'
 import { ProjectStatus } from '../types';
 import { ProjectModal } from '../components/ProjectModal';
 import { TaskModal } from '../components/TaskModal';
+import { PageShell } from '../components/layout/PageShell';
 
 export function Projects() {
   const store = useStore();
@@ -28,9 +29,9 @@ export function Projects() {
   const projects = store.projects.filter(p => filter === 'all' ? true : p.status === filter);
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+    <PageShell className="lg:pb-0">
+      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="min-w-0">
           <h1 className="page-title">Projects</h1>
           <p className="page-subtitle">Manage client projects and deliverables</p>
         </div>
@@ -46,9 +47,9 @@ export function Projects() {
             <span>New Project</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      <div className="segmented-control w-fit overflow-x-auto max-w-full">
+      <div className="page-block segmented-control segmented-control-full">
         {(['all', 'active', 'completed', 'on-hold'] as const).map(f => (
           <button
             key={f}
@@ -63,11 +64,9 @@ export function Projects() {
         ))}
       </div>
 
-      <div className="section-panel flex-1 flex flex-col">
-        <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="section-label">Project List</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 content-start">
+      <section className="page-block flex-1">
+        <h2 className="section-label mb-3">Project List</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 w-full min-w-0">
           {projects.map(project => (
             <div 
               key={project.id} 
@@ -86,7 +85,7 @@ export function Projects() {
                     )}>
                       {project.status}
                     </span>
-                    <h3 className="text-lg font-semibold text-[var(--color-ink)] transition-colors">{project.name}</h3>
+                    <h3 className="text-base font-medium text-[var(--color-ink)] break-words">{project.name}</h3>
                     <p className="page-subtitle">{project.clientName}</p>
                   </div>
                   <div className="relative">
@@ -197,7 +196,7 @@ export function Projects() {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Mobile FAB */}
       <button
@@ -222,6 +221,6 @@ export function Projects() {
         onClose={() => setIsTaskModalOpen(false)}
         defaultProjectId={selectedProjectIdForTask}
       />
-    </div>
+    </PageShell>
   );
 }

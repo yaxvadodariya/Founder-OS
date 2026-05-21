@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { formatCurrency, cn, CURRENCIES } from '../lib/utils';
 import { format } from 'date-fns';
-import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText, Eye, EyeOff } from 'lucide-react';
-import { TransactionType, FinanceCategory } from '../types';
+import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText } from 'lucide-react';
+import { FinanceCategory } from '../types';
 import { TransactionModal } from '../components/TransactionModal';
 import { HiddenValue } from '../components/HiddenValue';
+import { PageShell } from '../components/layout/PageShell';
 
 export function Finance() {
   const { type } = useParams<{ type: string }>();
@@ -17,12 +18,8 @@ export function Finance() {
   const currencyCode = store.currency || 'USD';
   const currencySymbol = CURRENCIES.find(c => c.code === currencyCode)?.symbol || '$';
   
-  // As requested, always show numbers on the Finance page tab, even if privacy mode is on globally
-  const isPrivacyMode = false;
-  
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPeeking, setIsPeeking] = useState(false);
   const [transactionToEdit, setTransactionToEdit] = useState<any>(null);
   
   const isHidden = false;
@@ -39,174 +36,175 @@ export function Finance() {
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
   const netBalance = totalIncome - totalExpense;
 
-  return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="page-title">Finance</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="page-subtitle">Manage your {currentCategory} finances</p>
-          </div>
-        </div>
-        <div className="flex gap-2 items-center">
-          <button 
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="hidden sm:inline-flex btn-primary"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Transaction</span>
-          </button>
-        </div>
-      </div>
+  const openTransaction = (t: typeof transactions[0]) => {
+    setTransactionToEdit(t);
+    setIsModalOpen(true);
+  };
 
-      {/* Tabs */}
-      <div className="segmented-control w-full sm:w-fit">
+  return (
+    <PageShell className="lg:pb-0">
+      <header className="page-block">
+        <h1 className="page-title">Finance</h1>
+        <p className="page-subtitle">Manage your {currentCategory} finances</p>
+      </header>
+
+      <div className="page-block segmented-control segmented-control-full">
         <button
+          type="button"
           onClick={() => navigate('/finance/personal')}
-          className={cn(
-            "segmented-item flex-1 sm:px-6",
-            currentCategory === 'personal' && "segmented-item-active"
-          )}
+          className={cn('segmented-item', currentCategory === 'personal' && 'segmented-item-active')}
         >
           Personal
         </button>
         <button
+          type="button"
           onClick={() => navigate('/finance/business')}
-          className={cn(
-            "segmented-item flex-1 sm:px-6",
-            currentCategory === 'business' && "segmented-item-active"
-          )}
+          className={cn('segmented-item', currentCategory === 'business' && 'segmented-item-active')}
         >
           Business
         </button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="section-panel">
-        <div className="flex items-center mb-4 px-1">
-          <h2 className="section-label">Summary</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="design-card p-5">
-            <div className="flex flex-col gap-4">
-              <p className="metric-label">Net Balance</p>
+      <section className="page-block">
+        <h2 className="section-label mb-3">Summary</h2>
+        <div className="stack-list">
+          <div className="stack-list-item">
+            <p className="metric-label">Net Balance</p>
+            <p className="metric-value mt-1">
+              <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
+            </p>
+          </div>
+          <div className="stack-list-item">
+            <p className="metric-label">Total Income</p>
+            <div className="flex items-center gap-2 mt-1">
               <p className="metric-value">
-                <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
+                <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
               </p>
+              <ArrowUpRight className="h-4 w-4 text-emerald-500 shrink-0" />
             </div>
           </div>
-          <div className="design-card p-5">
-            <div className="flex flex-col gap-4">
-              <p className="metric-label">Total Income</p>
-              <div className="flex items-center gap-2">
-                <p className="metric-value">
-                  <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
-                </p>
-                <ArrowUpRight className="h-5 w-5 text-emerald-500" />
-              </div>
-            </div>
-          </div>
-          <div className="design-card p-5">
-            <div className="flex flex-col gap-4">
-              <p className="metric-label">Total Expenses</p>
-              <div className="flex items-center gap-2">
-                <p className="metric-value">
-                  <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
-                </p>
-                <ArrowDownRight className="h-5 w-5 text-red-500" />
-              </div>
+          <div className="stack-list-item">
+            <p className="metric-label">Total Expenses</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="metric-value">
+                <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
+              </p>
+              <ArrowDownRight className="h-4 w-4 text-red-500 shrink-0" />
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Transactions List */}
-      <div className="section-panel flex-1 min-h-[400px] flex flex-col">
-        <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="section-label">History</h2>
-        </div>
-        <div className="design-card flex flex-col flex-1">
-          <div className="p-5 border-b border-[var(--color-border-soft)] flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h2 className="text-base font-semibold text-[var(--color-ink)]">Recent Transactions</h2>
-            <div className="relative w-full sm:w-72">
+      <section className="page-block flex-1 flex flex-col min-h-0">
+        <h2 className="section-label mb-3">History</h2>
+        <div className="section-panel-flat w-full min-w-0 flex flex-col flex-1">
+          <div className="p-4 border-b border-[var(--color-border-soft)]">
+            <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Recent Transactions</h3>
+            <div className="relative w-full">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-ink-muted)]" />
               <input 
                 type="text" 
                 placeholder="Search transactions..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field !pl-10 !rounded-full"
+                className="input-field !pl-10 w-full max-w-full"
               />
             </div>
           </div>
-          
-          <div className="overflow-x-auto flex-1">
-            <table className="data-table min-w-full">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Description</th>
-                  <th scope="col">Category</th>
-                  <th scope="col" className="!text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.length > 0 ? (
-                  transactions.map((t) => (
-                    <tr 
-                      key={t.id} 
-                      className="hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
-                      onClick={() => {
-                        setTransactionToEdit(t);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {format(new Date(t.date), 'MMM dd, yyyy')}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <div className={cn(
-                            "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center mr-3",
-                            t.type === 'income' ? "bg-emerald-100 text-emerald-600" : "bg-red-100 text-red-600"
-                          )}>
-                            {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{t.description}</div>
-                            <div className="text-xs text-gray-500">{t.paymentMethod}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          {t.categoryDetail}
-                        </span>
-                      </td>
-                      <td className={cn(
-                        "px-6 py-4 whitespace-nowrap text-right text-sm font-semibold",
-                        t.type === 'income' ? "text-emerald-600" : "text-gray-900"
-                      )}>
-                        <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+ ${currencySymbol} ` : `- ${currencySymbol} `}>
-                          {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
-                        </HiddenValue>
-                      </td>
+
+          {transactions.length > 0 ? (
+            <>
+              <div className="list-mobile divide-y divide-[var(--color-border-soft)]">
+                {transactions.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => openTransaction(t)}
+                    className="list-row w-full"
+                  >
+                    <div className={cn(
+                      'flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center',
+                      t.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                    )}>
+                      {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                    </div>
+                    <div className="list-row-body">
+                      <p className="list-row-title">{t.description}</p>
+                      <p className="list-row-meta">
+                        {format(new Date(t.date), 'MMM d, yyyy')} · {t.categoryDetail}
+                      </p>
+                    </div>
+                    <span className={cn(
+                      'list-row-aside',
+                      t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--color-ink)]'
+                    )}>
+                      <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+${currencySymbol}` : `-${currencySymbol}`}>
+                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                      </HiddenValue>
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="data-table-desktop overflow-x-auto">
+                <table className="data-table w-full">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Category</th>
+                      <th scope="col" className="!text-right">Amount</th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center">
-                      <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <p className="text-gray-500 text-sm">No transactions found.</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  </thead>
+                  <tbody>
+                    {transactions.map((t) => (
+                      <tr 
+                        key={t.id} 
+                        className="hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
+                        onClick={() => openTransaction(t)}
+                      >
+                        <td className="whitespace-nowrap text-[var(--color-ink-muted)]">
+                          {format(new Date(t.date), 'MMM dd, yyyy')}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={cn(
+                              'flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center',
+                              t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'
+                            )}>
+                              {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-[var(--color-ink)] truncate">{t.description}</div>
+                              <div className="text-xs text-[var(--color-ink-muted)]">{t.paymentMethod}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="whitespace-nowrap">
+                          <span className="status-badge status-badge-neutral">{t.categoryDetail}</span>
+                        </td>
+                        <td className={cn(
+                          'whitespace-nowrap text-right font-medium',
+                          t.type === 'income' ? 'text-emerald-600' : 'text-[var(--color-ink)]'
+                        )}>
+                          <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+ ${currencySymbol} ` : `- ${currencySymbol} `}>
+                            {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                          </HiddenValue>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <div className="p-10 text-center">
+              <FileText className="h-10 w-10 text-[var(--color-ink-muted)] mx-auto mb-2 opacity-50" />
+              <p className="text-sm text-[var(--color-ink-muted)]">No transactions found.</p>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
       
       <TransactionModal 
         isOpen={isModalOpen} 
@@ -218,14 +216,14 @@ export function Finance() {
         transactionToEdit={transactionToEdit}
       />
       
-      {/* Mobile FAB */}
       <button
         type="button"
         onClick={() => setIsModalOpen(true)}
         className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
+        aria-label="Add transaction"
       >
-        <Plus className="h-6 w-6" />
+        <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
-    </div>
+    </PageShell>
   );
 }

@@ -78,9 +78,9 @@ export function AppLayout() {
     <div className="flex min-h-screen bg-[var(--color-canvas)] text-[var(--color-ink)] font-sans">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-h-screen lg:pl-[252px]">
-        <div className="app-shell flex flex-col flex-1 min-h-0 lg:min-h-[calc(100vh-1.5rem)]">
-          <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex-1 flex flex-col min-h-screen min-w-0 lg:pl-[252px]">
+        <div className="app-shell flex flex-col flex-1 min-h-0 min-w-0 lg:min-h-[calc(100vh-1.5rem)]">
+          <main className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden overflow-y-hidden relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
             {user?.email === 'yaxvadodariya@gmail.com' && store.lastError && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl m-4 text-sm relative z-50 shrink-0">
                 <strong className="font-semibold">Last Firestore Error:</strong>
@@ -93,8 +93,8 @@ export function AppLayout() {
                 </button>
               </div>
             )}
-            <div className="flex-1 overflow-y-auto">
-              <div className="mx-auto max-w-[1200px] px-5 sm:px-6 lg:px-8 py-5 lg:py-8">
+            <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
+              <div className="mx-auto max-w-[1200px] w-full min-w-0 box-border px-5 sm:px-6 lg:px-8 py-5 lg:py-8">
                 <Outlet />
               </div>
             </div>

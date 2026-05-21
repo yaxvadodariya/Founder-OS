@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { cn } from '../lib/utils';
 import { format, isToday, isTomorrow, isPast, isSameDay } from 'date-fns';
-import { Plus, CheckSquare, Calendar, Flag, AlertCircle, Briefcase } from 'lucide-react';
+import { Plus, CheckSquare, Calendar, Flag, AlertCircle } from 'lucide-react';
 import { Task } from '../types';
 import { TaskModal } from '../components/TaskModal';
+import { PageShell } from '../components/layout/PageShell';
 
 export function Tasks() {
   const store = useStore();
@@ -18,78 +19,62 @@ export function Tasks() {
   const tasks = store.tasks.filter(t => {
     if (filter === 'all') return !t.completed;
     if (filter === 'completed') return t.completed;
-    if (!t.dueDate) return filter === 'today'; // Tasks without due date show today
+    if (!t.dueDate) return filter === 'today';
     
     const dueDate = new Date(t.dueDate);
     if (filter === 'today') return isSameDay(dueDate, today) || (isPast(dueDate) && !t.completed);
     if (filter === 'upcoming') return !isPast(dueDate) && !isSameDay(dueDate, today) && !t.completed;
     return true;
   }).sort((a, b) => {
-    // Sort by priority first
     const pWeight = { high: 3, medium: 2, low: 1 };
     if (pWeight[a.priority] !== pWeight[b.priority]) {
       return pWeight[b.priority] - pWeight[a.priority];
     }
-    // Then by due date
     if (!a.dueDate) return 1;
     if (!b.dueDate) return -1;
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="page-title">Tasks</h1>
-          <p className="page-subtitle">Manage your to-dos and daily focus</p>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button 
-            type="button"
-            onClick={() => {
-              setTaskToEdit(null);
-              setIsModalOpen(true);
-            }}
-            className="hidden sm:inline-flex btn-primary"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Task</span>
-          </button>
-        </div>
-      </div>
+    <PageShell className="lg:pb-0">
+      <header className="page-block">
+        <h1 className="page-title">Tasks</h1>
+        <p className="page-subtitle">Manage your to-dos and daily focus</p>
+      </header>
 
-      <div className="segmented-control w-fit overflow-x-auto max-w-full">
+      <div className="page-block segmented-control segmented-control-full max-w-full">
         <FilterButton active={filter === 'today'} onClick={() => setFilter('today')}>Today</FilterButton>
         <FilterButton active={filter === 'upcoming'} onClick={() => setFilter('upcoming')}>Upcoming</FilterButton>
-        <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All Pending</FilterButton>
-        <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')}>Completed</FilterButton>
+        <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>Pending</FilterButton>
+        <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')}>Done</FilterButton>
       </div>
 
-      <div className="section-panel flex-1 overflow-hidden flex flex-col">
-        <div className="flex justify-between items-center mb-4 px-1">
-          <h2 className="section-label">Task List</h2>
-        </div>
-        <div className="design-card flex-1 overflow-hidden flex flex-col">
-          <div className="overflow-y-auto flex-1 p-2">
-            {tasks.length > 0 ? (
-              <div className="space-y-1">
-                {tasks.map(task => 
-                  <div key={task.id} onClick={() => { setTaskToEdit(task); setIsModalOpen(true); }} className="cursor-pointer">
+      <section className="page-block flex-1 min-h-0 flex flex-col">
+        <h2 className="section-label mb-3">Task List</h2>
+        <div className="section-panel-flat w-full min-w-0 flex-1 flex flex-col overflow-hidden">
+          {tasks.length > 0 ? (
+            <div className="overflow-y-auto flex-1 min-h-0 -mx-0">
+              <div className="divide-y divide-[var(--color-border-soft)]">
+                {tasks.map(task => (
+                  <div
+                    key={task.id}
+                    onClick={() => { setTaskToEdit(task); setIsModalOpen(true); }}
+                    className="cursor-pointer w-full min-w-0"
+                  >
                     <TaskItem task={task} />
                   </div>
-                )}
+                ))}
               </div>
-            ) : (
-               <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200 my-4 mx-2">
-                <CheckSquare className="h-12 w-12 text-gray-300 mb-3" />
-                <p className="text-gray-900 font-medium">All caught up!</p>
-                <p className="page-subtitle mt-1">No tasks in this view. Enjoy your day.</p>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-10 text-center">
+              <CheckSquare className="h-10 w-10 text-[var(--color-ink-muted)] mb-2 opacity-40" />
+              <p className="text-sm font-medium text-[var(--color-ink)]">All caught up!</p>
+              <p className="page-subtitle mt-1">No tasks in this view.</p>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
       
       <TaskModal 
         isOpen={isModalOpen}
@@ -97,7 +82,6 @@ export function Tasks() {
         taskToEdit={taskToEdit}
       />
       
-      {/* Mobile FAB */}
       <button
         type="button"
         onClick={() => {
@@ -105,21 +89,20 @@ export function Tasks() {
           setIsModalOpen(true);
         }}
         className="sm:hidden fixed bottom-[5.25rem] right-5 h-14 w-14 flex items-center justify-center fab-mobile z-40"
+        aria-label="Add task"
       >
-        <Plus className="h-6 w-6" />
+        <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
-    </div>
+    </PageShell>
   );
 }
 
 export const FilterButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={cn(
-        "segmented-item",
-        active && "segmented-item-active"
-      )}
+      className={cn('segmented-item', active && 'segmented-item-active')}
     >
       {children}
     </button>
@@ -131,55 +114,65 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   const isOverdue = task.dueDate && isPast(new Date(task.dueDate)) && !isToday(new Date(task.dueDate)) && !task.completed;
   
   return (
-    <div className={cn(
-      "flex items-start gap-3 p-3 rounded-xl group transition-colors",
-      task.completed ? "opacity-60" : "hover:bg-[var(--color-surface-muted)]"
-    )}>
+    <div
+      className={cn(
+        'flex items-start gap-3 p-4 w-full min-w-0 max-w-full box-border transition-colors',
+        task.completed ? 'opacity-70' : 'hover:bg-[var(--color-surface-muted)]'
+      )}
+    >
       <button 
-        onClick={() => store.toggleTaskCompletion(task.id)}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          store.toggleTaskCompletion(task.id);
+        }}
         className={cn(
-          "mt-0.5 flex-shrink-0 h-[22px] w-[22px] rounded border flex items-center justify-center transition-all",
-          task.completed 
-            ? "bg-gray-300 border-gray-300" 
-            : task.priority === 'high' 
-              ? "bg-white border-red-300 hover:border-red-500 hover:bg-red-50" 
-              : "bg-white border-gray-300 hover:border-blue-500 hover:bg-blue-50"
+          'mt-0.5 flex-shrink-0 h-5 w-5 rounded border flex items-center justify-center transition-colors',
+          task.completed
+            ? 'bg-[var(--color-ink-muted)] border-[var(--color-ink-muted)]'
+            : task.priority === 'high'
+              ? 'bg-[var(--color-surface)] border-red-400 dark:border-red-500'
+              : 'bg-[var(--color-surface)] border-[var(--color-border-subtle)]'
         )}
       >
-        {task.completed && <CheckSquare className="h-[14px] w-[14px] text-white" />}
+        {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
       </button>
       
-      <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm font-medium truncate transition-colors", 
-          task.completed ? "text-gray-400 line-through" : "text-gray-900"
-        )}>
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <p
+          className={cn(
+            'text-sm font-normal leading-snug break-words',
+            task.completed
+              ? 'text-[var(--color-ink-muted)] line-through'
+              : 'text-[var(--color-ink)]'
+          )}
+        >
           {task.title}
         </p>
         
-        {(!task.completed && (task.description || task.dueDate || task.tags.length > 0)) && (
-          <div className="flex flex-wrap items-center gap-3 mt-1.5">
+        {(!task.completed && (task.description || task.dueDate || task.tags.length > 0 || task.projectId)) && (
+          <div className="flex flex-wrap items-center gap-2 mt-2">
             {task.dueDate && (
-              <div className={cn(
-                "flex items-center text-xs font-medium",
-                isOverdue ? "text-red-600" : isToday(new Date(task.dueDate)) ? "text-orange-600" : "text-gray-500"
-              )}>
-                {isOverdue ? <AlertCircle className="mr-1 h-3 w-3" /> : <Calendar className="mr-1 h-3 w-3" />}
+              <span
+                className={cn(
+                  'inline-flex items-center text-xs font-medium',
+                  isOverdue ? 'text-red-600 dark:text-red-400' : isToday(new Date(task.dueDate)) ? 'text-orange-600 dark:text-orange-400' : 'text-[var(--color-ink-muted)]'
+                )}
+              >
+                {isOverdue ? <AlertCircle className="mr-1 h-3 w-3 shrink-0" /> : <Calendar className="mr-1 h-3 w-3 shrink-0" />}
                 {isOverdue ? 'Overdue' : isToday(new Date(task.dueDate)) ? 'Today' : isTomorrow(new Date(task.dueDate)) ? 'Tomorrow' : format(new Date(task.dueDate), 'MMM d')}
-              </div>
+              </span>
             )}
             
             {task.priority === 'high' && (
-              <div className="flex items-center text-xs font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                <Flag className="mr-1 h-3 w-3" />
+              <span className="status-badge status-badge-warning">
+                <Flag className="h-3 w-3 mr-0.5" />
                 High
-              </div>
+              </span>
             )}
 
             {task.projectId && (
-               <div className="text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                 Project
-               </div>
+              <span className="status-badge status-badge-neutral">Project</span>
             )}
           </div>
         )}

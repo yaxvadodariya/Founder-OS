@@ -23,6 +23,7 @@ import { TransactionModal } from '../components/TransactionModal';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { HiddenValue } from '../components/HiddenValue';
 import { ChartTooltip } from '../components/ChartTooltip';
+import { PageShell } from '../components/layout/PageShell';
 
 type ChartRange = '7d' | '14d' | '30d';
 
@@ -105,7 +106,7 @@ export function Dashboard() {
   const showTaskAlert = pendingTasksToday > 0;
 
   return (
-    <div className="mobile-page">
+    <PageShell>
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
         <div>
           <h1 className="page-title">Hey {user?.name.split(' ')[0]} 👋</h1>
@@ -380,7 +381,7 @@ export function Dashboard() {
       >
         <Plus className="h-6 w-6" strokeWidth={2} />
       </button>
-    </div>
+    </PageShell>
   );
 }
 

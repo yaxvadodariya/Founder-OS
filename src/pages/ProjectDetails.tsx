@@ -1,4 +1,5 @@
 import React from 'react';
+import { PageShell } from '../components/layout/PageShell';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { formatCurrency, cn } from '../lib/utils';
@@ -166,7 +167,7 @@ export function ProjectDetails() {
   }
 
   return (
-    <div className="mobile-page lg:pb-0 h-full flex flex-col">
+    <PageShell className="lg:pb-0">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
@@ -520,6 +521,6 @@ export function ProjectDetails() {
         onClose={() => setIsTaskModalOpen(false)} 
         defaultProjectId={project.id}
       />
-    </div>
+    </PageShell>
   );
 }
