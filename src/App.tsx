@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
-import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes, More, Settings } from './pages';
+import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes, More, Settings, ClientPortal } from './pages';
 import { FirebaseProvider } from './FirebaseProvider';
 import { Login } from './components/Login';
 import { useStore } from './store/useStore';
@@ -10,8 +10,9 @@ import { WhatsAppPoller } from './components/WhatsAppPoller';
 
 function AppContent() {
   const user = useStore(state => state.user);
+  const isPortal = window.location.pathname.startsWith('/portal/');
 
-  if (!user) {
+  if (!user && !isPortal) {
     return <Login />;
   }
 
@@ -20,7 +21,11 @@ function AppContent() {
       <SlackPoller />
       <WhatsAppPoller />
       <Routes>
-        <Route path="/" element={<AppLayout />}>
+        {/* Public Client Portal Route */}
+        <Route path="/portal/project/:userId/:projectId" element={<ClientPortal />} />
+
+        {/* Protected Application Routes */}
+        <Route path="/" element={user ? <AppLayout /> : <Navigate to="/" replace />}>
           <Route index element={<Dashboard />} />
           <Route path="finance/:type" element={<Finance />} />
           <Route path="finance" element={<Navigate to="/finance/personal" replace />} />

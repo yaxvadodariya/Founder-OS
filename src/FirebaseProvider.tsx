@@ -48,6 +48,10 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ notes: data });
           }, (err) => console.error("Notes snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/invoices`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            useStore.setState({ invoices: data });
+          }, (err) => console.error("Invoices snapshot error:", err)),
         ];
 
         setLoading(false);

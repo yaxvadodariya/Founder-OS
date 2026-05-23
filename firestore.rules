@@ -61,7 +61,10 @@ service cloud.firestore {
         data.description is string && data.description.size() <= 5000 &&
         data.deliverables is list && data.deliverables.size() <= 100 &&
         data.notes is string && data.notes.size() <= 5000 &&
-        data.milestones is list && data.milestones.size() <= 100;
+        data.milestones is list && data.milestones.size() <= 100 &&
+        (data.keys().hasAll(['isPublic']) ? (data.isPublic is bool) : true) &&
+        (data.keys().hasAll(['hourlyRate']) ? (data.hourlyRate is number) : true) &&
+        (data.keys().hasAll(['timeSpent']) ? (data.timeSpent is number) : true);
     }
 
     // Task
@@ -78,7 +81,8 @@ service cloud.firestore {
         (data.keys().hasAll(['description']) ? (data.description is string && data.description.size() <= 5000) : true) &&
         (data.keys().hasAll(['dueDate']) ? (data.dueDate is string && data.dueDate.size() <= 100) : true) &&
         (data.keys().hasAll(['projectId']) ? (data.projectId is string && data.projectId.size() <= 128) : true) &&
-        (data.keys().hasAll(['completedAt']) ? (data.completedAt is string && data.completedAt.size() <= 100) : true);
+        (data.keys().hasAll(['completedAt']) ? (data.completedAt is string && data.completedAt.size() <= 100) : true) &&
+        (data.keys().hasAll(['timeSpent']) ? (data.timeSpent is number) : true);
     }
 
     // Recurring Payment
@@ -113,6 +117,23 @@ service cloud.firestore {
         (data.keys().hasAll(['reminderDate']) ? (data.reminderDate is string && data.reminderDate.size() <= 100) : true);
     }
 
+    // Invoice
+    function isValidInvoice(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['id', 'projectId', 'invoiceNumber', 'amount', 'status', 'dueDate', 'createdAt']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.projectId is string && data.projectId.size() <= 128 &&
+        data.invoiceNumber is string && data.invoiceNumber.size() <= 100 &&
+        data.amount is number &&
+        data.status in ['draft', 'sent', 'overdue', 'paid'] &&
+        data.dueDate is string && data.dueDate.size() <= 100 &&
+        data.createdAt is string && data.createdAt.size() <= 100 &&
+        (data.keys().hasAll(['milestoneId']) ? (data.milestoneId is string && data.milestoneId.size() <= 128) : true) &&
+        (data.keys().hasAll(['sentAt']) ? (data.sentAt is string && data.sentAt.size() <= 100) : true) &&
+        (data.keys().hasAll(['paidAt']) ? (data.paidAt is string && data.paidAt.size() <= 100) : true) &&
+        (data.keys().hasAll(['description']) ? (data.description is string && data.description.size() <= 5000) : true);
+    }
+
     match /webhook_queue/{eventId} {
       allow read, write: if true;
     }
@@ -126,7 +147,7 @@ service cloud.firestore {
       }
       
       match /projects/{projectId} {
-        allow read: if isOwner(userId);
+        allow read: if isOwner(userId) || resource.data.isPublic == true;
         allow create: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming(), userId);
         allow update: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming(), userId) && incoming().userId == existing().userId;
         allow delete: if isOwner(userId) && isValidId(projectId);
@@ -151,6 +172,13 @@ service cloud.firestore {
         allow create: if isOwner(userId) && isValidId(noteId) && isValidNote(incoming(), userId);
         allow update: if isOwner(userId) && isValidId(noteId) && isValidNote(incoming(), userId) && incoming().userId == existing().userId && incoming().createdAt == existing().createdAt;
         allow delete: if isOwner(userId) && isValidId(noteId);
+      }
+
+      match /invoices/{invoiceId} {
+        allow read: if isOwner(userId) || (get(/databases/$(database)/documents/users/$(userId)/projects/$(resource.data.projectId)).data.isPublic == true);
+        allow create: if isOwner(userId) && isValidId(invoiceId) && isValidInvoice(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(invoiceId) && isValidInvoice(incoming(), userId);
+        allow delete: if isOwner(userId) && isValidId(invoiceId);
       }
     }
   }

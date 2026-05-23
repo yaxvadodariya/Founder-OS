@@ -139,16 +139,51 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
       </button>
       
       <div className="flex-1 min-w-0 overflow-hidden">
-        <p
-          className={cn(
-            'text-sm font-normal leading-snug break-words',
-            task.completed
-              ? 'text-[var(--color-ink-muted)] line-through'
-              : 'text-[var(--color-ink)]'
-          )}
-        >
-          {task.title}
-        </p>
+        <div className="flex justify-between items-start gap-2">
+          <p
+            className={cn(
+              'text-sm font-normal leading-snug break-words',
+              task.completed
+                ? 'text-[var(--color-ink-muted)] line-through'
+                : 'text-[var(--color-ink)]'
+            )}
+          >
+            {task.title}
+          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            {task.timeSpent ? (
+              <span className="text-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] px-1.5 py-0.5 rounded font-mono">
+                {(() => {
+                  const hrs = Math.floor(task.timeSpent / 3600);
+                  const mins = Math.floor((task.timeSpent % 3600) / 60);
+                  const secs = task.timeSpent % 60;
+                  return `${hrs}h ${mins}m ${secs}s`;
+                })()}
+              </span>
+            ) : null}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                const isTaskTimerActive = store.activeTimer?.id === task.id && store.activeTimer?.type === 'task';
+                if (isTaskTimerActive) {
+                  store.stopTimer();
+                } else {
+                  store.startTimer(task.id, 'task');
+                }
+              }}
+              className={cn(
+                "px-2 py-0.5 rounded text-[10px] font-medium transition-all",
+                store.activeTimer?.id === task.id && store.activeTimer?.type === 'task'
+                  ? "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400"
+                  : "bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)]"
+              )}
+              title={store.activeTimer?.id === task.id && store.activeTimer?.type === 'task' ? "Stop Timer" : "Start Timer"}
+            >
+              {store.activeTimer?.id === task.id && store.activeTimer?.type === 'task' ? "STOP" : "TRACK"}
+            </button>
+          </div>
+        </div>
         
         {(!task.completed && (task.description || task.dueDate || task.tags.length > 0 || task.projectId)) && (
           <div className="flex flex-wrap items-center gap-2 mt-2">

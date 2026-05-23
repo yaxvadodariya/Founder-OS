@@ -4,6 +4,21 @@ export type ProjectStatus = 'lead' | 'active' | 'completed' | 'on-hold' | 'cance
 export type TaskPriority = 'high' | 'medium' | 'low';
 export type PaymentFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type NoteCategory = 'idea' | 'important' | 'remember' | 'quote' | 'learning' | 'contact';
+export type InvoiceStatus = 'draft' | 'sent' | 'overdue' | 'paid';
+
+export interface Invoice {
+  id: string;
+  projectId: string;
+  milestoneId?: string;
+  invoiceNumber: string;
+  amount: number;
+  status: InvoiceStatus;
+  dueDate: string;
+  createdAt: string;
+  sentAt?: string;
+  paidAt?: string;
+  description?: string;
+}
 
 export interface User {
   name: string;
@@ -48,6 +63,9 @@ export interface Project {
   deliverables: string[];
   notes: string;
   milestones: Milestone[];
+  isPublic?: boolean;
+  hourlyRate?: number;
+  timeSpent?: number;
 }
 
 export interface SubTask {
@@ -68,6 +86,7 @@ export interface Task {
   subtasks: SubTask[];
   createdAt: string;
   completedAt?: string;
+  timeSpent?: number;
 }
 
 export interface RecurringPayment {

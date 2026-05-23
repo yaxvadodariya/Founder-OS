@@ -7,3 +7,4 @@ export { Payments } from './Payments';
 export { Notes } from './Notes';
 export { More } from './More';
 export { Settings } from './Settings';
+export { ClientPortal } from './ClientPortal';

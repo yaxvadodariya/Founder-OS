@@ -4,10 +4,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { formatCurrency, cn } from '../lib/utils';
 import { format } from 'date-fns';
-import { ArrowLeft, Calendar, FileText, CheckCircle2, ChevronRight, CheckSquare, ExternalLink, MessageSquare, Edit2, Plus, X } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, CheckCircle2, ChevronRight, CheckSquare, ExternalLink, MessageSquare, Edit2, Plus, X, Download } from 'lucide-react';
 import { ProjectModal } from '../components/ProjectModal';
 import { TaskModal } from '../components/TaskModal';
 import { SidePanel } from '../components/SidePanel';
+import { auth } from '../lib/firebase';
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -30,6 +31,9 @@ export function ProjectDetails() {
   const toggleMilestone = (milestoneId: string) => {
     if (!project) return;
     
+    const milestone = project.milestones.find(m => m.id === milestoneId);
+    if (!milestone) return;
+
     const updatedMilestones = project.milestones.map(m => 
       m.id === milestoneId ? { ...m, completed: !m.completed } : m
     );
@@ -43,6 +47,28 @@ export function ProjectDetails() {
       milestones: updatedMilestones,
       progress
     });
+
+    const projectInvoices = store.invoices.filter(inv => inv.projectId === project.id);
+
+    if (!milestone.completed) {
+      const autoInvoice = {
+        id: Math.random().toString(36).substring(2, 11),
+        projectId: project.id,
+        milestoneId: milestoneId,
+        invoiceNumber: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
+        amount: milestone.amount,
+        status: 'draft' as const,
+        dueDate: milestone.dueDate.split('T')[0],
+        createdAt: new Date().toISOString(),
+        description: `Milestone Payment: ${milestone.name}`
+      };
+      store.addInvoice(autoInvoice);
+    } else {
+      const draftInvoice = projectInvoices.find(inv => inv.milestoneId === milestoneId && inv.status === 'draft');
+      if (draftInvoice) {
+        store.deleteInvoice(draftInvoice.id);
+      }
+    }
   };
 
   const handleSaveMilestone = (e: React.FormEvent) => {
@@ -73,6 +99,138 @@ export function ProjectDetails() {
       setMilestoneDueDate(format(new Date(), 'yyyy-MM-dd'));
       setIsAddingMilestone(false);
     }
+  };
+
+  const [hourlyRate, setHourlyRate] = React.useState(0);
+
+  React.useEffect(() => {
+    if (project) {
+      setHourlyRate(project.hourlyRate || 0);
+    }
+  }, [project?.id]);
+
+  const activeTimer = store.activeTimer;
+  const isProjectTimerActive = activeTimer?.id === project?.id && activeTimer?.type === 'project';
+  const [tickingSeconds, setTickingSeconds] = React.useState(0);
+
+  React.useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (isProjectTimerActive && activeTimer) {
+      const updateTime = () => {
+        const elapsed = Math.round((Date.now() - new Date(activeTimer.startTime).getTime()) / 1000);
+        setTickingSeconds(elapsed);
+      };
+      updateTime();
+      interval = setInterval(updateTime, 1000);
+    } else {
+      setTickingSeconds(0);
+    }
+    return () => clearInterval(interval);
+  }, [isProjectTimerActive, activeTimer]);
+
+  const handleToggleTimer = () => {
+    if (!project) return;
+    if (isProjectTimerActive) {
+      store.stopTimer();
+    } else {
+      store.startTimer(project.id, 'project');
+    }
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  const totalProjectSeconds = project 
+    ? (project.timeSpent || 0) + projectTasks.reduce((acc, t) => acc + (t.timeSpent || 0), 0)
+    : 0;
+
+  const projectInvoices = project 
+    ? store.invoices.filter(inv => inv.projectId === project.id) 
+    : [];
+
+  const handleDownloadInvoice = (invoice: any) => {
+    if (!project) return;
+    
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(24);
+    doc.text("INVOICE", pageWidth / 2, 20, { align: "center" });
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(project.name, pageWidth / 2, 30, { align: "center" });
+    doc.text(`Invoice No: ${invoice.invoiceNumber}`, pageWidth / 2, 35, { align: "center" });
+    doc.text(`Due Date: ${invoice.dueDate}`, pageWidth / 2, 40, { align: "center" });
+    
+    const tableData = [
+      [invoice.description || 'Project Milestone Payment', 1, formatCurrency(invoice.amount), formatCurrency(invoice.amount)]
+    ];
+    
+    let currentY = 55;
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Item / Description', 'Qty', 'Rate', 'Amount']],
+      body: tableData,
+      theme: 'plain',
+      headStyles: {
+        fillColor: [255, 255, 255],
+        textColor: [0, 0, 0],
+        fontStyle: 'bold',
+        halign: 'center',
+        lineWidth: { bottom: 0.5 },
+        lineColor: [0, 0, 0]
+      },
+      bodyStyles: {
+        halign: 'center'
+      },
+      columnStyles: {
+        0: { halign: 'left' },
+        3: { halign: 'right' }
+      },
+      margin: { top: 10, left: 20, right: 20 }
+    });
+    
+    // @ts-ignore
+    currentY = doc.lastAutoTable.finalY + 10;
+    
+    // Summary
+    doc.line(20, currentY, pageWidth - 20, currentY);
+    currentY += 5;
+    doc.setFontSize(10);
+    doc.text("Subtotal", 20, currentY);
+    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    currentY += 5;
+    doc.text("Tax 0%", 20, currentY);
+    doc.text("$0.00", pageWidth - 20, currentY, { align: "right" });
+    currentY += 5;
+    doc.setFont("helvetica", "bold");
+    doc.text("Total", 20, currentY);
+    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    
+    currentY += 10;
+    doc.line(20, currentY, pageWidth - 20, currentY);
+    
+    // Client details
+    currentY += 15;
+    doc.setFont("helvetica", "bold");
+    doc.text("Prepared For:", 20, currentY);
+    doc.setFont("helvetica", "normal");
+    doc.text(project.clientName, 20, currentY + 5);
+    doc.text(project.clientEmail, 20, currentY + 10);
+    
+    // Footer
+    doc.setFont("helvetica", "italic");
+    doc.text("Thank you for your business!", pageWidth / 2, currentY + 30, { align: "center" });
+    
+    doc.save(`${invoice.invoiceNumber}.pdf`);
   };
 
   const handleGenerateInvoice = () => {
@@ -361,6 +519,85 @@ export function ProjectDetails() {
               </button>
             </div>
           </div>
+
+          {/* Invoices Section */}
+          <div className="section-panel">
+            <div className="flex justify-between items-center mb-4 px-1">
+              <h2 className="section-label">Invoices</h2>
+            </div>
+            <div className="design-card p-6 space-y-4">
+              {projectInvoices.length > 0 ? (
+                <div className="space-y-3">
+                  {projectInvoices.map((invoice) => (
+                    <div key={invoice.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-[var(--color-border-soft)] rounded-[10px] bg-[var(--color-surface)] gap-3 group relative">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] flex items-center justify-center text-[var(--color-ink-secondary)]">
+                          <FileText className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-[var(--color-ink)]">{invoice.invoiceNumber}</span>
+                            <span className={cn(
+                              "status-badge text-[9px] uppercase px-1.5 py-0.5",
+                              invoice.status === 'paid' && "status-badge-success",
+                              invoice.status === 'sent' && "status-badge-neutral",
+                              invoice.status === 'draft' && "status-badge-neutral",
+                              invoice.status === 'overdue' && "status-badge-warning"
+                            )}>
+                              {invoice.status}
+                            </span>
+                          </div>
+                          {invoice.description && (
+                            <p className="text-xs text-[var(--color-ink-secondary)] truncate max-w-[200px]">{invoice.description}</p>
+                          )}
+                          <p className="text-[10px] text-[var(--color-ink-muted)]">Due: {invoice.dueDate}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto border-t sm:border-t-0 pt-2 sm:pt-0 border-[var(--color-border-soft)]">
+                        <span className="text-sm font-semibold text-[var(--color-ink)]">{formatCurrency(invoice.amount)}</span>
+                        
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDownloadInvoice(invoice)}
+                            className="p-1.5 text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] bg-[var(--color-surface-muted)] rounded-lg transition-colors"
+                            title="Download Invoice PDF"
+                          >
+                            <Download className="h-4 w-4" />
+                          </button>
+
+                          <select
+                            value={invoice.status}
+                            onChange={(e) => store.updateInvoiceStatus(invoice.id, e.target.value as any)}
+                            className="text-xs bg-[var(--color-surface-muted)] border-none rounded-lg px-2.5 py-1 text-[var(--color-ink)] focus:ring-0 cursor-pointer"
+                          >
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="paid">Paid</option>
+                          </select>
+
+                          <button
+                            onClick={() => {
+                              if (confirm('Are you sure you want to delete this invoice?')) {
+                                store.deleteInvoice(invoice.id);
+                              }
+                            }}
+                            className="text-[var(--color-ink-muted)] hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete invoice"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-[var(--color-ink-secondary)] italic text-center py-2">No invoices generated yet. Mark a milestone as completed to auto-create a draft.</p>
+              )}
+            </div>
+          </div>
           
           {/* Related Tasks */}
           <div className="section-panel">
@@ -387,9 +624,38 @@ export function ProjectDetails() {
                         {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
                       </button>
                       <div className="flex-1">
-                        <p className={cn("text-sm font-medium transition-colors", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
-                          {task.title}
-                        </p>
+                        <div className="flex justify-between items-start gap-2">
+                          <p className={cn("text-sm font-medium transition-colors", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
+                            {task.title}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {task.timeSpent ? (
+                              <span className="text-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] px-1.5 py-0.5 rounded font-mono">
+                                {formatTime(task.timeSpent)}
+                              </span>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const isTaskTimerActive = store.activeTimer?.id === task.id && store.activeTimer?.type === 'task';
+                                if (isTaskTimerActive) {
+                                  store.stopTimer();
+                                } else {
+                                  store.startTimer(task.id, 'task');
+                                }
+                              }}
+                              className={cn(
+                                "px-2 py-0.5 rounded text-[10px] font-medium transition-all",
+                                store.activeTimer?.id === task.id && store.activeTimer?.type === 'task'
+                                  ? "text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400"
+                                  : "bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)]"
+                              )}
+                              title={store.activeTimer?.id === task.id && store.activeTimer?.type === 'task' ? "Stop Timer" : "Start Timer"}
+                            >
+                              {store.activeTimer?.id === task.id && store.activeTimer?.type === 'task' ? "STOP" : "TRACK"}
+                            </button>
+                          </div>
+                        </div>
                         <div className="flex items-center gap-2 mt-1">
                           {task.priority === 'high' && <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded">High</span>}
                           {task.dueDate && (
@@ -420,6 +686,122 @@ export function ProjectDetails() {
 
         {/* Right Column - Side Info */}
         <div className="space-y-6">
+          {/* Client Portal Sharing */}
+          <div className="section-panel">
+            <div className="flex justify-between items-center mb-4 px-1">
+              <h2 className="section-label">Client Portal</h2>
+            </div>
+            <div className="design-card p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-[var(--color-ink)]">Enable Share Link</span>
+                <button
+                  type="button"
+                  onClick={() => store.updateProject(project.id, { isPublic: !project.isPublic })}
+                  className={cn(
+                    "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                    project.isPublic ? "bg-[var(--color-ink)]" : "bg-[var(--color-surface-muted)]"
+                  )}
+                >
+                  <span className="sr-only">Toggle public portal</span>
+                  <span
+                    className={cn(
+                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                      project.isPublic ? "translate-x-5" : "translate-x-0"
+                    )}
+                  />
+                </button>
+              </div>
+              {project.isPublic && (
+                <div className="space-y-2">
+                  <input
+                    readOnly
+                    value={`${window.location.origin}/portal/project/${auth.currentUser?.uid}/${project.id}`}
+                    className="w-full text-xs bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] p-2.5 rounded-lg border-none focus:ring-0 truncate font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = `${window.location.origin}/portal/project/${auth.currentUser?.uid}/${project.id}`;
+                      navigator.clipboard.writeText(url);
+                      alert('Portal URL copied to clipboard!');
+                    }}
+                    className="w-full btn-secondary text-xs py-2"
+                  >
+                    Copy Portal Link
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Time Tracker */}
+          <div className="section-panel">
+            <div className="flex justify-between items-center mb-4 px-1">
+              <h2 className="section-label">Time Tracker</h2>
+            </div>
+            <div className="design-card p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium text-[var(--color-ink)]">Stopwatch</p>
+                  <p className="text-xs text-[var(--color-ink-muted)] mt-0.5">
+                    Logged: {formatTime(totalProjectSeconds)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleTimer}
+                  className={cn(
+                    "btn-secondary !p-2 rounded-full transition-all",
+                    isProjectTimerActive && "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30"
+                  )}
+                >
+                  {isProjectTimerActive ? (
+                    <div className="flex items-center gap-1.5 text-xs font-semibold px-2">
+                      <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
+                      <span>STOP ({formatTime(tickingSeconds)})</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-xs font-medium px-2">
+                      <span>START TIMER</span>
+                    </div>
+                  )}
+                </button>
+              </div>
+
+              {/* Hourly billing */}
+              <div className="pt-3 border-t border-[var(--color-border-soft)] space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Hourly Rate (INR)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={hourlyRate || ''}
+                    onChange={(e) => {
+                      const rate = Number(e.target.value) || 0;
+                      setHourlyRate(rate);
+                      store.updateProject(project.id, { hourlyRate: rate });
+                    }}
+                    placeholder="e.g. 2000"
+                    className="w-full text-sm bg-[var(--color-surface-muted)] border-none rounded-lg px-3 py-2 text-[var(--color-ink)] focus:ring-1 focus:ring-[var(--color-ink-muted)]"
+                  />
+                </div>
+                {totalProjectSeconds > 0 && hourlyRate > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm(`Are you sure you want to bill ${(totalProjectSeconds / 3600).toFixed(2)} hours at ₹${hourlyRate}/hr? This will reset logged times and generate a draft invoice.`)) {
+                        store.convertTimeToInvoice(project.id, hourlyRate);
+                      }
+                    }}
+                    className="w-full btn-primary text-xs py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+                  >
+                    Bill Logged Hours (₹{Math.round((totalProjectSeconds / 3600) * hourlyRate)})
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Deliverables */}
           <div className="section-panel">
             <div className="flex justify-between items-center mb-4 px-1">
