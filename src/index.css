@@ -32,6 +32,7 @@
   /* Semantic Colors */
   --color-positive: #10B981;
   --color-positive-soft: #ECFDF5;
+  --color-positive-text: #065F46;
   --color-negative: #EF4444;
   --color-negative-soft: #FEF2F2;
   --color-negative-text: #991B1B;
@@ -115,6 +116,7 @@
     --color-on-primary: #09090B;
     --color-chart-secondary: #3F3F46;
     --color-positive-soft: #052E16;
+    --color-positive-text: #34D399;
     --color-negative-soft: #450A0A;
     --color-negative-text: #FCA5A5;
     --color-insight-from: #1E1B4B;

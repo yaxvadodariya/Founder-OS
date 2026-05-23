@@ -124,7 +124,9 @@ export function Finance() {
                   >
                     <div className={cn(
                       'flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center',
-                      t.type === 'income' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                      t.type === 'income' 
+                        ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive-text)]' 
+                        : 'bg-[var(--color-negative-soft)] text-[var(--color-negative-text)]'
                     )}>
                       {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                     </div>
@@ -171,8 +173,8 @@ export function Finance() {
                             <div className={cn(
                               'flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center',
                               t.type === 'income' 
-                                ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400' 
-                                : 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                                ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive-text)]' 
+                                : 'bg-[var(--color-negative-soft)] text-[var(--color-negative-text)]'
                             )}>
                               {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                             </div>
