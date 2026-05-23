@@ -408,19 +408,25 @@ function ChartMetricCard({
   isHidden: boolean;
   invertTrend?: boolean;
 }) {
+  const store = useStore();
+  const isDarkMode = store.isDarkMode;
   const isPositive = invertTrend ? pct <= 0 : pct >= 0;
   const pctLabel = `${pct >= 0 ? '↑' : '↓'} ${Math.abs(pct).toFixed(2)}% vs last month`;
+
+  const activeLineColor = '#F97316'; // premium orange
+  const prevLineColor = isDarkMode ? '#3F3F46' : '#D1D5DB';
+  const cursorColor = isDarkMode ? '#2A2A2E' : '#E5E7EB';
 
   return (
     <div className="chart-card">
       <div className="chart-card-head">{icon}{title}</div>
       <div className="metric-compare">
         <div className="metric-compare-item">
-          <span className="metric-dot metric-dot-primary" />
+          <span className="metric-dot" style={{ backgroundColor: activeLineColor }} />
           <span><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(current)}</HiddenValue></span> This month</span>
         </div>
         <div className="metric-compare-item">
-          <span className="metric-dot metric-dot-muted" />
+          <span className="metric-dot" style={{ backgroundColor: prevLineColor }} />
           <span><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(previous)}</HiddenValue></span> Last month</span>
         </div>
       </div>
@@ -430,9 +436,9 @@ function ChartMetricCard({
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} interval="preserveStartEnd" />
             <YAxis hide domain={['auto', 'auto']} />
-            <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#E5E7EB', strokeDasharray: '4 4' }} />
-            <Line type="monotone" dataKey={prevKey} stroke="#D1D5DB" strokeWidth={1.5} dot={false} />
-            <Line type="monotone" dataKey={dataKey} stroke="#111827" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#111827' }} />
+            <Tooltip content={<ChartTooltip />} cursor={{ stroke: cursorColor, strokeDasharray: '4 4' }} />
+            <Line type="monotone" dataKey={prevKey} stroke={prevLineColor} strokeWidth={1.5} dot={false} />
+            <Line type="monotone" dataKey={dataKey} stroke={activeLineColor} strokeWidth={2} dot={false} activeDot={{ r: 4, fill: activeLineColor }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

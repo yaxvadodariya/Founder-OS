@@ -41,10 +41,10 @@ export function PrivacyToggle() {
       </button>
 
       {isTooltipVisible && (
-        <div className="absolute top-full right-0 mt-2 z-50">
-          <div className="flex flex-col items-end">
+        <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 z-50">
+          <div className="flex flex-col items-start sm:items-end">
             <div 
-              className="flex flex-col gap-0.5 bg-[var(--color-ink)] text-white rounded-xl px-3 py-2 shadow-[var(--shadow-elevated)]"
+              className="flex flex-col gap-0.5 bg-[var(--color-ink)] text-white rounded-xl px-3 py-2 shadow-[var(--shadow-elevated)] whitespace-nowrap"
             >
               <p className="text-sm font-medium">
                 {store.isPrivacyMode ? "Privacy Mode On" : "Privacy Mode Off"}

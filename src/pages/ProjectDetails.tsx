@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ArrowLeft, Calendar, FileText, CheckCircle2, ChevronRight, CheckSquare, ExternalLink, MessageSquare, Edit2, Plus, X } from 'lucide-react';
 import { ProjectModal } from '../components/ProjectModal';
 import { TaskModal } from '../components/TaskModal';
+import { SidePanel } from '../components/SidePanel';
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -19,6 +20,9 @@ export function ProjectDetails() {
   const [isProjectModalOpen, setIsProjectModalOpen] = React.useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = React.useState(false);
   const [isAddingMilestone, setIsAddingMilestone] = React.useState(false);
+  const [milestoneName, setMilestoneName] = React.useState('');
+  const [milestoneAmount, setMilestoneAmount] = React.useState('');
+  const [milestoneDueDate, setMilestoneDueDate] = React.useState(format(new Date(), 'yyyy-MM-dd'));
   
   const project = store.projects.find(p => p.id === id);
   const projectTasks = store.tasks.filter(t => t.projectId === id);
@@ -31,14 +35,44 @@ export function ProjectDetails() {
     );
     
     const completedCount = updatedMilestones.filter(m => m.completed).length;
-    const progress = project.milestones.length > 0 
-      ? Math.round((completedCount / project.milestones.length) * 100)
+    const progress = updatedMilestones.length > 0 
+      ? Math.round((completedCount / updatedMilestones.length) * 100)
       : 0;
       
     store.updateProject(project.id, {
       milestones: updatedMilestones,
       progress
     });
+  };
+
+  const handleSaveMilestone = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!project) return;
+    if (milestoneName && milestoneDueDate) {
+      const newMilestone = {
+        id: Math.random().toString(36).substring(2, 9),
+        name: milestoneName,
+        amount: Number(milestoneAmount) || 0,
+        dueDate: new Date(milestoneDueDate).toISOString(),
+        completed: false
+      };
+      
+      const updatedMilestones = [...project.milestones, newMilestone];
+      const completedCount = updatedMilestones.filter(m => m.completed).length;
+      const progress = updatedMilestones.length > 0 
+        ? Math.round((completedCount / updatedMilestones.length) * 100)
+        : 0;
+
+      store.updateProject(project.id, { 
+        milestones: updatedMilestones,
+        progress
+      });
+      
+      setMilestoneName('');
+      setMilestoneAmount('');
+      setMilestoneDueDate(format(new Date(), 'yyyy-MM-dd'));
+      setIsAddingMilestone(false);
+    }
   };
 
   const handleGenerateInvoice = () => {
@@ -289,7 +323,15 @@ export function ProjectDetails() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        store.updateProject(project.id, { milestones: project.milestones.filter(m => m.id !== milestone.id) });
+                        const updatedMilestones = project.milestones.filter(m => m.id !== milestone.id);
+                        const completedCount = updatedMilestones.filter(m => m.completed).length;
+                        const progress = updatedMilestones.length > 0 
+                          ? Math.round((completedCount / updatedMilestones.length) * 100)
+                          : 0;
+                        store.updateProject(project.id, { 
+                          milestones: updatedMilestones,
+                          progress
+                        });
                       }}
                       className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[var(--color-ink-muted)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface)]/80 rounded"
                       title="Delete milestone"
@@ -303,71 +345,18 @@ export function ProjectDetails() {
                 )}
               </div>
               
-              {!isAddingMilestone ? (
-                <button
-                  onClick={() => setIsAddingMilestone(true)}
-                  className="w-full mt-2 py-3 border-2 border-dashed border-[var(--color-border-subtle)] rounded-xl text-sm font-medium text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] hover:border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)] transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Milestone
-                </button>
-              ) : (
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const nameInput = form.elements.namedItem('mName') as HTMLInputElement;
-                    const amtInput = form.elements.namedItem('mAmount') as HTMLInputElement;
-                    const dateInput = form.elements.namedItem('mDate') as HTMLInputElement;
-                    
-                    if (nameInput.value && amtInput.value && dateInput.value) {
-                      const newMilestone = {
-                        id: Math.random().toString(36).substring(2, 9),
-                        name: nameInput.value,
-                        amount: Number(amtInput.value),
-                        dueDate: new Date(dateInput.value).toISOString(),
-                        completed: false
-                      };
-                      store.updateProject(project.id, { milestones: [...project.milestones, newMilestone] });
-                      form.reset();
-                      setIsAddingMilestone(false);
-                    }
-                  }}
-                  className="mt-4 pt-4 border-t border-[var(--color-border-soft)] bg-[var(--color-surface-muted)] p-4 rounded-xl space-y-4"
-                >
-                  <div>
-                    <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Milestone Name</label>
-                    <input autoFocus required type="text" name="mName" placeholder="e.g. Wireframes approved" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Amount</label>
-                      <input required type="number" name="mAmount" placeholder="0" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Due Date</label>
-                      <input required type="date" name="mDate" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)]" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2 pt-2">
-                    <button 
-                      type="button" 
-                      onClick={() => setIsAddingMilestone(false)}
-                      className="flex-1 py-2 px-4 shadow-[var(--shadow-card)] text-sm font-medium rounded-[10px] text-[var(--color-ink)] bg-[var(--color-surface)] border border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="flex-1 btn-primary !text-sm"
-                    >
-                      Save Milestone
-                    </button>
-                  </div>
-                </form>
-              )}
+              <button
+                onClick={() => {
+                  setMilestoneName('');
+                  setMilestoneAmount('0');
+                  setMilestoneDueDate(format(new Date(), 'yyyy-MM-dd'));
+                  setIsAddingMilestone(true);
+                }}
+                className="w-full mt-2 py-3 border-2 border-dashed border-[var(--color-border-subtle)] rounded-xl text-sm font-medium text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] hover:border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)] transition-colors flex items-center justify-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Milestone
+              </button>
             </div>
           </div>
           
@@ -522,6 +511,63 @@ export function ProjectDetails() {
         onClose={() => setIsTaskModalOpen(false)} 
         defaultProjectId={project.id}
       />
+
+      {isAddingMilestone && (
+        <SidePanel
+          isOpen={isAddingMilestone}
+          onClose={() => setIsAddingMilestone(false)}
+          title="Add Milestone"
+          subtitle={`Create a new payment milestone for ${project.name}`}
+          width="max-w-md"
+          footer={
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setIsAddingMilestone(false)} className="btn-secondary">Cancel</button>
+              <button type="submit" form="milestone-form" className="btn-primary">Save Milestone</button>
+            </div>
+          }
+        >
+          <form id="milestone-form" onSubmit={handleSaveMilestone} className="space-y-4">
+            <div>
+              <label className="form-label">Milestone Name *</label>
+              <input 
+                autoFocus 
+                required 
+                type="text" 
+                value={milestoneName}
+                onChange={(e) => setMilestoneName(e.target.value)}
+                placeholder="e.g. Wireframes approved" 
+                className="input-field" 
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="form-label">Amount (INR) *</label>
+                <input 
+                  required 
+                  type="number" 
+                  min="0"
+                  step="1"
+                  value={milestoneAmount}
+                  onChange={(e) => setMilestoneAmount(e.target.value)}
+                  placeholder="0" 
+                  className="input-field" 
+                />
+              </div>
+              <div>
+                <label className="form-label">Due Date *</label>
+                <input 
+                  required 
+                  type="date" 
+                  value={milestoneDueDate}
+                  onChange={(e) => setMilestoneDueDate(e.target.value)}
+                  className="input-field" 
+                />
+              </div>
+            </div>
+          </form>
+        </SidePanel>
+      )}
     </PageShell>
   );
 }
