@@ -228,21 +228,18 @@ export function ClientPortal() {
           {/* Milestones */}
           <div className="design-card p-6 sm:p-8 space-y-6">
             <h2 className="text-lg font-bold border-b border-[var(--color-border-soft)] pb-3">Project Milestones</h2>
-            <div className="space-y-3">
+            <div className="divide-y divide-[var(--color-border-soft)]">
               {project.milestones.map((milestone) => (
                 <div 
                   key={milestone.id} 
-                  className={cn(
-                    "flex items-center justify-between p-4 rounded-xl border transition-colors text-left",
-                    milestone.completed ? "bg-[var(--color-surface-muted)] border-[var(--color-border-soft)]" : "border-[var(--color-border-subtle)]"
-                  )}
+                  className="flex items-center justify-between py-4 transition-colors text-left"
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
                       milestone.completed 
-                        ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" 
-                        : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)]"
+                        ? "text-emerald-600 dark:text-emerald-400" 
+                        : "text-[var(--color-ink-muted)]"
                     )}>
                       {milestone.completed ? (
                         <CheckCircle2 className="h-5 w-5" />

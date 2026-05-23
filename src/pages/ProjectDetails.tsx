@@ -443,30 +443,28 @@ export function ProjectDetails() {
                 </div>
               </div>
 
-              <div className="space-y-3 mb-4">
+              <div className="divide-y divide-[var(--color-border-soft)] mb-4">
                 {project.milestones.map((milestone) => (
                   <div key={milestone.id} className="relative group">
                     <button 
                       onClick={() => toggleMilestone(milestone.id)}
-                      className={cn(
-                      "w-full flex items-center justify-between p-4 rounded-xl border transition-colors text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]",
-                      milestone.completed ? "bg-[var(--color-surface-muted)] border-[var(--color-border-soft)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border-subtle)]"
-                    )}>
+                      className="w-full flex items-center justify-between py-4 px-1 transition-colors text-left focus:outline-none"
+                    >
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
                           milestone.completed 
-                            ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" 
-                            : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)] group-hover:bg-[var(--color-surface-hover)] group-hover:text-[var(--color-ink-secondary)]"
+                            ? "text-emerald-600 dark:text-emerald-400" 
+                            : "text-[var(--color-ink-muted)]"
                         )}>
                           {milestone.completed ? (
                             <CheckCircle2 className="h-5 w-5" />
                           ) : (
-                            <div className="h-4.5 w-4.5 rounded-full border-2 border-[var(--color-border-subtle)] group-hover:border-[var(--color-ink-muted)] transition-colors" />
+                            <div className="h-4.5 w-4.5 rounded-full border-2 border-[var(--color-border-subtle)] group-hover:border-[var(--color-ink-secondary)] transition-colors" />
                           )}
                         </div>
                         <div>
-                          <p className={cn("font-medium transition-colors", milestone.completed ? "text-[var(--color-ink-secondary)] line-through" : "text-[var(--color-ink)]")}>
+                           <p className={cn("font-medium transition-colors text-sm", milestone.completed ? "text-[var(--color-ink-secondary)] line-through" : "text-[var(--color-ink)]")}>
                             {milestone.name}
                           </p>
                           <p className="text-xs text-[var(--color-ink-secondary)] flex items-center mt-0.5">
@@ -493,11 +491,11 @@ export function ProjectDetails() {
                           ? Math.round((completedCount / updatedMilestones.length) * 100)
                           : 0;
                         store.updateProject(project.id, { 
-                          milestones: updatedMilestones,
-                          progress
+                           milestones: updatedMilestones,
+                           progress
                         });
                       }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[var(--color-ink-muted)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface)]/80 rounded"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[var(--color-ink-muted)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface)]/80 rounded"
                       title="Delete milestone"
                     >
                       <X className="h-4 w-4" />
