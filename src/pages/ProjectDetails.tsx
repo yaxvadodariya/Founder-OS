@@ -459,7 +459,11 @@ export function ProjectDetails() {
                             ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" 
                             : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)] group-hover:bg-[var(--color-surface-hover)] group-hover:text-[var(--color-ink-secondary)]"
                         )}>
-                          {milestone.completed ? <CheckCircle2 className="h-5 w-5" /> : <div className="h-2.5 w-2.5 rounded-full bg-[var(--color-ink-muted)]" />}
+                          {milestone.completed ? (
+                            <CheckCircle2 className="h-5 w-5" />
+                          ) : (
+                            <div className="h-4.5 w-4.5 rounded-full border-2 border-[var(--color-border-subtle)] group-hover:border-[var(--color-ink-muted)] transition-colors" />
+                          )}
                         </div>
                         <div>
                           <p className={cn("font-medium transition-colors", milestone.completed ? "text-[var(--color-ink-secondary)] line-through" : "text-[var(--color-ink)]")}>
