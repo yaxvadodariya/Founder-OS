@@ -179,7 +179,7 @@ export function Projects() {
                 </div>
               </div>
               
-              <div className="px-5 py-3 bg-[var(--color-surface-muted)] rounded-b-[24px] flex items-center justify-between">
+              <div className="px-5 py-3 bg-[var(--color-surface-muted)] rounded-b-[calc(var(--radius-card)-1px)] flex items-center justify-between">
                 <div className="flex items-center text-xs text-[var(--color-ink-secondary)]">
                   <Calendar className="mr-1.5 h-3.5 w-3.5" />
                   Due {format(new Date(project.deadline), 'MMM dd')}

@@ -238,7 +238,7 @@ export function Dashboard() {
             
             <div className="space-y-0 lg:space-y-3">
               {store.projects.filter(p => p.status === 'active').map(project => (
-                <div key={project.id} className="design-card p-4 lg:p-5 first:pt-0">
+                <div key={project.id} className="design-card p-4 lg:p-5 max-lg:first:pt-0">
                   <div className="flex justify-between items-start mb-3 gap-3">
                     <div className="min-w-0">
                       <h3 className="text-sm font-medium text-[var(--color-ink)] truncate">{project.name}</h3>

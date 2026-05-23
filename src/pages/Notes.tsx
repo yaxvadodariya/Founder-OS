@@ -135,7 +135,7 @@ export function Notes() {
                   )}
                 </div>
                 
-                <div className="px-5 py-3 bg-[var(--color-surface-muted)]/80 border-t border-[var(--color-border-soft)] flex items-center justify-between text-xs text-[var(--color-ink-muted)] mt-auto rounded-b-[24px]">
+                <div className="px-5 py-3 bg-[var(--color-surface-muted)]/80 border-t border-[var(--color-border-soft)] flex items-center justify-between text-xs text-[var(--color-ink-muted)] mt-auto rounded-b-[calc(var(--radius-card)-1px)]">
                   <span>{format(new Date(note.createdAt), 'MMM d, yyyy')}</span>
                   <button className="hover:text-[var(--color-ink)] transition-colors opacity-0 group-hover:opacity-100">
                     <MoreHorizontal className="h-4 w-4" />
