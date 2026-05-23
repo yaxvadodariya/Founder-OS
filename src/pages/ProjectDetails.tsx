@@ -215,14 +215,14 @@ export function ProjectDetails() {
         </div>
         <div className="flex items-center gap-2">
           <span className={cn(
-            "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium",
-            project.status === 'lead' && "bg-[var(--color-surface-muted)] text-[var(--color-ink)]",
-            project.status === 'active' && "bg-emerald-100 text-emerald-800",
-            project.status === 'completed' && "bg-[var(--color-surface-muted)] text-[var(--color-ink)]",
-            project.status === 'on-hold' && "bg-orange-100 text-orange-800",
-            project.status === 'cancelled' && "bg-red-100 text-red-800",
+            "status-badge uppercase px-3 py-1 text-xs",
+            project.status === 'lead' && "status-badge-neutral",
+            project.status === 'active' && "status-badge-success",
+            project.status === 'completed' && "status-badge-neutral",
+            project.status === 'on-hold' && "status-badge-warning",
+            project.status === 'cancelled' && "status-badge-warning",
           )}>
-            {project.status.toUpperCase()}
+            {project.status}
           </span>
           <button 
             onClick={() => setIsProjectModalOpen(true)}
@@ -297,7 +297,9 @@ export function ProjectDetails() {
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                          milestone.completed ? "bg-emerald-100 text-emerald-600" : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)] group-hover:bg-[var(--color-surface-hover)] group-hover:text-[var(--color-ink-secondary)]"
+                          milestone.completed 
+                            ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400" 
+                            : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)] group-hover:bg-[var(--color-surface-hover)] group-hover:text-[var(--color-ink-secondary)]"
                         )}>
                           {milestone.completed ? <CheckCircle2 className="h-5 w-5" /> : <div className="h-2.5 w-2.5 rounded-full bg-[var(--color-ink-muted)]" />}
                         </div>

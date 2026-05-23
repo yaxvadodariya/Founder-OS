@@ -1161,3 +1161,9 @@
   }
 }
 
+/* ── Recharts Focus Outline Fix ── */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}
+
