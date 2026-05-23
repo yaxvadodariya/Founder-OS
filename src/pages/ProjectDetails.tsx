@@ -182,6 +182,7 @@ export function ProjectDetails() {
         <div className="flex items-center gap-2">
           <span className={cn(
             "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium",
+            project.status === 'lead' && "bg-[var(--color-surface-muted)] text-[var(--color-ink)]",
             project.status === 'active' && "bg-emerald-100 text-emerald-800",
             project.status === 'completed' && "bg-[var(--color-surface-muted)] text-[var(--color-ink)]",
             project.status === 'on-hold' && "bg-orange-100 text-orange-800",

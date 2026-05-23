@@ -50,7 +50,7 @@ export function Projects() {
       </header>
 
       <div className="page-block segmented-control segmented-control-full">
-        {(['all', 'active', 'completed', 'on-hold'] as const).map(f => (
+        {(['all', 'lead', 'active', 'completed', 'on-hold'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -78,6 +78,7 @@ export function Projects() {
                   <div className="flex flex-col">
                     <span className={cn(
                       "status-badge mb-2 w-fit uppercase",
+                      project.status === 'lead' && "status-badge-neutral",
                       project.status === 'active' && "status-badge-success",
                       project.status === 'completed' && "status-badge-neutral",
                       project.status === 'on-hold' && "status-badge-warning",

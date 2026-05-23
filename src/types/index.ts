@@ -1,6 +1,6 @@
 export type TransactionType = 'income' | 'expense';
 export type FinanceCategory = 'personal' | 'business';
-export type ProjectStatus = 'active' | 'completed' | 'on-hold' | 'cancelled';
+export type ProjectStatus = 'lead' | 'active' | 'completed' | 'on-hold' | 'cancelled';
 export type TaskPriority = 'high' | 'medium' | 'low';
 export type PaymentFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type NoteCategory = 'idea' | 'important' | 'remember' | 'quote' | 'learning' | 'contact';
