@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { RecurringPayment, PaymentFrequency } from '../types';
-import { X } from 'lucide-react';
 import { format } from 'date-fns';
+import { SidePanel } from './SidePanel';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -41,8 +41,6 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
     }
   }, [paymentToEdit, isOpen]);
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !amount || !category) return;
@@ -75,136 +73,122 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
-      <div className="modal-panel w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{paymentToEdit ? 'Edit Payment' : 'Add Payment'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-            <input 
-              type="text" 
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input-field"
-              placeholder="e.g. Netflix Subscription"
-            />
+    <SidePanel
+      isOpen={isOpen}
+      onClose={onClose}
+      title={paymentToEdit ? 'Edit Payment' : 'New Payment'}
+      subtitle={paymentToEdit ? 'Update recurring payment details' : 'Add a recurring bill or subscription'}
+      footer={
+        <div className="flex justify-between items-center">
+          {paymentToEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                store.deleteRecurringPayment(paymentToEdit.id);
+                onClose();
+              }}
+              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            >
+              Delete
+            </button>
+          ) : <div />}
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+            <button type="submit" form="payment-form" className="btn-primary">Save Payment</button>
           </div>
+        </div>
+      }
+    >
+      <form id="payment-form" onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="form-label">Name *</label>
+          <input 
+            type="text" 
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input-field"
+            placeholder="e.g. Netflix Subscription"
+          />
+        </div>
 
+        <div>
+          <label className="form-label">Amount (INR) *</label>
+          <input 
+            type="number" 
+            required
+            min="0"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="input-field"
+            placeholder="0.00"
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Frequency *</label>
+          <select 
+            required
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value as PaymentFrequency)}
+            className="input-field"
+          >
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+
+        {frequency === 'monthly' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (INR) *</label>
+            <label className="form-label">Day of Month</label>
             <input 
               type="number" 
-              required
-              min="0"
-              step="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              min="1"
+              max="31"
+              value={dayOfMonth}
+              onChange={(e) => setDayOfMonth(e.target.value)}
               className="input-field"
-              placeholder="0.00"
+              placeholder="1-31"
             />
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Frequency *</label>
-            <select 
-              required
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value as PaymentFrequency)}
-              className="input-field"
-            >
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-              <option value="weekly">Weekly</option>
-            </select>
-          </div>
+        <div>
+          <label className="form-label">Start Date *</label>
+          <input 
+            type="date" 
+            required
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="input-field"
+          />
+        </div>
 
-          {frequency === 'monthly' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Day of Month</label>
-              <input 
-                type="number" 
-                min="1"
-                max="31"
-                value={dayOfMonth}
-                onChange={(e) => setDayOfMonth(e.target.value)}
-                className="input-field"
-                placeholder="1-31"
-              />
-            </div>
-          )}
+        <div>
+          <label className="form-label">Category *</label>
+          <input 
+            type="text" 
+            required
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="input-field"
+            placeholder="e.g. Subscriptions, Utilities"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
-            <input 
-              type="date" 
-              required
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="input-field"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-            <input 
-              type="text" 
-              required
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="input-field"
-              placeholder="e.g. Subscriptions, Utilities"
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input 
-              type="checkbox" 
-              id="activeCheckbox"
-              checked={active}
-              onChange={(e) => setActive(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="activeCheckbox" className="text-sm font-medium text-gray-700">Active</label>
-          </div>
-
-          <div className="pt-4 border-t border-gray-100 flex justify-between gap-3">
-            {paymentToEdit ? (
-              <button
-                type="button"
-                onClick={() => {
-                  store.deleteRecurringPayment(paymentToEdit.id);
-                  onClose();
-                }}
-                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-              >
-                Delete
-              </button>
-            ) : <div />}
-            <div className="flex gap-3">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="btn-secondary !text-sm"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="btn-primary !text-sm"
-              >
-                Save Payment
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="activeCheckbox"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+            className="rounded border-[var(--color-border-subtle)] text-[var(--color-ink)] focus:ring-[var(--color-ink-muted)]"
+          />
+          <label htmlFor="activeCheckbox" className="form-label !mb-0">Active</label>
+        </div>
+      </form>
+    </SidePanel>
   );
 }

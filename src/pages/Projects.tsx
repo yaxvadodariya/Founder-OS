@@ -90,7 +90,7 @@ export function Projects() {
                   </div>
                   <div className="relative">
                     <button 
-                      className="text-gray-400 hover:text-gray-900 p-1 rounded-md hover:bg-gray-100 transition-colors" 
+                      className="text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] p-1 rounded-md hover:bg-[var(--color-surface-muted)] transition-colors" 
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -101,7 +101,7 @@ export function Projects() {
                     </button>
                     
                     {openMenuId === project.id && (
-                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-1 z-50">
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-[var(--color-surface)] rounded-[10px] shadow-[var(--shadow-elevated)] border border-[var(--color-border-subtle)] py-1 z-50">
                         <button
                           onClick={(e) => {
                             e.preventDefault();
@@ -110,7 +110,7 @@ export function Projects() {
                             setIsTaskModalOpen(true);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] transition-colors border-b border-[var(--color-border-soft)]"
                         >
                           Add Task
                         </button>
@@ -122,7 +122,7 @@ export function Projects() {
                             setIsModalOpen(true);
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] transition-colors"
                         >
                           Edit Project
                         </button>
@@ -133,7 +133,7 @@ export function Projects() {
                             store.updateProject(project.id, { status: project.status === 'completed' ? 'active' : 'completed' });
                             setOpenMenuId(null);
                           }}
-                          className="w-full text-left px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] transition-colors"
                         >
                           {project.status === 'completed' ? 'Mark as Active' : 'Mark as Completed'}
                         </button>
@@ -155,21 +155,21 @@ export function Projects() {
                 
                 <div className="mt-4 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Project Value</p>
-                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(project.value)}</p>
+                    <p className="text-xs text-[var(--color-ink-secondary)] mb-1">Project Value</p>
+                    <p className="text-sm font-semibold text-[var(--color-ink)]">{formatCurrency(project.value)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 mb-1">Pending Amount</p>
+                    <p className="text-xs text-[var(--color-ink-secondary)] mb-1">Pending Amount</p>
                     <p className="text-sm font-semibold text-orange-600">{formatCurrency(project.amountPending)}</p>
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <div className="flex justify-between text-xs font-medium mb-1.5">
-                    <span className="text-gray-700">Progress</span>
+                    <span className="text-[var(--color-ink)]">Progress</span>
                     <span className={project.progress === 100 ? "text-emerald-600" : "text-blue-600"}>{project.progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-[var(--color-surface-muted)] rounded-full h-2">
                     <div 
                       className={cn("h-2 rounded-full", project.progress === 100 ? "bg-emerald-500" : "bg-[var(--color-ink)]")}
                       style={{ width: `${project.progress}%` }}
@@ -178,12 +178,12 @@ export function Projects() {
                 </div>
               </div>
               
-              <div className="px-5 py-3 bg-gray-50 rounded-b-[24px] flex items-center justify-between">
-                <div className="flex items-center text-xs text-gray-500">
+              <div className="px-5 py-3 bg-[var(--color-surface-muted)] rounded-b-[24px] flex items-center justify-between">
+                <div className="flex items-center text-xs text-[var(--color-ink-secondary)]">
                   <Calendar className="mr-1.5 h-3.5 w-3.5" />
                   Due {format(new Date(project.deadline), 'MMM dd')}
                 </div>
-                <div className="flex items-center text-xs text-gray-500">
+                <div className="flex items-center text-xs text-[var(--color-ink-secondary)]">
                   <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                   {project.milestones.filter(m => m.completed).length}/{project.milestones.length} Milestones
                 </div>
@@ -191,7 +191,7 @@ export function Projects() {
             </div>
           ))}
           {projects.length === 0 && (
-            <div className="col-span-full py-12 text-center text-gray-500 border-2 border-dashed border-gray-200 rounded-xl bg-white/50">
+            <div className="col-span-full py-12 text-center text-[var(--color-ink-secondary)] border-2 border-dashed border-[var(--color-border-subtle)] rounded-xl bg-[var(--color-surface)]/50">
               No projects found for the selected filter.
             </div>
           )}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Task } from '../types';
-import { X, Calendar, Flag, Briefcase } from 'lucide-react';
+import { Calendar, Flag, Briefcase } from 'lucide-react';
 import { format } from 'date-fns';
+import { SidePanel } from './SidePanel';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -43,8 +44,6 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
     }
   }, [taskToEdit, isOpen, defaultProjectId]);
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) return;
@@ -78,126 +77,112 @@ export function TaskModal({ isOpen, onClose, taskToEdit = null, defaultProjectId
   const projects = store.projects;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
-      <div className="modal-panel w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{taskToEdit ? 'Edit Task' : 'Add Task'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
+    <SidePanel
+      isOpen={isOpen}
+      onClose={onClose}
+      title={taskToEdit ? 'Edit Task' : 'New Task'}
+      subtitle={taskToEdit ? 'Update task details' : 'Create a new task'}
+      footer={
+        <div className="flex justify-between items-center">
+          {taskToEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                store.deleteTask(taskToEdit.id);
+                onClose();
+              }}
+              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+            >
+              Delete
+            </button>
+          ) : <div />}
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+            <button type="submit" form="task-form" className="btn-primary">Save Task</button>
+          </div>
         </div>
-        
-        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 space-y-4">
+      }
+    >
+      <form id="task-form" onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="form-label">Title *</label>
+          <input 
+            type="text" 
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="input-field"
+            placeholder="What needs to be done?"
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Description</label>
+          <textarea 
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="input-field resize-vertical"
+            placeholder="Add more details..."
+            rows={3}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-            <input 
-              type="text" 
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+            <label className="form-label flex items-center gap-1">
+              <Flag className="w-3.5 h-3.5" /> Priority
+            </label>
+            <select 
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
               className="input-field"
-              placeholder="What needs to be done?"
-            />
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea 
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="input-field resize-vertical"
-              placeholder="Add more details..."
-              rows={3}
-            />
+            <label className="form-label flex items-center gap-1">
+              <Briefcase className="w-3.5 h-3.5" /> Project
+            </label>
+            <select 
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              className="input-field"
+            >
+              <option value="">Personal (None)</option>
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                <Flag className="w-4 h-4 text-gray-400" /> Priority
-              </label>
-              <select 
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-                className="input-field"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                <Briefcase className="w-4 h-4 text-gray-400" /> Project
-              </label>
-              <select 
-                value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
-                className="input-field"
-              >
-                <option value="">Personal (None)</option>
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-             <div className="flex items-center gap-2 mb-2 mt-2">
-                <input 
-                  type="checkbox" 
-                  id="hasDueDateCheckbox"
-                  checked={hasDueDate}
-                  onChange={(e) => setHasDueDate(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <label htmlFor="hasDueDateCheckbox" className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  <Calendar className="w-4 h-4 text-gray-400" /> Need Due Date?
-                </label>
-              </div>
-            {hasDueDate && (
+        <div>
+           <div className="flex items-center gap-2 mb-2">
               <input 
-                type="date" 
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="input-field"
+                type="checkbox" 
+                id="hasDueDateCheckbox"
+                checked={hasDueDate}
+                onChange={(e) => setHasDueDate(e.target.checked)}
+                className="rounded border-[var(--color-border-subtle)] text-[var(--color-ink)] focus:ring-[var(--color-ink-muted)]"
               />
-            )}
-          </div>
-
-          <div className="pt-4 border-t border-gray-100 flex justify-between gap-3">
-            {taskToEdit ? (
-              <button
-                type="button"
-                onClick={() => {
-                  store.deleteTask(taskToEdit.id);
-                  onClose();
-                }}
-                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-              >
-                Delete
-              </button>
-            ) : <div />}
-            <div className="flex gap-3">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="btn-secondary !text-sm"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="btn-primary !text-sm"
-              >
-                Save Task
-              </button>
+              <label htmlFor="hasDueDateCheckbox" className="form-label !mb-0 flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5" /> Set Due Date
+              </label>
             </div>
-          </div>
-        </form>
-      </div>
-    </div>
+          {hasDueDate && (
+            <input 
+              type="date" 
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="input-field"
+            />
+          )}
+        </div>
+      </form>
+    </SidePanel>
   );
 }

@@ -30,12 +30,12 @@ export function Settings() {
         {/* Profile Section */}
         <div className="design-card p-4 flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-2xl overflow-hidden">
+            <div className="h-16 w-16 rounded-full bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] flex items-center justify-center font-bold text-2xl overflow-hidden">
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div>
-              <p className="text-base font-semibold text-gray-900">{user?.name}</p>
-              <p className="text-sm tracking-tight text-gray-500">{user?.email}</p>
+              <p className="text-base font-semibold text-[var(--color-ink)]">{user?.name}</p>
+              <p className="text-sm tracking-tight text-[var(--color-ink-secondary)]">{user?.email}</p>
             </div>
           </div>
           <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800">PRO</span>
@@ -45,18 +45,18 @@ export function Settings() {
         <div className="flex justify-between items-center mb-2 px-1">
           <h2 className="section-label">Preferences</h2>
         </div>
-        <div className="design-card divide-y divide-gray-100 overflow-hidden mb-6">
+        <div className="design-card divide-y divide-[var(--color-border-soft)] overflow-hidden mb-6">
            <div className="w-full flex items-center justify-between p-4 transition-colors">
              <div className="flex items-center gap-3">
-               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+               <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
                  <Globe className="w-5 h-5" />
                </div>
-               <span className="text-sm font-medium text-gray-900">Currency</span>
+               <span className="text-sm font-medium text-[var(--color-ink)]">Currency</span>
              </div>
              <select
                value={store.currency}
                onChange={(e) => store.setCurrency(e.target.value)}
-               className="text-sm font-medium text-gray-700 bg-transparent border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+               className="text-sm font-medium text-[var(--color-ink)] bg-transparent border-[var(--color-border-subtle)] rounded-[10px] focus:ring-[var(--color-ink-muted)] focus:border-[var(--color-ink-muted)]"
              >
                {CURRENCIES.map(c => (
                  <option key={c.code} value={c.code}>
@@ -67,29 +67,29 @@ export function Settings() {
            </div>
            <button
              onClick={() => store.toggleDarkMode()}
-             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+             className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-surface-hover)] transition-colors"
            >
              <div className="flex items-center gap-3">
-               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+               <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
                  {store.isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                </div>
-               <span className="text-sm font-medium text-gray-900">Dark Mode</span>
+               <span className="text-sm font-medium text-[var(--color-ink)]">Dark Mode</span>
              </div>
-             <div className="text-gray-500 font-medium text-sm">
+             <div className="text-[var(--color-ink-secondary)] font-medium text-sm">
                {store.isDarkMode ? "On" : "Off"}
              </div>
            </button>
            <button
              onClick={() => store.togglePrivacyMode()}
-             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+             className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-surface-hover)] transition-colors"
            >
              <div className="flex items-center gap-3">
-               <div className="p-2 rounded-lg bg-gray-100 text-gray-700">
+               <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
                  <Shield className="w-5 h-5" />
                </div>
-               <span className="text-sm font-medium text-gray-900">Privacy Mode</span>
+               <span className="text-sm font-medium text-[var(--color-ink)]">Privacy Mode</span>
              </div>
-             <div className="text-gray-500 font-medium text-sm">
+             <div className="text-[var(--color-ink-secondary)] font-medium text-sm">
                {store.isPrivacyMode ? "On" : "Off"}
              </div>
            </button>
@@ -102,7 +102,7 @@ export function Settings() {
         <div className="design-card overflow-hidden">
            <button
              onClick={() => logOut()}
-             className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-red-600"
+             className="w-full flex items-center gap-3 p-4 hover:bg-[var(--color-surface-hover)] transition-colors text-red-600"
            >
              <LogOut className="w-5 h-5" />
              <span className="text-sm font-medium">Sign Out</span>

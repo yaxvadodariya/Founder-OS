@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Note, NoteCategory } from '../types';
-import { X } from 'lucide-react';
+import { SidePanel } from './SidePanel';
 
 interface NoteModalProps {
   isOpen: boolean;
@@ -33,8 +33,6 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
       setPinned(false);
     }
   }, [noteToEdit, isOpen]);
-
-  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,111 +66,98 @@ export function NoteModal({ isOpen, onClose, noteToEdit = null }: NoteModalProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
-      <div className="bg-white rounded-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
-        <div className="flex justify-between items-center p-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{noteToEdit ? 'Edit Note' : 'Add Note'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="modal-body overflow-y-auto flex-1 flex flex-col gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-            <input 
-              type="text" 
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="input-field text-lg font-medium"
-              placeholder="Note Title"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-            <select 
-              required
-              value={category}
-              onChange={(e) => setCategory(e.target.value as NoteCategory)}
-              className="input-field"
+    <SidePanel
+      isOpen={isOpen}
+      onClose={onClose}
+      title={noteToEdit ? 'Edit Note' : 'New Note'}
+      subtitle={noteToEdit ? 'Update your note' : 'Capture an idea or important note'}
+      width="max-w-xl"
+      footer={
+        <div className="flex justify-between items-center">
+          {noteToEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                store.deleteNote(noteToEdit.id);
+                onClose();
+              }}
+              className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
             >
-              <option value="idea">Idea</option>
-              <option value="important">Important</option>
-              <option value="remember">Remember</option>
-              <option value="quote">Quote</option>
-              <option value="learning">Learning</option>
-              <option value="contact">Contact</option>
-            </select>
+              Delete
+            </button>
+          ) : <div />}
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+            <button type="submit" form="note-form" className="btn-primary">Save Note</button>
           </div>
+        </div>
+      }
+    >
+      <form id="note-form" onSubmit={handleSubmit} className="space-y-5 flex flex-col min-h-full">
+        <div>
+          <label className="form-label">Title *</label>
+          <input 
+            type="text" 
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="input-field text-lg font-medium"
+            placeholder="Note Title"
+          />
+        </div>
 
-          <div className="flex-1 flex flex-col min-h-[200px]">
-             <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-             <textarea 
-               required
-               value={content}
-               onChange={(e) => setContent(e.target.value)}
-               className="w-full flex-1 min-h-[200px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
-               placeholder="Write your note here..."
-             />
-          </div>
+        <div>
+          <label className="form-label">Category *</label>
+          <select 
+            required
+            value={category}
+            onChange={(e) => setCategory(e.target.value as NoteCategory)}
+            className="input-field"
+          >
+            <option value="idea">Idea</option>
+            <option value="important">Important</option>
+            <option value="remember">Remember</option>
+            <option value="quote">Quote</option>
+            <option value="learning">Learning</option>
+            <option value="contact">Contact</option>
+          </select>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-            <input 
-              type="text" 
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="input-field"
-              placeholder="e.g. work, personal, references"
-            />
-          </div>
+        <div className="flex-1 flex flex-col min-h-[200px]">
+           <label className="form-label">Content *</label>
+           <textarea 
+             required
+             value={content}
+             onChange={(e) => setContent(e.target.value)}
+             className="input-field flex-1 min-h-[200px] resize-y"
+             placeholder="Write your note here..."
+           />
+        </div>
 
-          <div className="flex items-center gap-2">
-            <input 
-              type="checkbox" 
-              id="pinnedCheckbox"
-              checked={pinned}
-              onChange={(e) => setPinned(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="pinnedCheckbox" className="text-sm font-medium text-gray-700 flex items-center">
-              Pinned
-            </label>
-          </div>
+        <div>
+          <label className="form-label">Tags (comma separated)</label>
+          <input 
+            type="text" 
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="input-field"
+            placeholder="e.g. work, personal, references"
+          />
+        </div>
 
-          <div className="pt-4 border-t border-gray-100 flex justify-between gap-3">
-            {noteToEdit ? (
-              <button
-                type="button"
-                onClick={() => {
-                  store.deleteNote(noteToEdit.id);
-                  onClose();
-                }}
-                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-              >
-                Delete
-              </button>
-            ) : <div />}
-            <div className="flex gap-3">
-              <button 
-                type="button" 
-                onClick={onClose}
-                className="btn-secondary !text-sm"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="btn-primary !text-sm"
-              >
-                Save Note
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="pinnedCheckbox"
+            checked={pinned}
+            onChange={(e) => setPinned(e.target.checked)}
+            className="rounded border-[var(--color-border-subtle)] text-[var(--color-ink)] focus:ring-[var(--color-ink-muted)]"
+          />
+          <label htmlFor="pinnedCheckbox" className="form-label !mb-0">
+            Pinned
+          </label>
+        </div>
+      </form>
+    </SidePanel>
   );
 }

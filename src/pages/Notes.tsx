@@ -71,13 +71,13 @@ export function Notes() {
       {/* Controls */}
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-ink-muted)]" />
           <input 
             type="text" 
             placeholder="Search your brain..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-9 pr-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 no-scrollbar items-center">
@@ -119,15 +119,15 @@ export function Notes() {
                     {note.category}
                   </div>
                   
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 pr-6 leading-tight">{note.title}</h3>
-                  <p className="text-sm text-gray-600 whitespace-pre-wrap line-clamp-4 leading-relaxed mb-4">
+                  <h3 className="text-lg font-bold text-[var(--color-ink)] mb-2 pr-6 leading-tight">{note.title}</h3>
+                  <p className="text-sm text-[var(--color-ink-secondary)] whitespace-pre-wrap line-clamp-4 leading-relaxed mb-4">
                     {note.content}
                   </p>
                   
                   {note.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-auto">
                       {note.tags.map(tag => (
-                        <span key={tag} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">
+                        <span key={tag} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)]">
                           #{tag}
                         </span>
                       ))}
@@ -135,9 +135,9 @@ export function Notes() {
                   )}
                 </div>
                 
-                <div className="px-5 py-3 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400 mt-auto rounded-b-[24px]">
+                <div className="px-5 py-3 bg-[var(--color-surface-muted)]/80 border-t border-[var(--color-border-soft)] flex items-center justify-between text-xs text-[var(--color-ink-muted)] mt-auto rounded-b-[24px]">
                   <span>{format(new Date(note.createdAt), 'MMM d, yyyy')}</span>
-                  <button className="hover:text-gray-900 transition-colors opacity-0 group-hover:opacity-100">
+                  <button className="hover:text-[var(--color-ink)] transition-colors opacity-0 group-hover:opacity-100">
                     <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </div>
@@ -147,9 +147,9 @@ export function Notes() {
         </div>
         
         {notes.length === 0 && (
-          <div className="design-card flex-1 flex flex-col items-center justify-center p-12 text-center mt-2 bg-white/50">
-            <BookOpen className="h-12 w-12 text-gray-300 mb-3" />
-            <p className="text-gray-900 font-medium">No notes found</p>
+          <div className="design-card flex-1 flex flex-col items-center justify-center p-12 text-center mt-2 bg-[var(--color-surface)]/50">
+            <BookOpen className="h-12 w-12 text-[var(--color-ink-muted)] mb-3" />
+            <p className="text-[var(--color-ink)] font-medium">No notes found</p>
             <p className="page-subtitle mt-1">Try adjusting your search or create a new note.</p>
           </div>
         )}
@@ -183,8 +183,8 @@ export const FilterPill: React.FC<{ active: boolean; onClick: () => void; childr
       className={cn(
         "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all border",
         active 
-          ? "bg-gray-900 text-white border-gray-900" 
-          : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+          ? "bg-[var(--color-ink)] text-white border-[var(--color-ink)]" 
+          : "bg-[var(--color-surface)] text-[var(--color-ink-secondary)] border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)]"
       )}
     >
       {children}

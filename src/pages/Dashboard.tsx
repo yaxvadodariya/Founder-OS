@@ -131,8 +131,8 @@ export function Dashboard() {
 
       {showTaskAlert && (
         <div className="alert-banner">
-          <div className="alert-banner-icon mt-0.5 h-5 w-5 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-            <span className="text-red-600 text-xs font-medium">!</span>
+          <div className="alert-banner-icon mt-0.5 h-5 w-5 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center shrink-0">
+            <span className="text-red-600 dark:text-red-400 text-xs font-medium">!</span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="alert-banner-title">{pendingTasksToday} task{pendingTasksToday > 1 ? 's' : ''} due today</p>
@@ -317,7 +317,7 @@ export function Dashboard() {
                   })
                   .slice(0, 4)
                   .map(task => (
-                  <div key={task.id} className="flex items-start gap-3 p-2.5 hover:bg-[var(--color-surface-muted)] rounded-lg transition-colors">
+                  <div key={task.id} className="flex items-start gap-3 p-2.5 hover:bg-[var(--color-surface-hover)] rounded-[10px] transition-colors">
                     <button 
                       onClick={() => store.toggleTaskCompletion(task.id)}
                       className={cn(
@@ -352,7 +352,7 @@ export function Dashboard() {
                 {upcomingPayments.map(payment => (
                   <div key={payment.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-lg bg-[var(--color-surface-muted)] border border-[var(--color-border-soft)] flex items-center justify-center text-[var(--color-ink-muted)]">
+                      <div className="h-9 w-9 rounded-[10px] bg-[var(--color-surface-muted)] border border-[var(--color-border-soft)] flex items-center justify-center text-[var(--color-ink-muted)]">
                         <BellRing className="h-4 w-4" />
                       </div>
                       <div>
@@ -428,11 +428,11 @@ function ChartMetricCard({
       <div className="h-36 w-full -mx-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9ca3af' }} interval="preserveStartEnd" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} interval="preserveStartEnd" />
             <YAxis hide domain={['auto', 'auto']} />
-            <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#e5e7eb', strokeDasharray: '4 4' }} />
-            <Line type="monotone" dataKey={prevKey} stroke="#d1d5db" strokeWidth={1.5} dot={false} />
-            <Line type="monotone" dataKey={dataKey} stroke="#f97316" strokeWidth={2.5} dot={false} activeDot={{ r: 4, fill: '#f97316' }} />
+            <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#E5E7EB', strokeDasharray: '4 4' }} />
+            <Line type="monotone" dataKey={prevKey} stroke="#D1D5DB" strokeWidth={1.5} dot={false} />
+            <Line type="monotone" dataKey={dataKey} stroke="#111827" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#111827' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

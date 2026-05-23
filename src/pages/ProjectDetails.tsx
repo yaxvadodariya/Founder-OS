@@ -153,11 +153,11 @@ export function ProjectDetails() {
   if (!project) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Project not found</h2>
-        <p className="text-gray-500 mb-6">The project you are looking for does not exist or has been removed.</p>
+        <h2 className="text-2xl font-bold text-[var(--color-ink)] mb-2">Project not found</h2>
+        <p className="text-[var(--color-ink-secondary)] mb-6">The project you are looking for does not exist or has been removed.</p>
         <button 
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-[10px] text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] transition-colors shadow-[var(--shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)] focus:ring-offset-2"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Projects</span>
@@ -171,10 +171,10 @@ export function ProjectDetails() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link to="/projects" className="hover:text-gray-900">Projects</Link>
+          <div className="flex items-center gap-2 text-sm text-[var(--color-ink-secondary)] mb-2">
+            <Link to="/projects" className="hover:text-[var(--color-ink)]">Projects</Link>
             <ChevronRight className="h-4 w-4" />
-            <span className="text-gray-900 font-medium">{project.name}</span>
+            <span className="text-[var(--color-ink)] font-medium">{project.name}</span>
           </div>
           <h1 className="page-title">{project.name}</h1>
           <p className="page-subtitle">Client: {project.clientName} ({project.clientEmail})</p>
@@ -183,7 +183,7 @@ export function ProjectDetails() {
           <span className={cn(
             "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium",
             project.status === 'active' && "bg-emerald-100 text-emerald-800",
-            project.status === 'completed' && "bg-gray-100 text-gray-800",
+            project.status === 'completed' && "bg-[var(--color-surface-muted)] text-[var(--color-ink)]",
             project.status === 'on-hold' && "bg-orange-100 text-orange-800",
             project.status === 'cancelled' && "bg-red-100 text-red-800",
           )}>
@@ -191,7 +191,7 @@ export function ProjectDetails() {
           </span>
           <button 
             onClick={() => setIsProjectModalOpen(true)}
-            className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+            className="inline-flex items-center justify-center p-2 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-[10px] hover:bg-[var(--color-surface-hover)] transition-colors shadow-[var(--shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-border-subtle)]"
             title="Edit Project"
           >
             <Edit2 className="h-4 w-4" />
@@ -208,24 +208,24 @@ export function ProjectDetails() {
               <h2 className="section-label">Overview</h2>
             </div>
             <div className="design-card p-6">
-              <p className="text-gray-700 leading-relaxed mb-6">{project.description}</p>
+              <p className="text-[var(--color-ink)] leading-relaxed mb-6">{project.description}</p>
               
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4 sm:gap-4 pt-6 border-t border-gray-100">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4 sm:gap-4 pt-6 border-t border-[var(--color-border-soft)]">
                 <div className="flex flex-col gap-1.5 sm:gap-2">
-                  <p className="text-xs font-medium text-gray-500">Total Value</p>
-                  <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-black">{formatCurrency(project.value)}</p>
+                  <p className="text-xs font-medium text-[var(--color-ink-secondary)]">Total Value</p>
+                  <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-[var(--color-ink)]">{formatCurrency(project.value)}</p>
                 </div>
                 <div className="flex flex-col gap-1.5 sm:gap-2">
-                  <p className="text-xs font-medium text-gray-500">Received</p>
+                  <p className="text-xs font-medium text-[var(--color-ink-secondary)]">Received</p>
                   <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-emerald-600">{formatCurrency(project.amountReceived)}</p>
                 </div>
                 <div className="flex flex-col gap-1.5 sm:gap-2">
-                  <p className="text-xs font-medium text-gray-500">Pending</p>
+                  <p className="text-xs font-medium text-[var(--color-ink-secondary)]">Pending</p>
                   <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-orange-600">{formatCurrency(project.amountPending)}</p>
                 </div>
                 <div className="flex flex-col gap-1.5 sm:gap-2">
-                  <p className="text-xs font-medium text-gray-500">Start Date</p>
-                  <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-black whitespace-nowrap">{format(new Date(project.startDate), 'MMM dd, yyyy')}</p>
+                  <p className="text-xs font-medium text-[var(--color-ink-secondary)]">Start Date</p>
+                  <p className="text-lg sm:text-[20px] font-medium leading-tight sm:leading-none tracking-[-0.011em] text-[var(--color-ink)] whitespace-nowrap">{format(new Date(project.startDate), 'MMM dd, yyyy')}</p>
                 </div>
               </div>
             </div>
@@ -239,10 +239,10 @@ export function ProjectDetails() {
             <div className="design-card p-6 space-y-4">
               <div className="mb-6">
                 <div className="flex justify-between text-sm font-medium mb-2">
-                  <span className="text-gray-700">Project Progress</span>
-                  <span className={project.progress === 100 ? "text-emerald-600" : "text-blue-600"}>{project.progress}%</span>
+                  <span className="text-[var(--color-ink)]">Project Progress</span>
+                  <span className={project.progress === 100 ? "text-emerald-600" : "text-[var(--color-ink-secondary)]"}>{project.progress}%</span>
                 </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5">
+                <div className="w-full bg-[var(--color-surface-muted)] rounded-full h-2.5">
                   <div 
                     className={cn("h-2.5 rounded-full transition-all duration-500", project.progress === 100 ? "bg-emerald-500" : "bg-[var(--color-ink)]")}
                     style={{ width: `${project.progress}%` }}
@@ -256,21 +256,21 @@ export function ProjectDetails() {
                     <button 
                       onClick={() => toggleMilestone(milestone.id)}
                       className={cn(
-                      "w-full flex items-center justify-between p-4 rounded-xl border transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500",
-                      milestone.completed ? "bg-gray-50 border-gray-100" : "border-gray-200 hover:border-blue-100"
+                      "w-full flex items-center justify-between p-4 rounded-xl border transition-colors text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]",
+                      milestone.completed ? "bg-[var(--color-surface-muted)] border-[var(--color-border-soft)]" : "border-[var(--color-border-subtle)] hover:border-[var(--color-border-subtle)]"
                     )}>
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "h-8 w-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                          milestone.completed ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-500"
+                          milestone.completed ? "bg-emerald-100 text-emerald-600" : "bg-[var(--color-surface-muted)] text-[var(--color-ink-muted)] group-hover:bg-[var(--color-surface-hover)] group-hover:text-[var(--color-ink-secondary)]"
                         )}>
-                          {milestone.completed ? <CheckCircle2 className="h-5 w-5" /> : <div className="h-2.5 w-2.5 rounded-full bg-gray-300" />}
+                          {milestone.completed ? <CheckCircle2 className="h-5 w-5" /> : <div className="h-2.5 w-2.5 rounded-full bg-[var(--color-ink-muted)]" />}
                         </div>
                         <div>
-                          <p className={cn("font-medium transition-colors", milestone.completed ? "text-gray-600 line-through" : "text-gray-900")}>
+                          <p className={cn("font-medium transition-colors", milestone.completed ? "text-[var(--color-ink-secondary)] line-through" : "text-[var(--color-ink)]")}>
                             {milestone.name}
                           </p>
-                          <p className="text-xs text-gray-500 flex items-center mt-0.5">
+                          <p className="text-xs text-[var(--color-ink-secondary)] flex items-center mt-0.5">
                             <Calendar className="h-3 w-3 mr-1" />
                             Due {format(new Date(milestone.dueDate), 'MMM dd, yyyy')}
                           </p>
@@ -279,7 +279,7 @@ export function ProjectDetails() {
                       <div className="text-right">
                         <span className={cn(
                           "font-semibold text-sm transition-colors mr-6",
-                          milestone.completed ? "text-gray-500" : "text-gray-900"
+                          milestone.completed ? "text-[var(--color-ink-secondary)]" : "text-[var(--color-ink)]"
                         )}>
                           {formatCurrency(milestone.amount)}
                         </span>
@@ -290,7 +290,7 @@ export function ProjectDetails() {
                         e.stopPropagation();
                         store.updateProject(project.id, { milestones: project.milestones.filter(m => m.id !== milestone.id) });
                       }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 rounded"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[var(--color-ink-muted)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface)]/80 rounded"
                       title="Delete milestone"
                     >
                       <X className="h-4 w-4" />
@@ -298,14 +298,14 @@ export function ProjectDetails() {
                   </div>
                 ))}
                 {project.milestones.length === 0 && (
-                  <p className="text-sm text-gray-500 italic text-center py-4">No milestones created yet.</p>
+                  <p className="text-sm text-[var(--color-ink-secondary)] italic text-center py-4">No milestones created yet.</p>
                 )}
               </div>
               
               {!isAddingMilestone ? (
                 <button
                   onClick={() => setIsAddingMilestone(true)}
-                  className="w-full mt-2 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm font-medium text-gray-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full mt-2 py-3 border-2 border-dashed border-[var(--color-border-subtle)] rounded-xl text-sm font-medium text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] hover:border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)] transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   Add Milestone
@@ -332,21 +332,21 @@ export function ProjectDetails() {
                       setIsAddingMilestone(false);
                     }
                   }}
-                  className="mt-4 pt-4 border-t border-gray-100 bg-gray-50 p-4 rounded-xl space-y-4"
+                  className="mt-4 pt-4 border-t border-[var(--color-border-soft)] bg-[var(--color-surface-muted)] p-4 rounded-xl space-y-4"
                 >
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Milestone Name</label>
-                    <input autoFocus required type="text" name="mName" placeholder="e.g. Wireframes approved" className="w-full text-sm bg-white border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-gray-900 placeholder:text-gray-400" />
+                    <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Milestone Name</label>
+                    <input autoFocus required type="text" name="mName" placeholder="e.g. Wireframes approved" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Amount</label>
-                      <input required type="number" name="mAmount" placeholder="0" className="w-full text-sm bg-white border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-gray-900 placeholder:text-gray-400" />
+                      <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Amount</label>
+                      <input required type="number" name="mAmount" placeholder="0" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1.5 uppercase tracking-wide">Due Date</label>
-                      <input required type="date" name="mDate" className="w-full text-sm bg-white border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-gray-900" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
+                      <label className="block text-xs font-medium text-[var(--color-ink-secondary)] mb-1.5 uppercase tracking-wide">Due Date</label>
+                      <input required type="date" name="mDate" className="w-full text-sm bg-[var(--color-surface)] border border-[var(--color-border-subtle)] focus:border-[var(--color-ink-muted)] focus:ring-1 focus:ring-[var(--color-ink-muted)] rounded-[10px] px-3 py-2 text-[var(--color-ink)]" defaultValue={format(new Date(), 'yyyy-MM-dd')} />
                     </div>
                   </div>
                   
@@ -354,7 +354,7 @@ export function ProjectDetails() {
                     <button 
                       type="button" 
                       onClick={() => setIsAddingMilestone(false)}
-                      className="flex-1 py-2 px-4 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 py-2 px-4 shadow-[var(--shadow-card)] text-sm font-medium rounded-[10px] text-[var(--color-ink)] bg-[var(--color-surface)] border border-[var(--color-border-subtle)] hover:bg-[var(--color-surface-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]"
                     >
                       Cancel
                     </button>
@@ -376,7 +376,7 @@ export function ProjectDetails() {
               <h2 className="section-label">Related Tasks</h2>
               <button 
                  onClick={() => setIsTaskModalOpen(true)}
-                 className="flex items-center gap-1 text-[11px] font-medium text-blue-600 hover:text-blue-700 tracking-tight"
+                 className="flex items-center gap-1 text-[11px] font-medium text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] tracking-tight"
                >
                  <Plus className="h-3.5 w-3.5" /> ADD TASK
                </button>
@@ -385,23 +385,23 @@ export function ProjectDetails() {
                {projectTasks.length > 0 ? (
                  <div className="space-y-3">
                   {projectTasks.map(task => (
-                    <div key={task.id} className="flex items-start gap-3 p-3 border border-gray-100 rounded-lg group">
+                    <div key={task.id} className="flex items-start gap-3 p-3 border border-[var(--color-border-soft)] rounded-[10px] group">
                       <button 
                         onClick={() => store.toggleTaskCompletion(task.id)}
                         className={cn(
                         "mt-0.5 flex-shrink-0 h-5 w-5 rounded border flex items-center justify-center transition-colors",
-                        task.completed ? "bg-blue-500 border-blue-500" : "bg-white border-gray-300 hover:border-blue-500 hover:bg-blue-50"
+                        task.completed ? "bg-[var(--color-ink)] border-[var(--color-ink)]" : "bg-[var(--color-surface)] border-[var(--color-border-subtle)] hover:border-[var(--color-ink-muted)] hover:bg-[var(--color-surface-muted)]"
                       )}>
                         {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
                       </button>
                       <div className="flex-1">
-                        <p className={cn("text-sm font-medium transition-colors", task.completed ? "text-gray-400 line-through" : "text-gray-900")}>
+                        <p className={cn("text-sm font-medium transition-colors", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
                           {task.title}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                           {task.priority === 'high' && <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded">High</span>}
                           {task.dueDate && (
-                            <span className="text-[10px] text-gray-500 flex items-center">
+                            <span className="text-[10px] text-[var(--color-ink-secondary)] flex items-center">
                               <Calendar className="h-3 w-3 mr-1" />
                               {format(new Date(task.dueDate), 'MMM dd')}
                             </span>
@@ -413,10 +413,10 @@ export function ProjectDetails() {
                  </div>
                ) : (
                  <div className="text-center py-6">
-                   <p className="text-sm font-medium text-gray-900 mb-3">No tasks created yet for this project.</p>
+                   <p className="text-sm font-medium text-[var(--color-ink)] mb-3">No tasks created yet for this project.</p>
                    <button 
                      onClick={() => setIsTaskModalOpen(true)}
-                     className="inline-flex items-center justify-center px-4 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg text-sm hover:bg-blue-100 transition-colors"
+                     className="inline-flex items-center justify-center px-4 py-2 bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] font-medium rounded-[10px] text-sm hover:bg-[var(--color-surface-hover)] transition-colors"
                    >
                      Create First Task
                    </button>
@@ -436,21 +436,21 @@ export function ProjectDetails() {
             <div className="design-card p-6">
               <ul className="space-y-3 mb-4">
                 {project.deliverables.map((item, i) => (
-                  <li key={i} className="flex items-start justify-between text-sm text-gray-700 group">
+                  <li key={i} className="flex items-start justify-between text-sm text-[var(--color-ink)] group">
                     <div className="flex items-start gap-2">
-                      <FileText className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                      <FileText className="h-4 w-4 text-[var(--color-ink-secondary)] shrink-0 mt-0.5" />
                       <span>{item}</span>
                     </div>
                     <button 
                       onClick={() => store.updateProject(project.id, { deliverables: project.deliverables.filter((_, index) => index !== i) })}
-                      className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-[var(--color-ink-muted)] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </li>
                 ))}
                 {project.deliverables.length === 0 && (
-                  <li className="text-sm text-gray-500 italic">No deliverables added yet.</li>
+                  <li className="text-sm text-[var(--color-ink-secondary)] italic">No deliverables added yet.</li>
                 )}
               </ul>
               <form 
@@ -462,15 +462,15 @@ export function ProjectDetails() {
                     input.value = '';
                   }
                 }}
-                className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100"
+                className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--color-border-soft)]"
               >
                 <input 
                   type="text" 
                   name="newDeliverable"
                   placeholder="Add a deliverable..." 
-                  className="flex-1 text-sm bg-gray-50 border-none rounded-lg px-3 py-2 text-gray-700 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 text-sm bg-[var(--color-surface-muted)] border-none rounded-[10px] px-3 py-2 text-[var(--color-ink)] focus:ring-1 focus:ring-[var(--color-ink-muted)]"
                 />
-                <button type="submit" className="text-xs font-medium text-blue-600 hover:text-blue-700 px-3 py-2 bg-blue-50 rounded-lg">Add</button>
+                <button type="submit" className="text-xs font-medium text-[var(--color-ink-secondary)] hover:text-[var(--color-ink)] px-3 py-2 bg-[var(--color-surface-muted)] rounded-[10px]">Add</button>
               </form>
             </div>
           </div>
@@ -482,7 +482,7 @@ export function ProjectDetails() {
             </div>
             <div className="design-card p-6">
               <textarea 
-                className="w-full text-sm text-gray-700 whitespace-pre-wrap bg-transparent border-none focus:ring-0 resize-none p-0"
+                className="w-full text-sm text-[var(--color-ink)] whitespace-pre-wrap bg-transparent border-none focus:ring-0 resize-none p-0"
                 placeholder="Add project notes here..."
                 defaultValue={project.notes}
                 rows={5}
@@ -497,13 +497,13 @@ export function ProjectDetails() {
               <h2 className="section-label">Actions</h2>
             </div>
             <div className="design-card p-4 space-y-2">
-              <button onClick={handleEmailClient} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <span className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-gray-500" /> Email Client</span>
-                <ExternalLink className="h-3 w-3 text-gray-400" />
+              <button onClick={handleEmailClient} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] rounded-[10px] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]">
+                <span className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-[var(--color-ink-secondary)]" /> Email Client</span>
+                <ExternalLink className="h-3 w-3 text-[var(--color-ink-muted)]" />
               </button>
-              <button onClick={handleGenerateInvoice} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-gray-500" /> Generate Invoice</span>
-                <ChevronRight className="h-4 w-4 text-gray-400" />
+              <button onClick={handleGenerateInvoice} className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] rounded-[10px] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]">
+                <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-[var(--color-ink-secondary)]" /> Generate Invoice</span>
+                <ChevronRight className="h-4 w-4 text-[var(--color-ink-muted)]" />
               </button>
             </div>
           </div>

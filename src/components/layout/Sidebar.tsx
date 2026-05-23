@@ -167,7 +167,7 @@ export function Sidebar() {
         </NavLink>
       </nav>
 
-      <div className="px-3 pb-5 pt-2 space-y-0.5 border-t border-[var(--color-border-subtle)]/80 mx-3">
+      <div className="px-3 pb-5 pt-2 space-y-0.5 border-t border-[var(--color-border-soft)] mx-3">
         <NavLink
           to="/settings"
           className={cn('sidebar-nav-item', isActive('/settings') && 'sidebar-nav-item-active')}
@@ -188,7 +188,7 @@ export function Sidebar() {
       {user && (
         <div className="px-5 pb-6 pt-2">
           <div className="flex items-center gap-2.5 px-2">
-            <div className="h-8 w-8 rounded-full avatar-accent flex items-center justify-center text-xs shrink-0">
+            <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center text-xs font-semibold text-[var(--color-ink-secondary)] shrink-0">
               {user.name?.charAt(0) || 'F'}
             </div>
             <div className="min-w-0">
