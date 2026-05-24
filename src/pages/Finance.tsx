@@ -43,9 +43,22 @@ export function Finance() {
 
   return (
     <PageShell className="lg:pb-0">
-      <header className="page-block">
-        <h1 className="page-title">Finance</h1>
-        <p className="page-subtitle">Manage your {currentCategory} finances</p>
+      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="min-w-0">
+          <h1 className="page-title">Finance</h1>
+          <p className="page-subtitle">Manage your {currentCategory} finances</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setTransactionToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="hidden sm:inline-flex btn-primary"
+        >
+          <Plus className="h-4 w-4" />
+          <span>New Transaction</span>
+        </button>
       </header>
 
       <div className="page-block segmented-control segmented-control-full">

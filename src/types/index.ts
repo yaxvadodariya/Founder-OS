@@ -97,6 +97,7 @@ export interface RecurringPayment {
   dayOfMonth?: number;
   dayOfWeek?: number;
   category: string;
+  categoryGroup?: 'business' | 'personal';
   startDate: string;
   endDate?: string;
   active: boolean;

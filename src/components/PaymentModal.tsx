@@ -18,6 +18,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
   const [frequency, setFrequency] = useState<PaymentFrequency>('monthly');
   const [dayOfMonth, setDayOfMonth] = useState('');
   const [category, setCategory] = useState('');
+  const [categoryGroup, setCategoryGroup] = useState<'business' | 'personal'>('business');
   const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [active, setActive] = useState(true);
 
@@ -28,6 +29,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
       setFrequency(paymentToEdit.frequency);
       setDayOfMonth(paymentToEdit.dayOfMonth?.toString() || '');
       setCategory(paymentToEdit.category);
+      setCategoryGroup(paymentToEdit.categoryGroup || 'business');
       setStartDate(format(new Date(paymentToEdit.startDate), 'yyyy-MM-dd'));
       setActive(paymentToEdit.active);
     } else {
@@ -36,6 +38,7 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
       setFrequency('monthly');
       setDayOfMonth('');
       setCategory('');
+      setCategoryGroup('business');
       setStartDate(format(new Date(), 'yyyy-MM-dd'));
       setActive(true);
     }
@@ -52,20 +55,35 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
         frequency,
         dayOfMonth: dayOfMonth ? parseInt(dayOfMonth) : undefined,
         category,
+        categoryGroup,
         startDate: new Date(startDate).toISOString(),
         active,
       });
     } else {
+      const paymentId = Math.random().toString(36).substring(2, 11);
       store.addRecurringPayment({
-        id: Math.random().toString(36).substring(2, 11),
+        id: paymentId,
         name,
         amount: parseFloat(amount),
         frequency,
         dayOfMonth: dayOfMonth ? parseInt(dayOfMonth) : undefined,
         category,
+        categoryGroup,
         startDate: new Date(startDate).toISOString(),
         active,
         reminderDays: [1]
+      });
+
+      // Automatically log the initial payment as a transaction in Finance
+      store.addTransaction({
+        id: Math.random().toString(36).substring(2, 11),
+        type: 'expense',
+        category: categoryGroup,
+        amount: parseFloat(amount),
+        categoryDetail: category,
+        date: new Date(startDate).toISOString(),
+        description: `${name} (Subscription)`,
+        paymentMethod: 'Credit Card',
       });
     }
     
@@ -124,6 +142,19 @@ export function PaymentModal({ isOpen, onClose, paymentToEdit = null }: PaymentM
             className="input-field"
             placeholder="0.00"
           />
+        </div>
+
+        <div>
+          <label className="form-label">Type *</label>
+          <select 
+            required
+            value={categoryGroup}
+            onChange={(e) => setCategoryGroup(e.target.value as 'business' | 'personal')}
+            className="input-field"
+          >
+            <option value="business">Business (Company Bill)</option>
+            <option value="personal">Personal (Private Bill)</option>
+          </select>
         </div>
 
         <div>

@@ -28,7 +28,7 @@ export function Payments() {
 
   return (
     <PageShell className="lg:pb-0">
-      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="min-w-0">
           <h1 className="page-title">Payments & Bills</h1>
           <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -41,7 +41,20 @@ export function Payments() {
             )}
           </div>
         </div>
-        <PrivacyToggle />
+        <div className="flex items-center gap-2">
+          <PrivacyToggle />
+          <button
+            type="button"
+            onClick={() => {
+              setPaymentToEdit(null);
+              setIsModalOpen(true);
+            }}
+            className="hidden sm:inline-flex btn-primary"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Payment</span>
+          </button>
+        </div>
       </header>
 
       <section className="page-block flex-1">
