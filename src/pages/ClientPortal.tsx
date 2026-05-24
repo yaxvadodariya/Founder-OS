@@ -175,7 +175,9 @@ export function ClientPortal() {
           <div className="space-y-1">
             <span className="status-badge status-badge-success mb-2 uppercase text-[10px]">Client Portal</span>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-ink)]">{project.name}</h1>
-            <p className="text-sm text-[var(--color-ink-secondary)]">Client: {project.clientName} ({project.clientEmail})</p>
+            <p className="text-sm text-[var(--color-ink-secondary)]">
+              Client: {project.clientName}{project.clientEmail ? ` (${project.clientEmail})` : ''}
+            </p>
           </div>
           <div className="flex flex-col items-end">
             <span className={cn(

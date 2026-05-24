@@ -369,7 +369,9 @@ export function ProjectDetails() {
             <span className="text-[var(--color-ink)] font-medium">{project.name}</span>
           </div>
           <h1 className="page-title">{project.name}</h1>
-          <p className="page-subtitle">Client: {project.clientName} ({project.clientEmail})</p>
+          <p className="page-subtitle">
+            Client: {project.clientName}{project.clientEmail ? ` (${project.clientEmail})` : ''}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <span className={cn(
