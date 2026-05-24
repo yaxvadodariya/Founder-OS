@@ -1075,6 +1075,7 @@
     top: 0;
     right: 0;
     bottom: 0;
+    height: 100dvh;
     z-index: 70;
     width: 100%;
     background: var(--color-surface);
@@ -1089,6 +1090,7 @@
     .side-panel {
       border-top-left-radius: 28px;
       border-bottom-left-radius: 28px;
+      height: 100%;
     }
   }
   .side-panel-open {
@@ -1153,6 +1155,18 @@
     flex-shrink: 0;
   }
 
+  @media (max-width: 640px) {
+    .side-panel-header {
+      padding: 1.25rem 1.25rem 1rem;
+    }
+    .side-panel-body {
+      padding: 1.25rem 1.25rem 1.5rem;
+    }
+    .side-panel-footer {
+      padding: 1rem 1.25rem calc(1rem + env(safe-area-inset-bottom));
+    }
+  }
+
   html.dark .side-panel {
     box-shadow: -20px 0 60px rgba(0, 0, 0, 0.4);
   }
@@ -1175,5 +1189,15 @@
 .recharts-wrapper:focus,
 .recharts-surface:focus {
   outline: none !important;
+}
+
+/* ── Prevent Mobile Input Zoom ── */
+@media (max-width: 768px) {
+  .input-field,
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 

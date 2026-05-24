@@ -37,9 +37,22 @@ export function Tasks() {
 
   return (
     <PageShell className="lg:pb-0">
-      <header className="page-block">
-        <h1 className="page-title">Tasks</h1>
-        <p className="page-subtitle">Manage your to-dos and daily focus</p>
+      <header className="page-block flex flex-row justify-between items-center gap-4">
+        <div className="min-w-0">
+          <h1 className="page-title">Tasks</h1>
+          <p className="page-subtitle hidden sm:block">Manage your to-dos and daily focus</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setTaskToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="btn-primary"
+        >
+          <Plus className="h-4 w-4" />
+          <span>New Task</span>
+        </button>
       </header>
 
       <div className="page-block segmented-control segmented-control-full max-w-full">
