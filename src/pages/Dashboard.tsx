@@ -646,71 +646,67 @@ function StatCard({
   icon, 
   badge,
   subText,
-  gradientClass,
 }: { 
   title: string; 
   value: React.ReactNode; 
   icon: React.ReactNode; 
   badge?: React.ReactNode;
   subText?: string;
-  gradientClass?: string;
 }) {
   return (
-    <div className={cn("chart-card h-full flex flex-col justify-between relative overflow-hidden bg-gradient-to-br border", gradientClass || "from-indigo-500/5 to-transparent border-indigo-500/10")}>
+    <div className="chart-card h-full flex flex-col justify-between">
       <div className="chart-card-head flex items-center justify-between">
         <span className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">{title}</span>
         <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center shrink-0">
           {icon}
         </div>
       </div>
-      <p className="text-3xl font-extrabold text-[var(--color-ink)] mt-2 leading-none tracking-tight">{value}</p>
-      <div className="mt-auto pt-3 flex flex-wrap items-center justify-between gap-2">
+      <p className="text-3xl font-bold text-[var(--color-ink)] mt-3 leading-none tracking-tight">{value}</p>
+      <div className="mt-auto pt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-border-soft)]">
         {badge}
-        {subText && <p className="text-[11px] text-[var(--color-ink-muted)]">{subText}</p>}
+        {subText && <p className="text-[11px] text-[var(--color-ink-muted)] font-medium">{subText}</p>}
       </div>
     </div>
   );
 }
 
 function DualBalanceCard({ personalBalance, currentBalance, isHidden, currencySymbol }: { personalBalance: number; currentBalance: number; isHidden: boolean; currencySymbol: string }) {
-  const mode = useStore(state => state.balanceDisplayMode) || 'net-worth';
+  const store = useStore();
+  const mode = store.balanceDisplayMode || 'net-worth';
 
-  if (mode === 'liquid-cash') {
-    return (
-      <div className="chart-card h-full flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-indigo-500/5 to-transparent border border-indigo-500/10">
-        <div className="chart-card-head text-indigo-600 dark:text-indigo-400">
-          <Wallet className="h-4 w-4" />
-          <span>Liquid Cash</span>
-        </div>
-        <div className="my-auto py-4">
-          <p className="text-3xl font-extrabold text-[var(--color-ink)] tracking-tight">
-            <HiddenValue isHidden={isHidden}>{formatCurrency(personalBalance)}</HiddenValue>
-          </p>
-          <p className="text-[11px] text-[var(--color-ink-muted)] mt-1 font-medium">Available for spending</p>
-        </div>
-      </div>
-    );
-  }
+  const isNetWorth = mode === 'net-worth';
+  const mainLabel = isNetWorth ? 'NET WORTH' : 'LIQUID CASH';
+  const mainValue = isNetWorth ? currentBalance : personalBalance;
+  const footerLabel = isNetWorth ? 'Liquid Cash' : 'Net Worth';
+  const footerValue = isNetWorth ? personalBalance : currentBalance;
 
   return (
-    <div className="chart-card h-full flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-indigo-500/5 to-transparent border border-indigo-500/10">
+    <div className="chart-card h-full flex flex-col justify-between">
       <div>
-        <div className="chart-card-head text-indigo-600 dark:text-indigo-400">
-          <Wallet className="h-4 w-4" />
-          <span>Net Worth</span>
+        <div className="flex items-center justify-between">
+          <div className="chart-card-head !text-[var(--color-ink-muted)]">
+            <Wallet className="h-4 w-4 text-[var(--color-accent)]" />
+            <span>{mainLabel}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => store.setBalanceDisplayMode(isNetWorth ? 'liquid-cash' : 'net-worth')}
+            className="px-2.5 py-0.5 text-xs font-semibold text-[var(--color-accent)] border border-[var(--color-border-subtle)] rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors focus:outline-none cursor-pointer"
+          >
+            Switch
+          </button>
         </div>
-        <p className="text-3xl font-extrabold text-[var(--color-ink)] tracking-tight mt-3">
-          <HiddenValue isHidden={isHidden}>{formatCurrency(currentBalance)}</HiddenValue>
+        <p className="text-3xl font-bold text-[var(--color-ink)] tracking-tight mt-4">
+          <HiddenValue isHidden={isHidden}>{formatCurrency(mainValue)}</HiddenValue>
         </p>
       </div>
       <div className="mt-auto pt-3 border-t border-[var(--color-border-soft)]">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-[var(--color-ink-secondary)] font-medium">Liquid Cash</span>
-          <span className="text-sm font-bold text-[var(--color-ink)] tabular-nums">
-            <HiddenValue isHidden={isHidden} bulletCount={4} prefix={currencySymbol}>{formatCurrency(personalBalance)}</HiddenValue>
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-xs text-[var(--color-ink-secondary)]">{footerLabel}</span>
+          <span className="font-semibold text-[var(--color-ink)] tabular-nums">
+            <HiddenValue isHidden={isHidden} bulletCount={4} prefix={currencySymbol}>{formatCurrency(footerValue)}</HiddenValue>
           </span>
         </div>
-        <p className="text-[11px] text-[var(--color-ink-muted)] mt-0.5">Available for spending</p>
       </div>
     </div>
   );
