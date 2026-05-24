@@ -37,7 +37,7 @@ export function HiddenValue({ children, isHidden, className, bulletCount = 6, pr
             animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
             exit={{ opacity: 0, filter: 'blur(4px)', y: -4 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="inline-flex items-center tracking-widest text-[#B3B3B3]"
+            className="inline-flex items-center tracking-widest text-[var(--color-ink-muted)]"
           >
             {finalPrefix}{'•'.repeat(bulletCount)}
           </motion.span>

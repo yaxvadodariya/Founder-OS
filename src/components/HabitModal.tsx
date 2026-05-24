@@ -39,7 +39,7 @@ export function HabitModal({ isOpen, onClose, habitToEdit = null }: HabitModalPr
         id: Math.random().toString(36).substring(2, 11),
         name,
         icon,
-        color: '#10B981',
+        color: '#38C793',
         frequency,
         completedDates: [],
         createdAt: new Date().toISOString(),

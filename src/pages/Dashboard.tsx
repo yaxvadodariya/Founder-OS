@@ -422,30 +422,30 @@ export function Dashboard() {
                   <div className="h-44 w-full -mx-1">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={forecastData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#9CA3AF' }} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#9CA3AF' }} width={30} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#868C98' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#868C98' }} width={30} />
                         <Tooltip 
                           content={<ChartTooltip />} 
-                          cursor={{ stroke: isDarkMode ? '#2A2A2E' : '#E5E7EB', strokeDasharray: '4 4' }} 
+                          cursor={{ stroke: isDarkMode ? '#20232d' : '#e2e4e9', strokeDasharray: '4 4' }} 
                         />
                         <Line 
                           type="monotone" 
                           dataKey="actual" 
-                          stroke="#3B82F6" 
+                          stroke={isDarkMode ? '#546fed' : '#405cf2'} 
                           name="Actual"
                           strokeWidth={2} 
-                          dot={{ r: 3, fill: '#3B82F6' }} 
+                          dot={{ r: 3, fill: isDarkMode ? '#546fed' : '#405cf2' }} 
                           activeDot={{ r: 5 }} 
                           connectNulls
                         />
                         <Line 
                           type="monotone" 
                           dataKey="projected" 
-                          stroke="#F97316" 
+                          stroke="#f17b2c" 
                           name="Projected"
                           strokeWidth={2} 
                           strokeDasharray="4 4" 
-                          dot={{ r: 3, fill: '#F97316' }} 
+                          dot={{ r: 3, fill: '#f17b2c' }} 
                           activeDot={{ r: 5 }} 
                           connectNulls
                         />
@@ -607,9 +607,9 @@ function ChartMetricCard({
   const isPositive = invertTrend ? pct <= 0 : pct >= 0;
   const pctLabel = `${pct >= 0 ? '↑' : '↓'} ${Math.abs(pct).toFixed(2)}% vs last month`;
 
-  const activeLineColor = '#F97316'; // premium orange
-  const prevLineColor = isDarkMode ? '#3F3F46' : '#D1D5DB';
-  const cursorColor = isDarkMode ? '#2A2A2E' : '#E5E7EB';
+  const activeLineColor = isDarkMode ? '#546fed' : '#405cf2';
+  const prevLineColor = isDarkMode ? '#31353f' : '#cdd0d5';
+  const cursorColor = isDarkMode ? '#20232d' : '#e2e4e9';
 
   return (
     <div className="chart-card">
@@ -628,7 +628,7 @@ function ChartMetricCard({
       <div className="h-36 w-full -mx-1">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} interval="preserveStartEnd" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#868C98' }} interval="preserveStartEnd" />
             <YAxis hide domain={['auto', 'auto']} />
             <Tooltip content={<ChartTooltip />} cursor={{ stroke: cursorColor, strokeDasharray: '4 4' }} />
             <Line type="monotone" dataKey={prevKey} stroke={prevLineColor} strokeWidth={1.5} dot={false} connectNulls />

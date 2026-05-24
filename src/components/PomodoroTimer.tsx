@@ -200,7 +200,7 @@ export function PomodoroTimer() {
                   cx="32"
                   cy="32"
                   r={radius}
-                  stroke={mode === 'focus' ? '#F97316' : mode === 'shortBreak' ? '#10B981' : '#3B82F6'}
+                  stroke={mode === 'focus' ? '#f17b2c' : mode === 'shortBreak' ? '#38c793' : '#375dfb'}
                   strokeWidth="3.5"
                   fill="transparent"
                   strokeDasharray={circumference}
