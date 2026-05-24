@@ -1,16 +1,14 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  FolderKanban, 
-  CheckSquare, 
+import {
+  LayoutDashboard,
+  Wallet,
+  FolderKanban,
+  CheckSquare,
   Menu,
-  X
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
-import { DarkModeToggle } from '../DarkModeToggle';
 import { Sidebar } from './Sidebar';
 import { CommandBar } from '../CommandBar';
 import { PomodoroTimer } from '../PomodoroTimer';
@@ -25,7 +23,6 @@ const mobileNav = [
 
 export function AppLayout() {
   const store = useStore();
-  const user = store.user;
   const togglePrivacyMode = store.togglePrivacyMode;
   const isDarkMode = store.isDarkMode;
   const location = useLocation();
@@ -90,33 +87,27 @@ export function AppLayout() {
                 <Outlet />
               </div>
             </div>
-            <div className="hidden lg:block fixed bottom-8 right-8 z-50">
-              <DarkModeToggle />
-            </div>
           </main>
         </div>
       </div>
 
-      <nav 
+      <nav
         className="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-4 pb-3"
         style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
       >
-        <div className="flex justify-around items-center rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] py-2.5 shadow-[var(--shadow-card)]">
+        <div className="mobile-bottom-nav">
           {mobileNav.map((item) => {
-            const isActive = location.pathname === item.href || 
+            const isActive = location.pathname === item.href ||
             (item.href !== '/' && item.href !== '/more' && location.pathname.startsWith(item.href));
-            
+
             return (
               <NavLink
                 key={item.name}
                 to={item.href}
-                className={cn(
-                  "flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-xl transition-colors",
-                  isActive ? "text-[var(--color-ink)] font-medium" : "text-[var(--color-ink-muted)] font-normal"
-                )}
+                className={cn('mobile-nav-item', isActive && 'mobile-nav-item-active')}
               >
-                <item.icon className={cn("h-5 w-5 mb-0.5 stroke-[1.5]", isActive ? "text-[var(--color-ink)]" : "text-[var(--color-ink-muted)]")} />
-                <span className="text-[10px] leading-none">{item.name}</span>
+                <item.icon className="h-[18px] w-[18px] stroke-[1.75]" />
+                <span>{item.name}</span>
               </NavLink>
             );
           })}
