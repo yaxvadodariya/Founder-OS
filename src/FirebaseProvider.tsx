@@ -10,6 +10,20 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let unsubs: (() => void)[] = [];
 
+    const handleSnapshotError = (source: string, err: any) => {
+      console.error(`${source} snapshot error:`, err);
+      fetch('/api/client-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          error: err instanceof Error ? err.message : String(err),
+          operationType: 'list',
+          path: source,
+          authInfo: { userId: auth.currentUser?.uid }
+        })
+      }).catch(() => {});
+    };
+
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       // Clear previous listeners
       unsubs.forEach(fn => fn());
@@ -31,48 +45,48 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
             // Sort by date descending
             data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
             useStore.setState({ transactions: data });
-          }, (err) => console.error("Transactions snapshot error:", err)),
+          }, (err) => handleSnapshotError("transactions", err)),
           onSnapshot(collection(db, `users/${userId}/projects`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ projects: data });
-          }, (err) => console.error("Projects snapshot error:", err)),
+          }, (err) => handleSnapshotError("projects", err)),
           onSnapshot(collection(db, `users/${userId}/tasks`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ tasks: data });
-          }, (err) => console.error("Tasks snapshot error:", err)),
+          }, (err) => handleSnapshotError("tasks", err)),
           onSnapshot(collection(db, `users/${userId}/recurringPayments`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ recurringPayments: data });
-          }, (err) => console.error("Recurring payments snapshot error:", err)),
+          }, (err) => handleSnapshotError("recurringPayments", err)),
           onSnapshot(collection(db, `users/${userId}/notes`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ notes: data });
-          }, (err) => console.error("Notes snapshot error:", err)),
+          }, (err) => handleSnapshotError("notes", err)),
           onSnapshot(collection(db, `users/${userId}/invoices`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ invoices: data });
-          }, (err) => console.error("Invoices snapshot error:", err)),
+          }, (err) => handleSnapshotError("invoices", err)),
           onSnapshot(collection(db, `users/${userId}/habits`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ habits: data });
-          }, (err) => console.error("Habits snapshot error:", err)),
+          }, (err) => handleSnapshotError("habits", err)),
           onSnapshot(collection(db, `users/${userId}/goals`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ goals: data });
-          }, (err) => console.error("Goals snapshot error:", err)),
+          }, (err) => handleSnapshotError("goals", err)),
           onSnapshot(collection(db, `users/${userId}/journal`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
             useStore.setState({ journalEntries: data });
-          }, (err) => console.error("Journal snapshot error:", err)),
+          }, (err) => handleSnapshotError("journal", err)),
           onSnapshot(collection(db, `users/${userId}/budgets`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ budgets: data });
-          }, (err) => console.error("Budgets snapshot error:", err)),
+          }, (err) => handleSnapshotError("budgets", err)),
           onSnapshot(collection(db, `users/${userId}/clients`), (snap) => {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ clients: data });
-          }, (err) => console.error("Clients snapshot error:", err)),
+          }, (err) => handleSnapshotError("clients", err)),
         ];
 
         setLoading(false);

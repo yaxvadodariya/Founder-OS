@@ -153,6 +153,12 @@ Kindly remind him of any pending tasks that need attention tomorrow, end on an e
     }
   });
 
+  // Client Log Endpoint for debugging
+  app.post('/api/client-log', (req, res) => {
+    console.error('=== CLIENT-LOG ===', JSON.stringify(req.body, null, 2));
+    res.status(200).json({ success: true });
+  });
+
   // Slack Events Webhook Endpoint
   app.post('/api/slack/events', async (req, res) => {
     if (req.body.type === 'url_verification') {

@@ -51,6 +51,13 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
   useStore.getState().setLastError(JSON.stringify(errInfo, null, 2));
+
+  // Send to dev server endpoint for debugging
+  fetch('/api/client-log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(errInfo)
+  }).catch(() => {});
 }
 
 interface StoreState {

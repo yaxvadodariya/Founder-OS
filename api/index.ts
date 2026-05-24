@@ -264,6 +264,12 @@ app.post('/api/test-reminder', async (req, res) => {
   }
 });
 
+// Client Log Endpoint for debugging
+app.post('/api/client-log', (req, res) => {
+  console.error('=== CLIENT-LOG ===', JSON.stringify(req.body, null, 2));
+  res.status(200).json({ success: true });
+});
+
 app.post('/api/notify/transaction', async (req, res) => {
   try {
     const client = getTwilio();

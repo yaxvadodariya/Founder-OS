@@ -285,3 +285,4 @@ service cloud.firestore {
     }
   }
 }
+// Force deploy rules to ensure all collections are active on the server.
