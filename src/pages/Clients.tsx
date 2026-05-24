@@ -49,25 +49,40 @@ export function Clients() {
 
       <section className="page-block">
         {clients.length > 0 ? (
-          <div className="section-panel-flat">
-            <div className="divide-y divide-[var(--color-border-soft)]">
-              {clients.map(client => (
-                <div key={client.id} className="flex items-center gap-4 p-4 hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
-                  onClick={() => { setClientToEdit(client); setIsModalOpen(true); }}>
-                  <div className="h-10 w-10 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center text-sm font-semibold text-[var(--color-ink-secondary)] shrink-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            {clients.map(client => (
+              <div 
+                key={client.id} 
+                className="design-card p-5 cursor-pointer hover:shadow-md transition-all flex flex-col justify-between group relative overflow-hidden"
+                onClick={() => { setClientToEdit(client); setIsModalOpen(true); }}
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-base font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
                     {client.name.charAt(0)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--color-ink)] truncate">{client.name}</p>
-                    <p className="text-xs text-[var(--color-ink-muted)] truncate">{client.company || client.email}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-[var(--color-ink)]">{formatCurrency(getClientRevenue(client))}</p>
-                    <p className="text-xs text-[var(--color-ink-muted)]">{getClientProjects(client)} projects</p>
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-[var(--color-ink)] truncate group-hover:text-[var(--color-accent)] transition-colors">{client.name}</p>
+                    <p className="text-xs text-[var(--color-ink-muted)] truncate flex items-center gap-1 mt-0.5">
+                      <Building2 className="h-3 w-3 inline shrink-0" />
+                      {client.company || 'Individual Client'}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
+
+                <div className="pt-3 border-t border-[var(--color-border-soft)] flex justify-between items-center mt-auto">
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-[var(--color-ink-muted)] uppercase tracking-wider font-semibold">Lifetime Value</p>
+                    <p className="text-base font-bold text-emerald-600 tabular-nums mt-0.5">{formatCurrency(getClientRevenue(client))}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[10px] text-[var(--color-ink-muted)] uppercase tracking-wider font-semibold">Projects</p>
+                    <span className="status-badge status-badge-neutral mt-1">
+                      {getClientProjects(client)} Active
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="section-panel-flat">

@@ -46,37 +46,72 @@ export function Journal() {
       </div>
 
       {todayEntry ? (
-        <section className="page-block space-y-4">
+        <section className="page-block space-y-6">
           {todayEntry.mood > 0 && (
-            <div className="design-card p-4 flex items-center gap-3">
-              {React.createElement(MOOD_ICONS[todayEntry.mood - 1], { className: cn('h-6 w-6', MOOD_COLORS[todayEntry.mood - 1]) })}
-              <span className="text-sm font-medium text-[var(--color-ink)]">Mood: {MOOD_LABELS[todayEntry.mood - 1]}</span>
+            <div className="design-card p-5 flex items-center gap-4 bg-gradient-to-br from-indigo-500/5 to-transparent border-indigo-500/10">
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center shrink-0">
+                {React.createElement(MOOD_ICONS[todayEntry.mood - 1], { className: cn('h-5 w-5', MOOD_COLORS[todayEntry.mood - 1]) })}
+              </div>
+              <div>
+                <p className="text-[10px] text-[var(--color-ink-muted)] uppercase tracking-wider font-semibold">Mood Status</p>
+                <p className="text-sm font-semibold text-[var(--color-ink)] mt-0.5">{MOOD_LABELS[todayEntry.mood - 1]}</p>
+              </div>
             </div>
           )}
-          {todayEntry.morningPlan && (
-            <div className="design-card p-5">
-              <h3 className="section-label mb-2">☀️ Morning Plan</h3>
-              <p className="text-sm text-[var(--color-ink)] whitespace-pre-wrap">{todayEntry.morningPlan}</p>
-            </div>
-          )}
-          {todayEntry.eveningReflection && (
-            <div className="design-card p-5">
-              <h3 className="section-label mb-2">🌙 Evening Reflection</h3>
-              <p className="text-sm text-[var(--color-ink)] whitespace-pre-wrap">{todayEntry.eveningReflection}</p>
-            </div>
-          )}
-          {todayEntry.wins && todayEntry.wins.length > 0 && (
-            <div className="design-card p-5">
-              <h3 className="section-label mb-2">🏆 Wins</h3>
-              <ul className="space-y-1">{todayEntry.wins.map((w, i) => <li key={i} className="text-sm text-[var(--color-ink)]">• {w}</li>)}</ul>
-            </div>
-          )}
-          {todayEntry.challenges && todayEntry.challenges.length > 0 && (
-            <div className="design-card p-5">
-              <h3 className="section-label mb-2">💪 Challenges</h3>
-              <ul className="space-y-1">{todayEntry.challenges.map((c, i) => <li key={i} className="text-sm text-[var(--color-ink)]">• {c}</li>)}</ul>
-            </div>
-          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {todayEntry.morningPlan && (
+              <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/10 flex flex-col">
+                <h3 className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <span>☀️</span> Morning Plan
+                </h3>
+                <p className="text-sm text-[var(--color-ink)] whitespace-pre-wrap leading-relaxed flex-1">{todayEntry.morningPlan}</p>
+              </div>
+            )}
+            
+            {todayEntry.eveningReflection && (
+              <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-purple-500/5 to-transparent border-purple-500/10 flex flex-col">
+                <h3 className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <span>🌙</span> Evening Reflection
+                </h3>
+                <p className="text-sm text-[var(--color-ink)] whitespace-pre-wrap leading-relaxed flex-1">{todayEntry.eveningReflection}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {todayEntry.wins && todayEntry.wins.length > 0 && (
+              <div className="design-card p-5">
+                <h3 className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider mb-3 flex items-center gap-1 border-b border-[var(--color-border-soft)] pb-2">
+                  <span>🏆</span> Wins & Achievements
+                </h3>
+                <ul className="space-y-2">
+                  {todayEntry.wins.map((w, i) => (
+                    <li key={i} className="text-sm text-[var(--color-ink)] flex items-start gap-2">
+                      <span className="text-emerald-500 font-bold select-none mt-0.5">✓</span>
+                      <span>{w}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {todayEntry.challenges && todayEntry.challenges.length > 0 && (
+              <div className="design-card p-5">
+                <h3 className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider mb-3 flex items-center gap-1 border-b border-[var(--color-border-soft)] pb-2">
+                  <span>💪</span> Challenges & Learnings
+                </h3>
+                <ul className="space-y-2">
+                  {todayEntry.challenges.map((c, i) => (
+                    <li key={i} className="text-sm text-[var(--color-ink)] flex items-start gap-2">
+                      <span className="text-orange-500 font-bold select-none mt-0.5">•</span>
+                      <span>{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </section>
       ) : (
         <section className="page-block">

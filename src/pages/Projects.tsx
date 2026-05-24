@@ -31,6 +31,11 @@ export function Projects() {
   
   const projects = store.projects.filter(p => filter === 'all' ? true : p.status === filter);
 
+  const activeProjectsCount = store.projects.filter(p => p.status === 'active').length;
+  const activeValue = store.projects.filter(p => p.status === 'active').reduce((acc, p) => acc + (p.value || 0), 0);
+  const totalMilestones = store.projects.reduce((acc, p) => acc + (p.milestones?.length || 0), 0);
+  const completedMilestones = store.projects.reduce((acc, p) => acc + (p.milestones?.filter(m => m.completed).length || 0), 0);
+
   return (
     <PageShell className="lg:pb-0">
       <header className="page-block flex flex-row justify-between items-center gap-4">
@@ -49,6 +54,22 @@ export function Projects() {
           <span>New Project</span>
         </button>
       </header>
+
+      {/* Premium Stats Grid */}
+      <section className="page-block grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-indigo-500/5 to-transparent border border-indigo-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Active Projects</p>
+          <p className="text-2xl font-bold text-[var(--color-ink)] mt-1.5">{activeProjectsCount}</p>
+        </div>
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Active Value</p>
+          <p className="text-2xl font-bold text-emerald-600 mt-1.5">{formatCurrency(activeValue)}</p>
+        </div>
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-purple-500/5 to-transparent border border-purple-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Milestones Progress</p>
+          <p className="text-2xl font-bold text-[var(--color-ink)] mt-1.5">{completedMilestones} / {totalMilestones}</p>
+        </div>
+      </section>
 
       <div className="page-block segmented-control segmented-control-full">
         {(['all', 'lead', 'active', 'completed', 'on-hold'] as const).map(f => (

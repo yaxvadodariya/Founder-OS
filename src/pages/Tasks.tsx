@@ -35,6 +35,12 @@ export function Tasks() {
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
   });
 
+  const pendingTasksCount = store.tasks.filter(t => !t.completed).length;
+  const highPriorityTasksCount = store.tasks.filter(t => !t.completed && t.priority === 'high').length;
+  const activeTimerTask = store.activeTimer && store.activeTimer.type === 'task' 
+    ? store.tasks.find(t => t.id === store.activeTimer?.id) 
+    : null;
+
   return (
     <PageShell className="lg:pb-0">
       <header className="page-block flex flex-row justify-between items-center gap-4">
@@ -54,6 +60,24 @@ export function Tasks() {
           <span>New Task</span>
         </button>
       </header>
+
+      {/* Tasks Page Metrics Grid */}
+      <section className="page-block grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-indigo-500/5 to-transparent border border-indigo-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Pending Tasks</p>
+          <p className="text-2xl font-bold text-[var(--color-ink)] mt-1.5">{pendingTasksCount}</p>
+        </div>
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-rose-500/5 to-transparent border border-rose-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">High Priority</p>
+          <p className="text-2xl font-bold text-rose-600 mt-1.5">{highPriorityTasksCount}</p>
+        </div>
+        <div className="design-card p-4 relative overflow-hidden bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/10">
+          <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Now Tracking</p>
+          <p className="text-sm font-bold text-[var(--color-ink)] truncate mt-2">
+            {activeTimerTask ? activeTimerTask.title : 'No active timer'}
+          </p>
+        </div>
+      </section>
 
       <div className="page-block segmented-control segmented-control-full max-w-full">
         <FilterButton active={filter === 'today'} onClick={() => setFilter('today')}>Today</FilterButton>

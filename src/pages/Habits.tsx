@@ -58,89 +58,124 @@ export function Habits() {
         </button>
       </header>
 
-      <div className="page-block grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="design-card p-4 text-center">
-          <p className="text-2xl font-bold text-[var(--color-ink)]">{habits.length}</p>
-          <p className="text-xs text-[var(--color-ink-muted)] mt-1">Total Habits</p>
+      <div className="page-block grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/5 to-transparent border border-indigo-500/10 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Total Habits</p>
+            <p className="text-3xl font-bold text-[var(--color-ink)] mt-2">{habits.length}</p>
+          </div>
+          <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+            <Zap className="h-4 w-4" />
+          </div>
         </div>
-        <div className="design-card p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-600">{completedToday}</p>
-          <p className="text-xs text-[var(--color-ink-muted)] mt-1">Done Today</p>
+        <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/10 flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Done Today</p>
+            <p className="text-3xl font-bold text-emerald-600 mt-2">{completedToday}</p>
+          </div>
+          <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+            <Check className="h-4 w-4" />
+          </div>
         </div>
-        <div className="design-card p-4 text-center hidden sm:block">
-          <p className="text-2xl font-bold text-orange-500">
-            {habits.length > 0 ? Math.max(...habits.map(h => getStreak(h.completedDates || []))) : 0}
-          </p>
-          <p className="text-xs text-[var(--color-ink-muted)] mt-1">Best Streak</p>
+        <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-orange-500/5 to-transparent border border-orange-500/10 flex flex-col justify-between hidden sm:flex">
+          <div>
+            <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Best Streak</p>
+            <p className="text-3xl font-bold text-orange-500 mt-2">
+              {habits.length > 0 ? Math.max(...habits.map(h => getStreak(h.completedDates || []))) : 0}
+            </p>
+          </div>
+          <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500">
+            <Flame className="h-4 w-4" />
+          </div>
         </div>
       </div>
 
       <section className="page-block">
         <h2 className="section-label mb-3">Your Habits</h2>
-        <div className="section-panel-flat">
-          {habits.length > 0 ? (
-            <div className="divide-y divide-[var(--color-border-soft)]">
-              {habits.map(habit => {
-                const isCompletedToday = (habit.completedDates || []).includes(today);
-                const streak = getStreak(habit.completedDates || []);
-                return (
-                  <div
-                    key={habit.id}
-                    className="flex items-center gap-3 p-4 hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
-                    onClick={() => { setHabitToEdit(habit); setIsModalOpen(true); }}
-                  >
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); store.toggleHabitDate(habit.id, today); }}
-                      className={cn(
-                        'h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-all text-lg',
-                        isCompletedToday
-                          ? 'bg-emerald-500 text-white shadow-sm'
-                          : 'border-2 border-[var(--color-border-subtle)] hover:border-emerald-400'
-                      )}
-                    >
-                      {isCompletedToday ? <Check className="h-4 w-4" /> : <span>{habit.icon || '✨'}</span>}
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <p className={cn('text-sm font-medium', isCompletedToday ? 'text-[var(--color-ink-muted)] line-through' : 'text-[var(--color-ink)]')}>
-                        {habit.name}
-                      </p>
-                      <div className="flex items-center gap-3 mt-1">
+        {habits.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+            {habits.map(habit => {
+              const isCompletedToday = (habit.completedDates || []).includes(today);
+              const streak = getStreak(habit.completedDates || []);
+              
+              return (
+                <div
+                  key={habit.id}
+                  className="design-card p-5 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+                  onClick={() => { setHabitToEdit(habit); setIsModalOpen(true); }}
+                >
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); store.toggleHabitDate(habit.id, today); }}
+                        className={cn(
+                          'h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 transition-all text-base border',
+                          isCompletedToday
+                            ? 'bg-emerald-500 border-emerald-600 text-white shadow-sm'
+                            : 'bg-[var(--color-surface-muted)] border-[var(--color-border-subtle)] hover:border-emerald-400 text-lg'
+                        )}
+                      >
+                        {isCompletedToday ? <Check className="h-4 w-4" /> : <span>{habit.icon || '✨'}</span>}
+                      </button>
+                      <div>
+                        <p className={cn('text-sm font-semibold transition-colors', isCompletedToday ? 'text-[var(--color-ink-muted)] line-through' : 'text-[var(--color-ink)] group-hover:text-[var(--color-accent)]')}>
+                          {habit.name}
+                        </p>
                         {streak > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-orange-500 font-medium">
-                            <Flame className="h-3 w-3" /> {streak}d streak
+                          <span className="inline-flex items-center gap-1 text-xs text-orange-500 font-semibold mt-0.5">
+                            <Flame className="h-3.5 w-3.5" /> {streak}d streak
                           </span>
                         )}
-                        <div className="flex items-center gap-0.5">
-                          {last7Days.map(day => {
-                            const dayStr = format(day, 'yyyy-MM-dd');
-                            const done = (habit.completedDates || []).includes(dayStr);
-                            return (
-                              <div
-                                key={dayStr}
-                                className={cn(
-                                  'h-2.5 w-2.5 rounded-full',
-                                  done ? 'bg-emerald-500' : 'bg-[var(--color-surface-muted)]'
-                                )}
-                                title={format(day, 'MMM d')}
-                              />
-                            );
-                          })}
-                        </div>
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
+
+                  <div className="pt-4 border-t border-[var(--color-border-soft)]">
+                    <p className="text-[10px] text-[var(--color-ink-muted)] uppercase tracking-wider font-semibold mb-2">Last 7 Days Consistency</p>
+                    <div className="flex justify-between items-center gap-1 bg-[var(--color-surface-muted)] p-2 rounded-xl border border-[var(--color-border-subtle)]">
+                      {last7Days.map(day => {
+                        const dayStr = format(day, 'yyyy-MM-dd');
+                        const done = (habit.completedDates || []).includes(dayStr);
+                        const isDayToday = isSameDay(day, new Date());
+                        
+                        return (
+                          <div
+                            key={dayStr}
+                            className="flex flex-col items-center gap-1 flex-1"
+                            title={format(day, 'EEEE, MMM d')}
+                          >
+                            <span className={cn('text-[9px] font-medium uppercase', isDayToday ? 'text-[var(--color-accent)] font-semibold' : 'text-[var(--color-ink-muted)]')}>
+                              {format(day, 'eee').charAt(0)}
+                            </span>
+                            <div
+                              className={cn(
+                                'h-5 w-5 rounded-full flex items-center justify-center transition-all',
+                                done 
+                                  ? 'bg-emerald-500 text-white shadow-sm' 
+                                  : 'bg-[var(--color-surface)] border border-[var(--color-border-subtle)]'
+                              )}
+                            >
+                              {done && <Check className="h-3 w-3" />}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="section-panel-flat">
             <div className="flex flex-col items-center justify-center p-10 text-center">
               <Zap className="h-10 w-10 text-[var(--color-ink-muted)] mb-2 opacity-40" />
               <p className="text-sm font-medium text-[var(--color-ink)]">No habits yet</p>
               <p className="page-subtitle mt-1">Start building daily routines.</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       <HabitModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} habitToEdit={habitToEdit} />

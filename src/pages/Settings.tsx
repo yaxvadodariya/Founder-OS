@@ -31,17 +31,17 @@ export function Settings() {
 
       <div className="section-panel">
         {/* Profile Section */}
-        <div className="design-card p-4 flex items-center justify-between mb-6">
+        <div className="design-card p-5 flex items-center justify-between mb-6 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent border border-indigo-500/10">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-[var(--color-surface-muted)] text-[var(--color-ink-secondary)] flex items-center justify-center font-bold text-2xl overflow-hidden">
+            <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-2xl overflow-hidden">
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div>
-              <p className="text-base font-semibold text-[var(--color-ink)]">{user?.name}</p>
+              <p className="text-lg font-bold text-[var(--color-ink)]">{user?.name}</p>
               <p className="text-sm tracking-tight text-[var(--color-ink-secondary)]">{user?.email}</p>
             </div>
           </div>
-          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800">PRO</span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-orange-100 text-orange-800 dark:bg-orange-950/20 dark:text-orange-400">PRO MEMBER</span>
         </div>
 
         {/* Preferences */}

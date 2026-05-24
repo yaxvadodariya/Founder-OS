@@ -45,37 +45,72 @@ export function Goals() {
 
       <section className="page-block">
         {goals.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
             {goals.map(goal => {
               const progress = getProgress(goal);
               const isOverBudget = goal.category === 'expense-limit' && progress > 100;
+              const isSavings = goal.category === 'savings';
+              const isIncome = goal.category === 'income';
+              const isExpenseLimit = goal.category === 'expense-limit';
+              
+              const cardBg = isIncome 
+                ? 'from-emerald-500/5 via-transparent to-transparent border-emerald-500/10' 
+                : isExpenseLimit
+                  ? 'from-rose-500/5 via-transparent to-transparent border-rose-500/10'
+                  : 'from-blue-500/5 via-transparent to-transparent border-blue-500/10';
+              
+              const barColor = progress >= 100 
+                ? 'bg-emerald-500' 
+                : isOverBudget 
+                  ? 'bg-red-500' 
+                  : isIncome 
+                    ? 'bg-emerald-500' 
+                    : isExpenseLimit 
+                      ? 'bg-orange-500' 
+                      : 'bg-indigo-500';
+
+              const badgeColor = progress >= 100 
+                ? 'status-badge-success' 
+                : isOverBudget 
+                  ? 'bg-red-100 text-red-700 dark:bg-red-950/20 dark:text-red-400' 
+                  : isIncome 
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400' 
+                    : isExpenseLimit 
+                      ? 'bg-orange-100 text-orange-700 dark:bg-orange-950/20 dark:text-orange-400' 
+                      : 'bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400';
+
               return (
                 <div key={goal.id}
-                  className="design-card p-5 cursor-pointer hover:shadow-md transition-shadow"
+                  className={cn(
+                    "design-card p-5 cursor-pointer hover:shadow-md transition-all relative overflow-hidden bg-gradient-to-br border flex flex-col justify-between group",
+                    cardBg
+                  )}
                   onClick={() => { setGoalToEdit(goal); setIsModalOpen(true); }}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--color-ink)]">{goal.title}</p>
-                      <p className="text-xs text-[var(--color-ink-muted)] mt-0.5 capitalize">{goal.category.replace('-', ' ')}</p>
+                  <div>
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div>
+                        <p className="text-base font-semibold text-[var(--color-ink)] group-hover:text-[var(--color-accent)] transition-colors">{goal.title}</p>
+                        <p className="text-xs text-[var(--color-ink-muted)] mt-0.5 capitalize">{goal.category.replace('-', ' ')} Goal</p>
+                      </div>
+                      <span className={cn('status-badge text-[10px] font-semibold uppercase px-2 py-0.5', badgeColor)}>
+                        {Math.round(progress)}%
+                      </span>
                     </div>
-                    <span className={cn(
-                      'text-xs font-medium px-2 py-0.5 rounded-full',
-                      progress >= 100 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                      isOverBudget ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                    )}>
-                      {Math.round(progress)}%
-                    </span>
+
+                    <div className="w-full bg-[var(--color-surface-muted)] rounded-full h-2 mb-4">
+                      <div className={cn('h-2 rounded-full transition-all duration-300', barColor)} style={{ width: `${Math.min(100, progress)}%` }} />
+                    </div>
                   </div>
-                  <div className="w-full bg-[var(--color-surface-muted)] rounded-full h-2 mb-2">
-                    <div className={cn('h-2 rounded-full transition-all',
-                      progress >= 100 ? 'bg-emerald-500' : isOverBudget ? 'bg-red-500' : 'bg-blue-500'
-                    )} style={{ width: `${Math.min(100, progress)}%` }} />
-                  </div>
-                  <div className="flex justify-between text-xs text-[var(--color-ink-muted)]">
-                    <span>Target: {formatCurrency(goal.targetAmount)}</span>
-                    {goal.deadline && <span>Due: {goal.deadline}</span>}
+
+                  <div className="pt-3 border-t border-[var(--color-border-soft)] flex justify-between items-center mt-auto text-xs text-[var(--color-ink-muted)]">
+                    <span className="font-medium">Target: <strong className="text-[var(--color-ink)]">{formatCurrency(goal.targetAmount)}</strong></span>
+                    {goal.deadline && (
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3 shrink-0" />
+                        Due {goal.deadline}
+                      </span>
+                    )}
                   </div>
                 </div>
               );

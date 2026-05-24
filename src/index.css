@@ -61,6 +61,41 @@
   --shadow-card: 0px 1px 2px 0px rgba(228, 229, 231, 0.24);
   --shadow-elevated: 0px 1px 2px 0px rgba(228, 229, 231, 0.24), 0px 12px 24px 0px rgba(135, 140, 151, 0.12);
   --shadow-modal: 0px 1px 2px 0px rgba(228, 229, 231, 0.24), 0px 20px 40px 0px rgba(135, 140, 151, 0.2);
+
+  /* Tailwind Grays Overrides for Light Mode Cohesion */
+  --color-white: #ffffff;
+  --color-gray-50: #f6f8fa;
+  --color-gray-100: #f6f8fa;
+  --color-gray-200: #e2e4e9;
+  --color-gray-300: #ced0d5;
+  --color-gray-400: #878c97;
+  --color-gray-500: #535865;
+  --color-gray-600: #535865;
+  --color-gray-700: #0b0d13;
+  --color-gray-800: #0b0d13;
+  --color-gray-900: #0b0d13;
+
+  /* Tailwind Blue Overrides */
+  --color-blue-50: #ecf1fe;
+  --color-blue-100: #c6d5fb;
+  --color-blue-600: #405cf2;
+  --color-blue-700: #2e3ef5;
+
+  /* Tailwind Emerald Overrides */
+  --color-emerald-50: #d4f4e5;
+  --color-emerald-100: #d4f4e5;
+  --color-emerald-600: #66c497;
+  --color-emerald-700: #519d78;
+
+  /* Tailwind Red Overrides */
+  --color-red-50: #faeef0;
+  --color-red-100: #faeef0;
+  --color-red-600: #cd3546;
+  --color-red-700: #671923;
+
+  /* Tailwind Purple Overrides */
+  --color-purple-50: #ecf1fe;
+  --color-purple-500: #6841ea;
 }
 
 /* ------------------------------------------------------------------ */
@@ -917,6 +952,7 @@
     width: 252px;
     flex-shrink: 0;
     background: var(--color-sidebar);
+    border-right: 1px solid var(--color-border-subtle);
     display: flex;
     flex-direction: column;
     height: 100vh;

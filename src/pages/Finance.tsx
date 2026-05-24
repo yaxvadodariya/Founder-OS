@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { formatCurrency, formatCurrencyPDF, cn, CURRENCIES } from '../lib/utils';
 import { format } from 'date-fns';
-import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText, Wallet } from 'lucide-react';
 import { FinanceCategory } from '../types';
 import { TransactionModal } from '../components/TransactionModal';
 import { HiddenValue } from '../components/HiddenValue';
@@ -198,29 +198,38 @@ export function Finance() {
 
       <section className="page-block">
         <h2 className="section-label mb-3">Summary</h2>
-        <div className="stack-list">
-          <div className="stack-list-item">
-            <p className="metric-label">Net Balance</p>
-            <p className="metric-value mt-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20">
+            <p className="metric-label font-medium text-indigo-600 dark:text-indigo-400">Net Balance</p>
+            <p className="text-2xl font-bold text-[var(--color-ink)] mt-2">
               <HiddenValue isHidden={isHidden}>{formatCurrency(netBalance)}</HiddenValue>
             </p>
-          </div>
-          <div className="stack-list-item">
-            <p className="metric-label">Total Income</p>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="metric-value">
-                <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
-              </p>
-              <ArrowUpRight className="h-4 w-4 text-emerald-500 shrink-0" />
+            <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <Wallet className="h-4 w-4" />
             </div>
           </div>
-          <div className="stack-list-item">
-            <p className="metric-label">Total Expenses</p>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="metric-value">
+          <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20">
+            <p className="metric-label font-medium text-emerald-600 dark:text-emerald-400">Total Income</p>
+            <div className="flex items-baseline gap-2 mt-2">
+              <p className="text-2xl font-bold text-[var(--color-ink)]">
+                <HiddenValue isHidden={isHidden}>{formatCurrency(totalIncome)}</HiddenValue>
+              </p>
+              <ArrowUpRight className="h-4 w-4 text-emerald-500 self-center" />
+            </div>
+            <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <ArrowUpRight className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-rose-500/10 via-red-500/5 to-transparent border border-rose-500/20">
+            <p className="metric-label font-medium text-rose-600 dark:text-rose-400">Total Expenses</p>
+            <div className="flex items-baseline gap-2 mt-2">
+              <p className="text-2xl font-bold text-[var(--color-ink)]">
                 <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
               </p>
-              <ArrowDownRight className="h-4 w-4 text-red-500 shrink-0" />
+              <ArrowDownRight className="h-4 w-4 text-rose-500 self-center" />
+            </div>
+            <div className="absolute top-4 right-4 h-8 w-8 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400">
+              <ArrowDownRight className="h-4 w-4" />
             </div>
           </div>
         </div>
@@ -228,18 +237,18 @@ export function Finance() {
 
       <section className="page-block">
         <h2 className="section-label mb-3">Tax Estimation</h2>
-        <div className="design-card p-4 lg:p-5">
+        <div className="design-card p-5 relative overflow-hidden bg-gradient-to-br from-amber-500/5 via-transparent to-transparent border border-[var(--color-border-subtle)]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-[var(--color-border-soft)]">
             <div>
-              <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Estimated Total Tax ({store.taxRate}%)</p>
-              <p className="text-2xl font-bold text-[var(--color-ink)] mt-2">
+              <p className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider">Estimated Total Tax ({store.taxRate ?? 20}%)</p>
+              <p className="text-3xl font-bold text-[var(--color-ink)] mt-2">
                 {formatCurrency(totalIncome * ((store.taxRate ?? 20) / 100))}
               </p>
               <p className="text-[11px] text-[var(--color-ink-muted)] mt-1">Based on total income of {formatCurrency(totalIncome)}</p>
             </div>
             <div className="pt-4 md:pt-0 md:pl-6">
-              <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Est. Quarterly Payment</p>
-              <p className="text-2xl font-bold text-orange-500 mt-2">
+              <p className="text-xs font-semibold text-[var(--color-ink-secondary)] uppercase tracking-wider">Est. Quarterly Payment</p>
+              <p className="text-3xl font-bold text-orange-500 mt-2">
                 {formatCurrency((totalIncome * ((store.taxRate ?? 20) / 100)) / 4)}
               </p>
               <p className="text-[11px] text-[var(--color-ink-muted)] mt-1">4 equal payments per fiscal year</p>
