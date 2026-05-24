@@ -103,7 +103,7 @@ export function Dashboard() {
     return data;
   }, [store.transactions, chartRange, rangeDays, today]);
 
-  const showTaskAlert = pendingTasksToday > 0;
+
 
   const COLORS = ['#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#EC4899', '#F59E0B', '#6366F1'];
 
@@ -207,18 +207,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {showTaskAlert && (
-        <div className="alert-banner">
-          <div className="alert-banner-icon mt-0.5 h-5 w-5 rounded-full bg-red-100 dark:bg-red-900/50 flex items-center justify-center shrink-0">
-            <span className="text-red-600 dark:text-red-400 text-xs font-medium">!</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="alert-banner-title">{pendingTasksToday} task{pendingTasksToday > 1 ? 's' : ''} due today</p>
-            <p className="alert-banner-body">Review your Today&apos;s Focus list and clear high-priority items before end of day.</p>
-            <Link to="/tasks" className="inline-block mt-2 text-xs font-medium text-[var(--color-insight-accent)] hover:underline">View tasks →</Link>
-          </div>
-        </div>
-      )}
+
 
       <section className="section-panel">
         <h2 className="section-label">Quick Access</h2>

@@ -85,18 +85,6 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col min-h-screen min-w-0 lg:pl-[252px]">
         <div className="app-shell flex flex-col flex-1 min-h-0 min-w-0 lg:min-h-[calc(100vh-1.5rem)]">
           <main className="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden overflow-y-hidden relative" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-            {user?.email === 'yaxvadodariya@gmail.com' && store.lastError && (
-              <div className="bg-[var(--color-negative-soft)] border border-red-200 dark:border-red-800 text-[var(--color-negative-text)] px-4 py-3 rounded-xl m-4 text-sm relative z-50 shrink-0">
-                <strong className="font-semibold">Last Firestore Error:</strong>
-                <pre className="mt-2 whitespace-pre-wrap">{store.lastError}</pre>
-                <button
-                  onClick={() => store.setLastError(null)}
-                  className="absolute top-3 right-3 text-[var(--color-negative)] hover:opacity-80"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            )}
             <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">
               <div className="mx-auto max-w-[1200px] w-full min-w-0 box-border px-5 sm:px-6 lg:px-8 py-5 lg:py-8">
                 <Outlet />
