@@ -3,7 +3,7 @@ import { SidePanel } from './SidePanel';
 import { FileText, Download, Sparkles } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { format } from 'date-fns';
-import { formatCurrency } from '../lib/utils';
+import { formatCurrency, formatCurrencyPDF } from '../lib/utils';
 import { Project } from '../types';
 
 interface ProposalModalProps {
@@ -163,7 +163,7 @@ export function ProposalModal({ isOpen, onClose, project }: ProposalModalProps) 
       doc.setFontSize(11);
       doc.setTextColor(24, 24, 27);
       doc.text(timeline || 'TBD', 20, currentY + 16);
-      doc.text(pricing ? formatCurrency(Number(pricing)) : 'TBD', 120, currentY + 16);
+      doc.text(pricing ? formatCurrencyPDF(Number(pricing)) : 'TBD', 120, currentY + 16);
       
       currentY += 38;
       

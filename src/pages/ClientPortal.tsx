@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Project, Invoice } from '../types';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency, formatCurrencyPDF, cn } from '../lib/utils';
 import { format } from 'date-fns';
 import { Calendar, CheckCircle2, FileText, ChevronRight, Download, CheckSquare } from 'lucide-react';
 import { jsPDF } from "jspdf";
@@ -83,7 +83,7 @@ export function ClientPortal() {
     doc.text(`Due Date: ${invoice.dueDate}`, pageWidth / 2, 40, { align: "center" });
     
     const tableData = [
-      [invoice.description || 'Project Milestone Payment', 1, formatCurrency(invoice.amount), formatCurrency(invoice.amount)]
+      [invoice.description || 'Project Milestone Payment', 1, formatCurrencyPDF(invoice.amount), formatCurrencyPDF(invoice.amount)]
     ];
     
     let currentY = 55;
@@ -119,14 +119,14 @@ export function ClientPortal() {
     currentY += 5;
     doc.setFontSize(10);
     doc.text("Subtotal", 20, currentY);
-    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    doc.text(`${formatCurrencyPDF(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
     currentY += 5;
     doc.text("Tax 0%", 20, currentY);
     doc.text("$0.00", pageWidth - 20, currentY, { align: "right" });
     currentY += 5;
     doc.setFont("helvetica", "bold");
     doc.text("Total", 20, currentY);
-    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    doc.text(`${formatCurrencyPDF(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
     
     currentY += 10;
     doc.line(20, currentY, pageWidth - 20, currentY);

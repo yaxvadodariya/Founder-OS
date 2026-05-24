@@ -2,7 +2,7 @@ import React from 'react';
 import { PageShell } from '../components/layout/PageShell';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency, formatCurrencyPDF, cn } from '../lib/utils';
 import { format } from 'date-fns';
 import { ArrowLeft, Calendar, FileText, CheckCircle2, ChevronRight, CheckSquare, ExternalLink, MessageSquare, Edit2, Plus, X, Download } from 'lucide-react';
 import { ProjectModal } from '../components/ProjectModal';
@@ -172,7 +172,7 @@ export function ProjectDetails() {
     doc.text(`Due Date: ${invoice.dueDate}`, pageWidth / 2, 40, { align: "center" });
     
     const tableData = [
-      [invoice.description || 'Project Milestone Payment', 1, formatCurrency(invoice.amount), formatCurrency(invoice.amount)]
+      [invoice.description || 'Project Milestone Payment', 1, formatCurrencyPDF(invoice.amount), formatCurrencyPDF(invoice.amount)]
     ];
     
     let currentY = 55;
@@ -208,14 +208,14 @@ export function ProjectDetails() {
     currentY += 5;
     doc.setFontSize(10);
     doc.text("Subtotal", 20, currentY);
-    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    doc.text(`${formatCurrencyPDF(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
     currentY += 5;
     doc.text("Tax 0%", 20, currentY);
     doc.text("$0.00", pageWidth - 20, currentY, { align: "right" });
     currentY += 5;
     doc.setFont("helvetica", "bold");
     doc.text("Total", 20, currentY);
-    doc.text(`${formatCurrency(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
+    doc.text(`${formatCurrencyPDF(invoice.amount)}`, pageWidth - 20, currentY, { align: "right" });
     
     currentY += 10;
     doc.line(20, currentY, pageWidth - 20, currentY);

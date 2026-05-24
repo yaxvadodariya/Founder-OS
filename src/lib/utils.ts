@@ -27,3 +27,29 @@ export function formatCurrency(amount: number) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function formatCurrencyPDF(amount: number) {
+  const currencyCode = useStore.getState().currency || 'USD';
+  const currency = CURRENCIES.find(c => c.code === currencyCode) || CURRENCIES[0];
+  
+  const numberPart = new Intl.NumberFormat(currency.locale, {
+    maximumFractionDigits: 0,
+  }).format(amount);
+  
+  if (currencyCode === 'INR') {
+    return `Rs. ${numberPart}`;
+  }
+  if (currencyCode === 'AED') {
+    return `AED ${numberPart}`;
+  }
+  if (currencyCode === 'USD') {
+    return `$${numberPart}`;
+  }
+  if (currencyCode === 'EUR') {
+    return `€${numberPart}`;
+  }
+  if (currencyCode === 'GBP') {
+    return `£${numberPart}`;
+  }
+  return `${currency.symbol}${numberPart}`;
+}

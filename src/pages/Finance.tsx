@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { formatCurrency, cn, CURRENCIES } from '../lib/utils';
+import { formatCurrency, formatCurrencyPDF, cn, CURRENCIES } from '../lib/utils';
 import { format } from 'date-fns';
 import { Plus, ArrowUpRight, ArrowDownRight, Search, FileText } from 'lucide-react';
 import { FinanceCategory } from '../types';
@@ -63,8 +63,8 @@ export function Finance() {
         }
       });
       
-      const incomeRows = Object.entries(incomeMap).map(([cat, amt]) => [cat, formatCurrency(amt)]);
-      const expenseRows = Object.entries(expenseMap).map(([cat, amt]) => [cat, formatCurrency(amt)]);
+      const incomeRows = Object.entries(incomeMap).map(([cat, amt]) => [cat, formatCurrencyPDF(amt)]);
+      const expenseRows = Object.entries(expenseMap).map(([cat, amt]) => [cat, formatCurrencyPDF(amt)]);
       
       const totalInc = Object.values(incomeMap).reduce((sum, a) => sum + a, 0);
       const totalExp = Object.values(expenseMap).reduce((sum, a) => sum + a, 0);
@@ -93,7 +93,7 @@ export function Finance() {
         head: [['Category', 'Amount']],
         body: [
           ...incomeRows,
-          [{ content: 'Total Revenue', styles: { fontStyle: 'bold' } }, { content: formatCurrency(totalInc), styles: { fontStyle: 'bold' } }]
+          [{ content: 'Total Revenue', styles: { fontStyle: 'bold' } }, { content: formatCurrencyPDF(totalInc), styles: { fontStyle: 'bold' } }]
         ],
         theme: 'striped',
         headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255] },
@@ -113,7 +113,7 @@ export function Finance() {
         head: [['Category', 'Amount']],
         body: [
           ...expenseRows,
-          [{ content: 'Total Operating Expenses', styles: { fontStyle: 'bold' } }, { content: formatCurrency(totalExp), styles: { fontStyle: 'bold' } }]
+          [{ content: 'Total Operating Expenses', styles: { fontStyle: 'bold' } }, { content: formatCurrencyPDF(totalExp), styles: { fontStyle: 'bold' } }]
         ],
         theme: 'striped',
         headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255] },
@@ -131,9 +131,9 @@ export function Finance() {
       (doc as any).autoTable({
         startY: currentY,
         body: [
-          ['Total Revenue', formatCurrency(totalInc)],
-          ['Total Expenses', `(${formatCurrency(totalExp)})`],
-          [{ content: 'Net Profit / Loss', styles: { fontStyle: 'bold', fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }, { content: formatCurrency(netProf), styles: { fontStyle: 'bold', textColor: netProf >= 0 ? [21, 128, 61] : [185, 28, 28], fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }]
+          ['Total Revenue', formatCurrencyPDF(totalInc)],
+          ['Total Expenses', `(${formatCurrencyPDF(totalExp)})`],
+          [{ content: 'Net Profit / Loss', styles: { fontStyle: 'bold', fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }, { content: formatCurrencyPDF(netProf), styles: { fontStyle: 'bold', textColor: netProf >= 0 ? [21, 128, 61] : [185, 28, 28], fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }]
         ],
         theme: 'plain',
         margin: { left: 14, right: 14 },
