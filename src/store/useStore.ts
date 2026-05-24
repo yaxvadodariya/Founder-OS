@@ -64,6 +64,7 @@ interface StoreState {
   isPeeking: boolean;
   isDarkMode: boolean;
   currency: string;
+  balanceDisplayMode: 'net-worth' | 'liquid-cash';
   
   // Actions
   setUser: (user: User) => void;
@@ -72,6 +73,7 @@ interface StoreState {
   setPeeking: (peeking: boolean) => void;
   toggleDarkMode: () => void;
   setCurrency: (currency: string) => void;
+  setBalanceDisplayMode: (mode: 'net-worth' | 'liquid-cash') => void;
   
   addTransaction: (ts: Transaction, skipNotify?: boolean) => void;
   updateTransaction: (id: string, t: Partial<Transaction>) => void;
@@ -138,6 +140,7 @@ export const useStore = create<StoreState>()(
       isPeeking: false,
       isDarkMode: false,
       currency: getBrowserCurrency(),
+      balanceDisplayMode: 'net-worth',
       invoices: [] as Invoice[],
       activeTimer: null as { id: string; type: 'project' | 'task'; startTime: string } | null,
       lastError: null,
@@ -149,6 +152,7 @@ export const useStore = create<StoreState>()(
       setPeeking: (peeking) => set({ isPeeking: peeking }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setCurrency: (currency) => set({ currency }),
+      setBalanceDisplayMode: (mode) => set({ balanceDisplayMode: mode }),
       
       addTransaction: async (ts, skipNotify) => {
         if (!auth.currentUser) return;

@@ -30,23 +30,21 @@ export function Projects() {
 
   return (
     <PageShell className="lg:pb-0">
-      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="page-block flex flex-row justify-between items-center gap-4">
         <div className="min-w-0">
           <h1 className="page-title">Projects</h1>
-          <p className="page-subtitle">Manage client projects and deliverables</p>
+          <p className="page-subtitle hidden sm:block">Manage client projects and deliverables</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={() => {
-              setProjectToEdit(null);
-              setIsModalOpen(true);
-            }}
-            className="hidden sm:inline-flex btn-primary"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Project</span>
-          </button>
-        </div>
+        <button 
+          onClick={() => {
+            setProjectToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="btn-primary"
+        >
+          <Plus className="h-4 w-4" />
+          <span>New Project</span>
+        </button>
       </header>
 
       <div className="page-block segmented-control segmented-control-full">

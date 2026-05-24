@@ -9,7 +9,8 @@ import {
   Shield,
   User,
   Bell,
-  Globe
+  Globe,
+  Wallet
 } from 'lucide-react';
 import { cn, CURRENCIES } from '../lib/utils';
 
@@ -56,13 +57,30 @@ export function Settings() {
              <select
                value={store.currency}
                onChange={(e) => store.setCurrency(e.target.value)}
-               className="text-sm font-medium text-[var(--color-ink)] bg-transparent border-[var(--color-border-subtle)] rounded-[10px] focus:ring-[var(--color-ink-muted)] focus:border-[var(--color-ink-muted)]"
+               className="text-sm font-medium text-[var(--color-ink)] bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] rounded-[10px] pl-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)] cursor-pointer"
              >
                {CURRENCIES.map(c => (
                  <option key={c.code} value={c.code}>
                    {c.flag} {c.code} - {c.name}
                  </option>
                ))}
+             </select>
+           </div>
+           
+           <div className="w-full flex items-center justify-between p-4 transition-colors">
+             <div className="flex items-center gap-3">
+               <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
+                 <Wallet className="w-5 h-5" />
+               </div>
+               <span className="text-sm font-medium text-[var(--color-ink)]">Dashboard Balance</span>
+             </div>
+             <select
+               value={store.balanceDisplayMode || 'net-worth'}
+               onChange={(e) => store.setBalanceDisplayMode(e.target.value as 'net-worth' | 'liquid-cash')}
+               className="text-sm font-medium text-[var(--color-ink)] bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] rounded-[10px] pl-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)] cursor-pointer"
+             >
+               <option value="net-worth">Net Worth (Full)</option>
+               <option value="liquid-cash">Liquid Cash Only</option>
              </select>
            </div>
            <button

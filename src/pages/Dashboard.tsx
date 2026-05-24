@@ -470,6 +470,22 @@ function StatCard({
 }
 
 function DualBalanceCard({ personalBalance, currentBalance, isHidden }: { personalBalance: number; currentBalance: number; isHidden: boolean }) {
+  const mode = useStore(state => state.balanceDisplayMode) || 'net-worth';
+
+  if (mode === 'liquid-cash') {
+    return (
+      <div className="chart-card h-full flex flex-col justify-between">
+        <div className="chart-card-head"><Wallet className="h-4 w-4" />Liquid Cash</div>
+        <div className="my-auto py-2">
+          <p className="metric-value-lg">
+            <HiddenValue isHidden={isHidden}>{formatCurrency(personalBalance)}</HiddenValue>
+          </p>
+          <p className="text-[11px] text-[var(--color-ink-muted)] mt-1">Available for spending</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="chart-card h-full">
       <div className="chart-card-head"><Wallet className="h-4 w-4" />Net Worth</div>

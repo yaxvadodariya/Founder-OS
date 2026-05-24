@@ -28,11 +28,11 @@ export function Payments() {
 
   return (
     <PageShell className="lg:pb-0">
-      <header className="page-block flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="page-block flex flex-row justify-between items-center gap-4">
         <div className="min-w-0">
           <h1 className="page-title">Payments & Bills</h1>
           <div className="flex flex-wrap items-center gap-2 mt-1">
-            <p className="page-subtitle">Track recurring subscriptions and scheduled payments</p>
+            <p className="page-subtitle hidden sm:block">Track recurring subscriptions and scheduled payments</p>
             {store.isPrivacyMode && (
               <span className="status-badge status-badge-neutral">
                 <EyeOff className="h-3 w-3" />
@@ -41,7 +41,7 @@ export function Payments() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <PrivacyToggle />
           <button
             type="button"
@@ -49,7 +49,7 @@ export function Payments() {
               setPaymentToEdit(null);
               setIsModalOpen(true);
             }}
-            className="hidden sm:inline-flex btn-primary"
+            className="btn-primary"
           >
             <Plus className="h-4 w-4" />
             <span>New Payment</span>

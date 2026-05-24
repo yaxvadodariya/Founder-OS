@@ -48,25 +48,23 @@ export function Notes() {
 
   return (
     <PageShell className="lg:pb-0">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+      <header className="page-block flex flex-row justify-between items-center gap-4">
+        <div className="min-w-0">
           <h1 className="page-title">Remember Book</h1>
-          <p className="page-subtitle">Your second brain for ideas and information</p>
+          <p className="page-subtitle hidden sm:block">Your second brain for ideas and information</p>
         </div>
-        <div className="flex items-center gap-2">
-          <button 
-            type="button"
-            onClick={() => {
-              setNoteToEdit(null);
-              setIsModalOpen(true);
-            }}
-            className="hidden sm:inline-flex btn-primary"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Note</span>
-          </button>
-        </div>
-      </div>
+        <button 
+          type="button"
+          onClick={() => {
+            setNoteToEdit(null);
+            setIsModalOpen(true);
+          }}
+          className="btn-primary"
+        >
+          <Plus className="h-4 w-4" />
+          <span>New Note</span>
+        </button>
+      </header>
 
       {/* Controls */}
       <div className="flex flex-col md:flex-row gap-4">
@@ -77,7 +75,7 @@ export function Notes() {
             placeholder="Search your brain..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-[10px] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-field pl-9 pr-4"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 no-scrollbar items-center">
