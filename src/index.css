@@ -1225,3 +1225,28 @@ select.input-field {
   background-position: right 1.125rem center;
   padding-right: 2.75rem;
 }
+
+/* ── Date & Month Picker Native Calendar Fixes ── */
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: light;
+}
+
+html.dark input[type="date"],
+html.dark input[type="month"],
+html.dark input[type="time"],
+html.dark input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
+::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.9;
+}

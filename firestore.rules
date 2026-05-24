@@ -134,6 +134,73 @@ service cloud.firestore {
         (data.keys().hasAll(['description']) ? (data.description is string && data.description.size() <= 5000) : true);
     }
 
+    // Habit
+    function isValidHabit(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'name', 'icon', 'color', 'frequency', 'completedDates', 'createdAt', 'active']) &&
+        data.userId == userId &&
+        data.name is string &&
+        data.icon is string &&
+        data.color is string &&
+        data.frequency in ['daily', 'weekly'] &&
+        data.completedDates is list &&
+        data.createdAt is string &&
+        data.active is bool;
+    }
+
+    // Goal
+    function isValidGoal(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'title', 'targetAmount', 'currentAmount', 'deadline', 'category', 'createdAt']) &&
+        data.userId == userId &&
+        data.title is string &&
+        data.targetAmount is number &&
+        data.currentAmount is number &&
+        data.deadline is string &&
+        data.category in ['savings', 'income', 'expense-limit'] &&
+        data.createdAt is string;
+    }
+
+    // Journal Entry
+    function isValidJournalEntry(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'date', 'morningPlan', 'eveningReflection', 'mood', 'wins', 'challenges', 'createdAt', 'updatedAt']) &&
+        data.userId == userId &&
+        data.date is string &&
+        data.morningPlan is string &&
+        data.eveningReflection is string &&
+        data.mood is number &&
+        data.wins is list &&
+        data.challenges is list &&
+        data.createdAt is string &&
+        data.updatedAt is string;
+    }
+
+    // Budget
+    function isValidBudget(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'category', 'monthlyLimit', 'month', 'createdAt']) &&
+        data.userId == userId &&
+        data.category is string &&
+        data.monthlyLimit is number &&
+        data.month is string &&
+        data.createdAt is string;
+    }
+
+    // Client
+    function isValidClient(data, userId) {
+      return isMap(data) &&
+        data.keys().hasAll(['userId', 'name', 'email', 'phone', 'company', 'notes', 'createdAt']) &&
+        data.userId == userId &&
+        data.name is string &&
+        data.email is string &&
+        data.phone is string &&
+        data.company is string &&
+        data.notes is string &&
+        (data.keys().hasAll(['tags']) ? (data.tags is list) : true) &&
+        data.createdAt is string;
+    }
+
     match /webhook_queue/{eventId} {
       allow read, write: if true;
     }
@@ -179,6 +246,41 @@ service cloud.firestore {
         allow create: if isOwner(userId) && isValidId(invoiceId) && isValidInvoice(incoming(), userId);
         allow update: if isOwner(userId) && isValidId(invoiceId) && isValidInvoice(incoming(), userId);
         allow delete: if isOwner(userId) && isValidId(invoiceId);
+      }
+
+      match /habits/{habitId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(habitId) && isValidHabit(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(habitId) && isValidHabit(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(habitId);
+      }
+
+      match /goals/{goalId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(goalId) && isValidGoal(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(goalId) && isValidGoal(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(goalId);
+      }
+
+      match /journal/{entryId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(entryId) && isValidJournalEntry(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(entryId) && isValidJournalEntry(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(entryId);
+      }
+
+      match /budgets/{budgetId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(budgetId) && isValidBudget(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(budgetId) && isValidBudget(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(budgetId);
+      }
+
+      match /clients/{clientId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(clientId) && isValidClient(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(clientId) && isValidClient(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(clientId);
       }
     }
   }
