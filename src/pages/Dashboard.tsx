@@ -423,11 +423,11 @@ function ChartMetricCard({
       <div className="metric-compare">
         <div className="metric-compare-item">
           <span className="metric-dot" style={{ backgroundColor: activeLineColor }} />
-          <span><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(current)}</HiddenValue></span> This month</span>
+          <span className="inline-flex items-center gap-1"><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(current)}</HiddenValue></span> This month</span>
         </div>
         <div className="metric-compare-item">
           <span className="metric-dot" style={{ backgroundColor: prevLineColor }} />
-          <span><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(previous)}</HiddenValue></span> Last month</span>
+          <span className="inline-flex items-center gap-1"><span className="metric-compare-value"><HiddenValue isHidden={isHidden}>{formatCurrency(previous)}</HiddenValue></span> Last month</span>
         </div>
       </div>
       <span className={isPositive ? 'trend-up' : 'trend-down'}>{pctLabel}</span>

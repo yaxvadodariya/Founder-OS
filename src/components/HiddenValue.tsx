@@ -17,7 +17,7 @@ export function HiddenValue({ children, isHidden, className, bulletCount = 6, pr
   const finalPrefix = prefix !== undefined ? prefix : `${currencySymbol} `;
 
   return (
-    <span className={cn("relative inline-block overflow-hidden", className)}>
+    <span className={cn("relative inline-flex items-center align-middle overflow-hidden", className)}>
       <AnimatePresence mode="wait" initial={false}>
         {!isHidden ? (
           <motion.span
@@ -26,7 +26,7 @@ export function HiddenValue({ children, isHidden, className, bulletCount = 6, pr
             animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
             exit={{ opacity: 0, filter: 'blur(4px)', y: -4 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="inline-block"
+            className="inline-flex items-center"
           >
             {children}
           </motion.span>
