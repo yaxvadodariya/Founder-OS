@@ -46,10 +46,16 @@
   --color-insight-to: #c2d6ff;
   --color-insight-accent: #6e3ff3;
 
-  /* Sidebar */
-  --color-sidebar: #f6f8fa;
-  --color-sidebar-active: #ffffff;
-  --shadow-sidebar-active: 0px 2px 4px 0px rgba(10, 13, 20, 0.03);
+  /* Sidebar — AlignUI signature dark slate (HR Management template) */
+  --color-sidebar: #1f2433;
+  --color-sidebar-elev: #262b3b;
+  --color-sidebar-border: #2d334a;
+  --color-sidebar-text: #e5e7ee;
+  --color-sidebar-muted: #9aa1b1;
+  --color-sidebar-icon: #a8aec0;
+  --color-sidebar-active: #2d334a;
+  --color-sidebar-active-text: #ffffff;
+  --shadow-sidebar-active: inset 0 1px 0 0 rgba(255,255,255,0.04), 0 1px 2px 0 rgba(0,0,0,0.2);
 
   /* Radii */
   --radius-shell: 28px;
@@ -165,9 +171,15 @@
     --color-insight-from: #162664;
     --color-insight-to: #253ea7;
     --color-insight-accent: #6e3ff3;
-    --color-sidebar: #0a0d14;
-    --color-sidebar-active: #161922;
-    --shadow-sidebar-active: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
+    --color-sidebar: #14171f;
+    --color-sidebar-elev: #1c202b;
+    --color-sidebar-border: #262b3b;
+    --color-sidebar-text: #e5e7ee;
+    --color-sidebar-muted: #868c98;
+    --color-sidebar-icon: #9aa1b1;
+    --color-sidebar-active: #262b3b;
+    --color-sidebar-active-text: #ffffff;
+    --shadow-sidebar-active: inset 0 1px 0 0 rgba(255,255,255,0.05), 0 1px 2px 0 rgba(0,0,0,0.3);
     --shadow-card: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
     --shadow-elevated: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 12px 24px 0px rgba(0, 0, 0, 0.4);
     --shadow-modal: 0px 1px 2px 0px rgba(0, 0, 0, 0.3), 0px 20px 40px 0px rgba(0, 0, 0, 0.5);
@@ -905,12 +917,12 @@
     }
   }
 
-  /* ── Sidebar ── */
+  /* ── Sidebar — Dark slate (AlignUI HR Management) ── */
   .sidebar {
     width: 252px;
     flex-shrink: 0;
     background: var(--color-sidebar);
-    border-right: 1px solid var(--color-border-subtle);
+    border-right: 1px solid var(--color-sidebar-border);
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -923,7 +935,7 @@
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 10px;
-    background: var(--color-ink);
+    background: var(--color-sidebar-elev);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -931,10 +943,10 @@
   .sidebar-logo-mark {
     width: 0.875rem;
     height: 0.875rem;
-    background: var(--color-primary-fg);
+    background: #ffffff;
     border-radius: 3px;
     transform: rotate(45deg);
-    opacity: 0.9;
+    opacity: 0.95;
   }
 
   .sidebar-nav-item {
@@ -945,23 +957,24 @@
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--color-ink-secondary);
+    color: var(--color-sidebar-text);
     border-radius: 8px;
     transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     text-align: left;
   }
   .sidebar-nav-item:hover {
-    color: var(--color-ink);
-    background: var(--color-surface-hover);
+    color: #ffffff;
+    background: var(--color-sidebar-elev);
   }
   .sidebar-nav-item-active {
     background: var(--color-sidebar-active);
-    color: var(--color-ink);
+    color: var(--color-sidebar-active-text);
     font-weight: 600;
     box-shadow: var(--shadow-sidebar-active);
   }
   .sidebar-nav-item-active:hover {
-    color: var(--color-ink);
+    color: var(--color-sidebar-active-text);
+    background: var(--color-sidebar-active);
   }
 
   .sidebar-group-trigger {
@@ -972,16 +985,16 @@
     padding: 0.5rem 0.75rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: var(--color-ink-secondary);
+    color: var(--color-sidebar-text);
     border-radius: 8px;
     transition: color 0.15s ease, background 0.15s ease;
   }
   .sidebar-group-trigger:hover {
-    color: var(--color-ink);
-    background: var(--color-surface-hover);
+    color: #ffffff;
+    background: var(--color-sidebar-elev);
   }
   .sidebar-group-trigger-open {
-    color: var(--color-ink);
+    color: #ffffff;
   }
 
   .sidebar-tree {
@@ -998,7 +1011,7 @@
     top: 0.5rem;
     bottom: 0.75rem;
     width: 1px;
-    background: var(--color-border-subtle);
+    background: var(--color-sidebar-border);
     border-radius: 1px;
   }
   .sidebar-tree-item {
@@ -1013,7 +1026,7 @@
     top: 50%;
     width: 0.625rem;
     height: 1px;
-    background: var(--color-border-subtle);
+    background: var(--color-sidebar-border);
   }
   .sidebar-tree-item .sidebar-nav-item {
     padding: 0.4375rem 0.75rem;
@@ -1253,32 +1266,33 @@ html.dark input[type="datetime-local"] {
     width: 100%;
     padding: 0.5rem 0.625rem;
     border-radius: 12px;
-    background: var(--color-sidebar-active);
-    border: 1px solid var(--color-border-subtle);
-    box-shadow: var(--shadow-sidebar-active);
+    background: var(--color-sidebar-elev);
+    border: 1px solid var(--color-sidebar-border);
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.04);
     transition: background 0.15s ease, border-color 0.15s ease;
     cursor: pointer;
     text-align: left;
   }
   .workspace-switcher:hover {
-    border-color: var(--color-border-soft);
+    background: var(--color-sidebar-active);
+    border-color: var(--color-sidebar-border);
   }
   .workspace-switcher-mark {
     width: 2rem;
     height: 2rem;
     border-radius: 8px;
-    background: linear-gradient(135deg, var(--color-ink) 0%, #1f2433 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #d8dcef 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   }
   .workspace-switcher-mark::after {
     content: '';
     width: 0.75rem;
     height: 0.75rem;
-    background: var(--color-primary-fg);
+    background: #1f2433;
     border-radius: 3px;
     transform: rotate(45deg);
     opacity: 0.92;
@@ -1286,18 +1300,18 @@ html.dark input[type="datetime-local"] {
   .workspace-switcher-name {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--color-sidebar-active-text);
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
   .workspace-switcher-plan {
     font-size: 0.6875rem;
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-muted);
     line-height: 1.2;
     margin-top: 0.0625rem;
   }
   .workspace-switcher-chev {
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-muted);
     flex-shrink: 0;
   }
 
@@ -1309,9 +1323,9 @@ html.dark input[type="datetime-local"] {
     width: 100%;
     padding: 0.5rem 0.75rem;
     border-radius: 10px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-subtle);
-    color: var(--color-ink-muted);
+    background: var(--color-sidebar-elev);
+    border: 1px solid var(--color-sidebar-border);
+    color: var(--color-sidebar-muted);
     font-size: 0.8125rem;
     font-weight: 400;
     transition: border-color 0.15s ease, background 0.15s ease;
@@ -1319,17 +1333,18 @@ html.dark input[type="datetime-local"] {
     text-align: left;
   }
   html.dark .sidebar-search {
-    background: var(--color-surface-muted);
+    background: var(--color-sidebar-elev);
   }
   .sidebar-search:hover {
-    border-color: var(--color-border-soft);
-    color: var(--color-ink-secondary);
+    border-color: var(--color-sidebar-active);
+    background: var(--color-sidebar-active);
+    color: var(--color-sidebar-active-text);
   }
   .sidebar-search:hover svg {
-    color: var(--color-ink-secondary);
+    color: var(--color-sidebar-active-text);
   }
   .sidebar-search svg {
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-icon);
     flex-shrink: 0;
     transition: color 0.15s ease;
   }
@@ -1346,21 +1361,21 @@ html.dark input[type="datetime-local"] {
     font-family: var(--font-sans);
     font-size: 0.625rem;
     font-weight: 500;
-    color: var(--color-ink-muted);
-    background: var(--color-surface-muted);
-    border: 1px solid var(--color-border-subtle);
+    color: var(--color-sidebar-muted);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--color-sidebar-border);
     border-radius: 4px;
     line-height: 1;
   }
   html.dark .kbd {
-    background: var(--color-surface-hover);
+    background: rgba(255,255,255,0.04);
   }
 
   /* ── Sidebar section heading ── */
   .sidebar-section-label {
     font-size: 0.625rem;
     font-weight: 600;
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-muted);
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 0 0.75rem;
@@ -1371,14 +1386,19 @@ html.dark input[type="datetime-local"] {
     margin-top: 0;
   }
 
-  /* Refined sidebar nav item — slightly tighter, with leading icon slot */
+  /* Sidebar nav icons inherit appropriate color */
   .sidebar-nav-item .lucide,
   .sidebar-group-trigger .lucide {
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-icon);
     transition: color 0.15s ease;
   }
+  .sidebar-nav-item:hover .lucide,
+  .sidebar-group-trigger:hover .lucide,
+  .sidebar-group-trigger-open .lucide {
+    color: var(--color-sidebar-active-text);
+  }
   .sidebar-nav-item-active .lucide {
-    color: var(--color-ink);
+    color: var(--color-sidebar-active-text);
   }
 
   /* ── Sidebar Profile Card (bottom) ── */
@@ -1388,9 +1408,9 @@ html.dark input[type="datetime-local"] {
     gap: 0.625rem;
     padding: 0.5rem;
     border-radius: 12px;
-    background: var(--color-sidebar-active);
-    border: 1px solid var(--color-border-subtle);
-    box-shadow: var(--shadow-sidebar-active);
+    background: var(--color-sidebar-elev);
+    border: 1px solid var(--color-sidebar-border);
+    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.04);
   }
   .sidebar-profile-avatar {
     width: 2rem;
@@ -1413,13 +1433,13 @@ html.dark input[type="datetime-local"] {
   .sidebar-profile-name {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--color-sidebar-active-text);
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
   .sidebar-profile-email {
     font-size: 0.6875rem;
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-muted);
     line-height: 1.2;
     margin-top: 0.0625rem;
   }
@@ -1429,7 +1449,7 @@ html.dark input[type="datetime-local"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-ink-muted);
+    color: var(--color-sidebar-muted);
     border-radius: 8px;
     transition: color 0.15s ease, background 0.15s ease;
     flex-shrink: 0;
@@ -1438,8 +1458,8 @@ html.dark input[type="datetime-local"] {
     cursor: pointer;
   }
   .sidebar-profile-action:hover {
-    color: var(--color-ink);
-    background: var(--color-surface-hover);
+    color: var(--color-sidebar-active-text);
+    background: var(--color-sidebar-active);
   }
 
   /* ── Icon Button (compact square w/ icon) ── */
