@@ -145,7 +145,7 @@ export function PomodoroTimer() {
   const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
 
   return (
-    <div className="fixed bottom-24 right-5 lg:bottom-8 lg:right-[5.5rem] z-50 flex flex-col items-end">
+    <div className="fixed bottom-[5.25rem] left-5 lg:left-auto lg:right-[5.5rem] lg:bottom-8 z-50 flex flex-col items-start lg:items-end">
       {/* Expanded Panel */}
       {isExpanded && (
         <div className="mb-3 w-80 design-card p-5 shadow-[0_10px_30px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-[var(--color-border-subtle)] bg-[var(--color-surface)]/95 backdrop-blur-md animate-in fade-in slide-in-from-bottom-5 duration-200">
