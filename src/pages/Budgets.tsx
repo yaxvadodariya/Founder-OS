@@ -106,7 +106,7 @@ export function Budgets() {
             })}
           </div>
         ) : (
-          <div className="section-panel-flat">
+          <div className="design-card">
             <div className="flex flex-col items-center justify-center p-10 text-center">
               <PieChart className="h-10 w-10 text-[var(--color-ink-muted)] mb-2 opacity-40" />
               <p className="text-sm font-medium text-[var(--color-ink)]">No budgets for this month</p>

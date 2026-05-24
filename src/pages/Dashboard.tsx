@@ -258,7 +258,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {(store.dashboardWidgets?.chart ?? true) && (
-            <section className="section-panel section-panel-flat lg:!p-5">
+            <section className="section-panel">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div className="flex items-center justify-between sm:justify-start gap-4">
                   <h2 className="section-label">Financial Overview</h2>
@@ -312,7 +312,7 @@ export function Dashboard() {
           )}
 
           {/* Active Projects List */}
-          <section className="section-panel section-panel-nested">
+          <section className="section-panel">
             <div className="flex justify-between items-center mb-3 lg:mb-4">
               <h2 className="section-label">Active Projects</h2>
               <Link to="/projects" className="section-link">View all →</Link>
@@ -360,7 +360,7 @@ export function Dashboard() {
                 : "grid-cols-1"
             )}>
               {(store.dashboardWidgets?.spendingBreakdown ?? true) && (
-                <section className="section-panel section-panel-flat lg:!p-5">
+                <section className="section-panel">
                   <h2 className="section-label mb-3">Spending Breakdown</h2>
                   {spendingBreakdownData.length === 0 ? (
                     <p className="text-xs text-[var(--color-ink-muted)] text-center py-8">
@@ -412,7 +412,7 @@ export function Dashboard() {
               )}
 
               {(store.dashboardWidgets?.revenueForecast ?? true) && (
-                <section className="section-panel section-panel-flat lg:!p-5">
+                <section className="section-panel">
                   <div className="flex justify-between items-center mb-1">
                     <h2 className="section-label">Revenue Forecast</h2>
                   </div>
@@ -459,8 +459,8 @@ export function Dashboard() {
         </div>
 
         <div className="space-y-6">
-          <section className="section-panel !p-0 overflow-hidden rounded-[14px] lg:rounded-[var(--radius-panel)]">
-            <div className="insight-banner !border-0 !rounded-[14px] lg:!rounded-none">
+          <section className="overflow-hidden rounded-[14px] lg:rounded-[var(--radius-panel)]">
+            <div className="insight-banner !rounded-[14px] lg:!rounded-none">
               <div className="flex-1 min-w-0">
                 <span className="insight-badge"><Sparkles className="h-3 w-3" /> Recommended by AI</span>
                 {store.transactions.length > 0 ? (
@@ -489,7 +489,7 @@ export function Dashboard() {
           </section>
 
           {(store.dashboardWidgets?.tasksSummary ?? true) && (
-            <section className="section-panel section-panel-flat">
+            <section className="section-panel">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="section-label">Today&apos;s Focus</h2>
                 <Link to="/tasks" className="section-link">View all →</Link>
@@ -533,7 +533,7 @@ export function Dashboard() {
           )}
 
           {(store.dashboardWidgets?.upcomingPayments ?? true) && (
-            <section className="section-panel section-panel-flat">
+            <section className="section-panel">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="section-label">Upcoming Bills</h2>
                 <Link to="/payments" className="section-link">View all →</Link>

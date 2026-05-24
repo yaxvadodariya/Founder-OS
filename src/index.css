@@ -94,8 +94,12 @@
   --color-red-700: #af1d38;
 
   /* Tailwind Purple Overrides */
-  --color-purple-50: #eeeebff;
+  --color-purple-50: #f0ecfe;
   --color-purple-500: #6e3ff3;
+
+  /* Tailwind Orange Overrides */
+  --color-orange-100: #fff5eb;
+  --color-orange-800: #f17b2c;
 }
 
 /* ------------------------------------------------------------------ */
@@ -130,11 +134,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #D1D5DB;
+    background: var(--color-border-soft);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #9CA3AF;
+    background: var(--color-ink-muted);
   }
 
   /* ── Dark mode tokens ── */
@@ -199,10 +203,10 @@
   }
 
   html.dark ::-webkit-scrollbar-thumb {
-    background: #3F3F46;
+    background: var(--color-border-soft);
   }
   html.dark ::-webkit-scrollbar-thumb:hover {
-    background: #52525B;
+    background: var(--color-ink-muted);
   }
 }
 
@@ -257,13 +261,18 @@
     background: var(--color-surface);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .design-card:hover {
+    border-color: var(--color-border-soft);
   }
 
   .chart-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
     padding: 1.125rem 1.25rem;
     display: flex;
     flex-direction: column;
@@ -273,9 +282,6 @@
     .chart-card {
       padding: 1.25rem 1.375rem;
       gap: 0.75rem;
-    }
-    .design-card {
-      box-shadow: var(--shadow-card);
     }
   }
 
@@ -390,11 +396,11 @@
     gap: 1rem;
     padding: 1.125rem 1.25rem;
     border-radius: var(--radius-card);
-    border: 1px solid #E9D5FF;
+    border: 1px solid var(--color-border-subtle);
     background: linear-gradient(135deg, var(--color-insight-from) 0%, var(--color-insight-to) 100%);
   }
   html.dark .insight-banner {
-    border-color: #4C1D95;
+    border-color: var(--color-border-subtle);
   }
   .insight-badge {
     display: inline-flex;
@@ -419,14 +425,14 @@
     padding: 1rem 1.125rem;
     border-radius: var(--radius-card);
     background: var(--color-negative-soft);
-    border: 1px solid #FECACA;
+    border: 1px solid var(--color-border-subtle);
   }
   html.dark .alert-banner {
-    border-color: #7F1D1D;
+    border-color: var(--color-border-subtle);
   }
   html.dark .alert-banner-icon {
-    background: #7F1D1D !important;
-    color: #FCA5A5 !important;
+    background: var(--color-negative-soft) !important;
+    color: var(--color-negative-text) !important;
   }
   .alert-banner-title {
     font-size: 0.875rem;
@@ -452,37 +458,29 @@
     white-space: nowrap;
   }
   .status-badge-success {
-    color: #059669;
-    background: #ECFDF5;
-  }
-  html.dark .status-badge-success {
-    color: #6EE7B7;
-    background: #064E3B;
+    color: var(--color-positive-text);
+    background: var(--color-positive-soft);
   }
   .status-badge-neutral {
     color: var(--color-ink-secondary);
     background: var(--color-surface-muted);
   }
   .status-badge-warning {
-    color: #B45309;
-    background: #FFFBEB;
-  }
-  html.dark .status-badge-warning {
-    color: #FCD34D;
-    background: #422006;
+    color: var(--color-negative-text);
+    background: var(--color-negative-soft);
   }
 
   /* ── Progress ── */
   .progress-track {
     width: 100%;
     height: 5px;
-    background: var(--color-surface-muted);
+    background: var(--color-border-subtle);
     border-radius: var(--radius-pill);
     overflow: hidden;
   }
   .progress-fill {
     height: 100%;
-    background: var(--color-ink);
+    background: var(--color-accent);
     border-radius: var(--radius-pill);
     transition: width 0.4s ease;
   }
@@ -660,8 +658,8 @@
   }
   .input-field:focus {
     outline: none;
-    border-color: var(--color-ink-muted);
-    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.12);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(64, 92, 242, 0.12);
   }
   .input-field::placeholder {
     color: var(--color-ink-muted);
@@ -838,31 +836,23 @@
     }
   }
 
-  /* ── Section Panel ── */
-  .section-panel {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-panel);
-    padding: 1.25rem;
+  /* ── Section Panel — transparent grouping container, no borders ── */
+  .section-panel,
+  .section-panel-nested,
+  .section-panel-flat {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
   }
-  @media (min-width: 1024px) {
-    .section-panel {
-      box-shadow: var(--shadow-card);
-    }
+  .section-panel .section-label {
+    margin-bottom: 0.75rem;
+    display: block;
   }
-  @media (max-width: 1023px) {
-    .section-panel {
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      padding: 0;
-      border-radius: 0;
-    }
-    .section-panel .section-label {
-      margin-bottom: 0.75rem;
-      display: block;
-    }
 
+  /* On mobile, quick-access cards stack with dividers */
+  @media (max-width: 1023px) {
     .quick-access-grid {
       display: flex;
       flex-direction: column;
@@ -870,6 +860,7 @@
       border-radius: var(--radius-card);
       overflow: hidden;
       background: var(--color-surface);
+      box-shadow: var(--shadow-card);
     }
     .quick-access-grid .chart-card {
       border: none;
@@ -880,39 +871,6 @@
     }
     .quick-access-grid .chart-card:last-child {
       border-bottom: none;
-    }
-
-    .section-panel-nested {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-card);
-      padding: 1rem;
-    }
-    .section-panel-nested .design-card {
-      border: none;
-      box-shadow: none;
-      background: transparent;
-      padding-left: 0;
-      padding-right: 0;
-    }
-    .section-panel-nested .design-card + .design-card,
-    .section-panel-nested .space-y-3 > .design-card {
-      border-top: 1px solid var(--color-border-soft);
-      padding-top: 1rem;
-      margin-top: 0;
-      border-radius: 0;
-    }
-
-    .section-panel-flat {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-subtle);
-      border-radius: var(--radius-card);
-      padding: 1rem;
-    }
-    .section-panel-flat > .design-card {
-      border: none;
-      box-shadow: none;
-      padding: 0;
     }
   }
 
@@ -1077,20 +1035,12 @@
     flex-shrink: 0;
   }
   .nav-count-badge-orange {
-    color: #C2410C;
-    background: #FFF7ED;
+    color: var(--color-orange-800);
+    background: var(--color-orange-100);
   }
   .nav-count-badge-green {
-    color: #059669;
-    background: #ECFDF5;
-  }
-  html.dark .nav-count-badge-orange {
-    color: #FDBA74;
-    background: #431407;
-  }
-  html.dark .nav-count-badge-green {
-    color: #6EE7B7;
-    background: #064E3B;
+    color: var(--color-positive-text);
+    background: var(--color-positive-soft);
   }
 
   /* ── Side Panel ── */

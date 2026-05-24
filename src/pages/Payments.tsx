@@ -59,7 +59,7 @@ export function Payments() {
 
       <section className="page-block flex-1">
         <h2 className="section-label mb-3">Scheduled Payments</h2>
-        <div className="section-panel-flat w-full min-w-0">
+        <div className="design-card w-full min-w-0">
           {payments.length > 0 ? (
             <>
               <div className="list-mobile">

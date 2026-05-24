@@ -264,7 +264,7 @@ export function Finance() {
 
       <section className="page-block flex-1 flex flex-col min-h-0">
         <h2 className="section-label mb-3">History</h2>
-        <div className="section-panel-flat w-full min-w-0 flex flex-col flex-1">
+        <div className="design-card w-full min-w-0 flex flex-col flex-1">
           <div className="p-4 border-b border-[var(--color-border-soft)]">
             <h3 className="text-sm font-medium text-[var(--color-ink)] mb-3">Recent Transactions</h3>
             <div className="relative w-full">

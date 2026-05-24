@@ -88,7 +88,7 @@ export function Tasks() {
 
       <section className="page-block flex-1 min-h-0 flex flex-col">
         <h2 className="section-label mb-3">Task List</h2>
-        <div className="section-panel-flat w-full min-w-0 flex-1 flex flex-col overflow-hidden">
+        <div className="design-card w-full min-w-0 flex-1 flex flex-col overflow-hidden">
           {tasks.length > 0 ? (
             <div className="overflow-y-auto flex-1 min-h-0 -mx-0">
               <div className="divide-y divide-[var(--color-border-soft)]">
