@@ -67,6 +67,10 @@
 /* BASE                                                                */
 /* ------------------------------------------------------------------ */
 @layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -609,6 +613,7 @@
     margin-bottom: 0.5rem;
   }
   .input-field {
+    box-sizing: border-box;
     width: 100%;
     padding: 0.75rem 1.125rem;
     font-size: 0.875rem;
