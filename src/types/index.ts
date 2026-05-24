@@ -115,3 +115,66 @@ export interface Note {
   createdAt: string;
   updatedAt: string;
 }
+
+export type HabitFrequency = 'daily' | 'weekly';
+
+export interface Habit {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  frequency: HabitFrequency;
+  completedDates: string[];
+  createdAt: string;
+  active: boolean;
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  category: 'savings' | 'income' | 'expense-limit';
+  createdAt: string;
+}
+
+export interface JournalEntry {
+  id: string;
+  date: string;
+  morningPlan: string;
+  eveningReflection: string;
+  mood: number;
+  wins: string[];
+  challenges: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Budget {
+  id: string;
+  category: string;
+  monthlyLimit: number;
+  month: string;
+  createdAt: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  notes: string;
+  tags: string[];
+  createdAt: string;
+}
+
+export interface DashboardWidgets {
+  balanceCard: boolean;
+  chart: boolean;
+  tasksSummary: boolean;
+  upcomingPayments: boolean;
+  spendingBreakdown: boolean;
+  revenueForecast: boolean;
+}

@@ -52,6 +52,27 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
             const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
             useStore.setState({ invoices: data });
           }, (err) => console.error("Invoices snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/habits`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            useStore.setState({ habits: data });
+          }, (err) => console.error("Habits snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/goals`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            useStore.setState({ goals: data });
+          }, (err) => console.error("Goals snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/journal`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            useStore.setState({ journalEntries: data });
+          }, (err) => console.error("Journal snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/budgets`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            useStore.setState({ budgets: data });
+          }, (err) => console.error("Budgets snapshot error:", err)),
+          onSnapshot(collection(db, `users/${userId}/clients`), (snap) => {
+            const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+            useStore.setState({ clients: data });
+          }, (err) => console.error("Clients snapshot error:", err)),
         ];
 
         setLoading(false);

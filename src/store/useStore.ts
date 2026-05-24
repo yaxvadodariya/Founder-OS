@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, deleteDoc, collection, onSnapshot, deleteField } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
-import { Transaction, Project, Task, RecurringPayment, Note, User, Invoice, InvoiceStatus } from '../types';
+import { Transaction, Project, Task, RecurringPayment, Note, User, Invoice, InvoiceStatus, Habit, Goal, JournalEntry, Budget, Client, DashboardWidgets } from '../types';
 // We'll keep sample data available but not loaded by default for authenticated users.
 
 const sanitizeDoc = (obj: any, isUpdate = false) => {
@@ -60,6 +60,12 @@ interface StoreState {
   tasks: Task[];
   recurringPayments: RecurringPayment[];
   notes: Note[];
+  habits: Habit[];
+  goals: Goal[];
+  journalEntries: JournalEntry[];
+  budgets: Budget[];
+  clients: Client[];
+  dashboardWidgets: DashboardWidgets;
   isPrivacyMode: boolean;
   isPeeking: boolean;
   isDarkMode: boolean;
@@ -95,6 +101,29 @@ interface StoreState {
   addNote: (n: Note) => void;
   updateNote: (id: string, n: Partial<Note>) => void;
   deleteNote: (id: string) => void;
+
+  addHabit: (h: Habit) => void;
+  updateHabit: (id: string, h: Partial<Habit>) => void;
+  deleteHabit: (id: string) => void;
+  toggleHabitDate: (id: string, date: string) => void;
+
+  addGoal: (g: Goal) => void;
+  updateGoal: (id: string, g: Partial<Goal>) => void;
+  deleteGoal: (id: string) => void;
+
+  addJournalEntry: (j: JournalEntry) => void;
+  updateJournalEntry: (id: string, j: Partial<JournalEntry>) => void;
+  deleteJournalEntry: (id: string) => void;
+
+  addBudget: (b: Budget) => void;
+  updateBudget: (id: string, b: Partial<Budget>) => void;
+  deleteBudget: (id: string) => void;
+
+  addClient: (c: Client) => void;
+  updateClient: (id: string, c: Partial<Client>) => void;
+  deleteClient: (id: string) => void;
+
+  setDashboardWidgets: (widgets: Partial<DashboardWidgets>) => void;
   
   invoices: Invoice[];
   activeTimer: { id: string; type: 'project' | 'task'; startTime: string } | null;
@@ -136,6 +165,12 @@ export const useStore = create<StoreState>()(
       tasks: [],
       recurringPayments: [],
       notes: [],
+      habits: [] as Habit[],
+      goals: [] as Goal[],
+      journalEntries: [] as JournalEntry[],
+      budgets: [] as Budget[],
+      clients: [] as Client[],
+      dashboardWidgets: { balanceCard: true, chart: true, tasksSummary: true, upcomingPayments: true, spendingBreakdown: true, revenueForecast: true } as DashboardWidgets,
       isPrivacyMode: true,
       isPeeking: false,
       isDarkMode: false,
@@ -351,6 +386,131 @@ export const useStore = create<StoreState>()(
         }
       },
 
+      // ── Habits ──
+      addHabit: async (h) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await setDoc(doc(db, `users/${userId}/habits`, h.id), sanitizeDoc({ ...h, userId })); }
+        catch (err) { handleFirestoreError(err, OperationType.CREATE, `users/${userId}/habits`); }
+      },
+      updateHabit: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().habits.find(h => h.id === id);
+        if (!current) return;
+        try { await setDoc(doc(db, `users/${userId}/habits`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/habits`); }
+      },
+      deleteHabit: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await deleteDoc(doc(db, `users/${userId}/habits`, id)); }
+        catch (err) { handleFirestoreError(err, OperationType.DELETE, `users/${userId}/habits`); }
+      },
+      toggleHabitDate: async (id, date) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const habit = useStore.getState().habits.find(h => h.id === id);
+        if (!habit) return;
+        const dates = habit.completedDates || [];
+        const newDates = dates.includes(date) ? dates.filter(d => d !== date) : [...dates, date];
+        try { await setDoc(doc(db, `users/${userId}/habits`, id), sanitizeDoc({ ...habit, completedDates: newDates, userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/habits`); }
+      },
+
+      // ── Goals ──
+      addGoal: async (g) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await setDoc(doc(db, `users/${userId}/goals`, g.id), sanitizeDoc({ ...g, userId })); }
+        catch (err) { handleFirestoreError(err, OperationType.CREATE, `users/${userId}/goals`); }
+      },
+      updateGoal: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().goals.find(g => g.id === id);
+        if (!current) return;
+        try { await setDoc(doc(db, `users/${userId}/goals`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/goals`); }
+      },
+      deleteGoal: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await deleteDoc(doc(db, `users/${userId}/goals`, id)); }
+        catch (err) { handleFirestoreError(err, OperationType.DELETE, `users/${userId}/goals`); }
+      },
+
+      // ── Journal Entries ──
+      addJournalEntry: async (j) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await setDoc(doc(db, `users/${userId}/journal`, j.id), sanitizeDoc({ ...j, userId })); }
+        catch (err) { handleFirestoreError(err, OperationType.CREATE, `users/${userId}/journal`); }
+      },
+      updateJournalEntry: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().journalEntries.find(j => j.id === id);
+        if (!current) return;
+        try { await setDoc(doc(db, `users/${userId}/journal`, id), sanitizeDoc({ ...current, ...params, updatedAt: new Date().toISOString(), userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/journal`); }
+      },
+      deleteJournalEntry: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await deleteDoc(doc(db, `users/${userId}/journal`, id)); }
+        catch (err) { handleFirestoreError(err, OperationType.DELETE, `users/${userId}/journal`); }
+      },
+
+      // ── Budgets ──
+      addBudget: async (b) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await setDoc(doc(db, `users/${userId}/budgets`, b.id), sanitizeDoc({ ...b, userId })); }
+        catch (err) { handleFirestoreError(err, OperationType.CREATE, `users/${userId}/budgets`); }
+      },
+      updateBudget: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().budgets.find(b => b.id === id);
+        if (!current) return;
+        try { await setDoc(doc(db, `users/${userId}/budgets`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/budgets`); }
+      },
+      deleteBudget: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await deleteDoc(doc(db, `users/${userId}/budgets`, id)); }
+        catch (err) { handleFirestoreError(err, OperationType.DELETE, `users/${userId}/budgets`); }
+      },
+
+      // ── Clients ──
+      addClient: async (c) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await setDoc(doc(db, `users/${userId}/clients`, c.id), sanitizeDoc({ ...c, userId })); }
+        catch (err) { handleFirestoreError(err, OperationType.CREATE, `users/${userId}/clients`); }
+      },
+      updateClient: async (id, params) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        const current = useStore.getState().clients.find(c => c.id === id);
+        if (!current) return;
+        try { await setDoc(doc(db, `users/${userId}/clients`, id), sanitizeDoc({ ...current, ...params, userId }, true), { merge: true }); }
+        catch (err) { handleFirestoreError(err, OperationType.UPDATE, `users/${userId}/clients`); }
+      },
+      deleteClient: async (id) => {
+        if (!auth.currentUser) return;
+        const userId = auth.currentUser.uid;
+        try { await deleteDoc(doc(db, `users/${userId}/clients`, id)); }
+        catch (err) { handleFirestoreError(err, OperationType.DELETE, `users/${userId}/clients`); }
+      },
+
+      // ── Dashboard Widgets ──
+      setDashboardWidgets: (widgets) => set((state) => ({
+        dashboardWidgets: { ...state.dashboardWidgets, ...widgets }
+      })),
+
       addInvoice: async (invoice) => {
         if (!auth.currentUser) return;
         const userId = auth.currentUser.uid;
@@ -516,6 +676,11 @@ export const useStore = create<StoreState>()(
         recurringPayments: [],
         notes: [],
         invoices: [],
+        habits: [],
+        goals: [],
+        journalEntries: [],
+        budgets: [],
+        clients: [],
         activeTimer: null,
       }),
     }),

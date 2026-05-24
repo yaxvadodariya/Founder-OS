@@ -10,7 +10,9 @@ import {
   User,
   Bell,
   Globe,
-  Wallet
+  Wallet,
+  Download,
+  LayoutGrid
 } from 'lucide-react';
 import { cn, CURRENCIES } from '../lib/utils';
 
@@ -111,6 +113,75 @@ export function Settings() {
                {store.isPrivacyMode ? "On" : "Off"}
              </div>
            </button>
+        </div>
+
+        {/* Dashboard Widgets */}
+        <div className="flex justify-between items-center mb-2 px-1 mt-6">
+          <h2 className="section-label">Dashboard Widgets</h2>
+        </div>
+        <div className="design-card divide-y divide-[var(--color-border-soft)] overflow-hidden mb-4">
+          {[
+            { key: 'balanceCard', label: 'Balance Card' },
+            { key: 'chart', label: 'Finance Chart' },
+            { key: 'tasksSummary', label: 'Tasks Summary' },
+            { key: 'upcomingPayments', label: 'Upcoming Payments' },
+            { key: 'spendingBreakdown', label: 'Spending Breakdown' },
+            { key: 'revenueForecast', label: 'Revenue Forecast' },
+          ].map(widget => (
+            <div key={widget.key} className="w-full flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
+                  <LayoutGrid className="w-5 h-5" />
+                </div>
+                <span className="text-sm font-medium text-[var(--color-ink)]">{widget.label}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => store.setDashboardWidgets({ [widget.key]: !(store.dashboardWidgets as any)[widget.key] })}
+                className={cn(
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                  (store.dashboardWidgets as any)[widget.key] ? 'bg-emerald-500' : 'bg-[var(--color-surface-muted)]'
+                )}
+              >
+                <span className={cn(
+                  'inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm',
+                  (store.dashboardWidgets as any)[widget.key] ? 'translate-x-6' : 'translate-x-1'
+                )} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Data Export */}
+        <div className="flex justify-between items-center mb-2 px-1 mt-6">
+          <h2 className="section-label">Data Export</h2>
+        </div>
+        <div className="design-card divide-y divide-[var(--color-border-soft)] overflow-hidden mb-4">
+          {[
+            { label: 'Export Transactions (CSV)', action: () => {
+              const csv = ['Date,Type,Amount,Category,Description', ...store.transactions.map(t => `${t.date},${t.type},${t.amount},${t.categoryDetail},"${t.description || ''}"`)].join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'transactions.csv'; a.click();
+            }},
+            { label: 'Export Tasks (CSV)', action: () => {
+              const csv = ['Title,Priority,Completed,Due Date', ...store.tasks.map(t => `"${t.title}",${t.priority},${t.completed},${t.dueDate || ''}`)].join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tasks.csv'; a.click();
+            }},
+            { label: 'Export All Data (JSON)', action: () => {
+              const data = { transactions: store.transactions, tasks: store.tasks, projects: store.projects, habits: store.habits, goals: store.goals, budgets: store.budgets, clients: store.clients, journalEntries: store.journalEntries, notes: store.notes };
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+              const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'founder-os-backup.json'; a.click();
+            }},
+          ].map((item, i) => (
+            <button key={i} type="button" onClick={item.action}
+              className="w-full flex items-center gap-3 p-4 hover:bg-[var(--color-surface-hover)] transition-colors">
+              <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
+                <Download className="w-5 h-5" />
+              </div>
+              <span className="text-sm font-medium text-[var(--color-ink)]">{item.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* Account Actions */}

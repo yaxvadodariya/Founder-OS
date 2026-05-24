@@ -16,7 +16,13 @@ import {
   Moon,
   Sun,
   Shield,
-  Wallet
+  Wallet,
+  Flame,
+  Target,
+  PenTool,
+  PieChart,
+  Users,
+  BarChart3
 } from 'lucide-react';
 import { cn, CURRENCIES } from '../lib/utils';
 
@@ -54,7 +60,13 @@ export function More() {
   const menuItems = [
     { name: 'Business Finance', icon: Briefcase, path: '/finance/business', color: 'text-blue-500', bg: 'bg-blue-50' },
     { name: 'Payments', icon: BellRing, path: '/payments', color: 'text-purple-500', bg: 'bg-purple-50' },
+    { name: 'Habits', icon: Flame, path: '/habits', color: 'text-orange-500', bg: 'bg-orange-50' },
+    { name: 'Goals', icon: Target, path: '/goals', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { name: 'Journal', icon: PenTool, path: '/journal', color: 'text-indigo-500', bg: 'bg-indigo-50' },
+    { name: 'Budgets', icon: PieChart, path: '/budgets', color: 'text-pink-500', bg: 'bg-pink-50' },
+    { name: 'Clients', icon: Users, path: '/clients', color: 'text-cyan-500', bg: 'bg-cyan-50' },
     { name: 'Remember Book', icon: BookOpen, path: '/notes', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { name: 'Weekly Review', icon: BarChart3, path: '/weekly-review', color: 'text-amber-500', bg: 'bg-amber-50' },
   ];
 
   return (

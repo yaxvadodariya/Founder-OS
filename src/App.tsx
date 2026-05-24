@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
-import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes, More, Settings, ClientPortal } from './pages';
+import { Dashboard, Finance, Projects, ProjectDetails, Tasks, Payments, Notes, More, Settings, ClientPortal, Habits, Goals, Journal, Budgets, Clients, WeeklyReview } from './pages';
 import { FirebaseProvider } from './FirebaseProvider';
 import { Login } from './components/Login';
 import { useStore } from './store/useStore';
@@ -36,6 +36,12 @@ function AppContent() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="payments" element={<Payments />} />
           <Route path="notes" element={<Notes />} />
+          <Route path="habits" element={<Habits />} />
+          <Route path="goals" element={<Goals />} />
+          <Route path="journal" element={<Journal />} />
+          <Route path="budgets" element={<Budgets />} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="weekly-review" element={<WeeklyReview />} />
           <Route path="more" element={<More />} />
           <Route path="settings" element={<Settings />} />
         </Route>

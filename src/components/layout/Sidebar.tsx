@@ -11,11 +11,18 @@ import {
   ChevronDown,
   LogOut,
   Layers,
+  Flame,
+  Target,
+  PenTool,
+  PieChart,
+  Users,
+  BarChart3,
+  Search,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
 import { logOut } from '../../lib/firebase';
-import { isToday, isPast, isSameDay } from 'date-fns';
+import { isToday, isPast, isSameDay, format } from 'date-fns';
 
 function NavItem({
   to,
@@ -53,12 +60,19 @@ export function Sidebar() {
   const store = useStore();
   const user = store.user;
 
-  const isFinanceRoute = location.pathname.startsWith('/finance');
+  const isFinanceRoute = location.pathname.startsWith('/finance') || location.pathname.startsWith('/budgets');
   const [financeOpen, setFinanceOpen] = useState(isFinanceRoute);
+
+  const isBusinessRoute = location.pathname.startsWith('/clients');
+  const [businessOpen, setBusinessOpen] = useState(isBusinessRoute);
 
   useEffect(() => {
     if (isFinanceRoute) setFinanceOpen(true);
   }, [isFinanceRoute]);
+
+  useEffect(() => {
+    if (isBusinessRoute) setBusinessOpen(true);
+  }, [isBusinessRoute]);
 
   const pendingTasks = store.tasks.filter((t) => {
     if (t.completed || !t.dueDate) return false;
@@ -67,6 +81,10 @@ export function Sidebar() {
   }).length;
 
   const upcomingPayments = store.recurringPayments.filter((p) => p.active).length;
+
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const habitsToday = store.habits.filter(h => h.active && (h.completedDates || []).includes(today)).length;
+  const totalActiveHabits = store.habits.filter(h => h.active).length;
 
   const isActive = (href: string) =>
     location.pathname === href ||
@@ -124,6 +142,13 @@ export function Sidebar() {
                   isActive={isActive('/finance/business')}
                 />
               </div>
+              <div className="sidebar-tree-item">
+                <NavItem
+                  to="/budgets"
+                  label="Budgets"
+                  isActive={isActive('/budgets')}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -148,6 +173,35 @@ export function Sidebar() {
         </NavLink>
 
         <NavLink
+          to="/habits"
+          className={cn('sidebar-nav-item', isActive('/habits') && 'sidebar-nav-item-active')}
+        >
+          <Flame className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
+          <span className="flex-1">Habits</span>
+          {totalActiveHabits > 0 && (
+            <span className={cn('nav-count-badge', habitsToday === totalActiveHabits ? 'nav-count-badge-green' : 'nav-count-badge-orange')}>
+              {habitsToday}/{totalActiveHabits}
+            </span>
+          )}
+        </NavLink>
+
+        <NavLink
+          to="/goals"
+          className={cn('sidebar-nav-item', isActive('/goals') && 'sidebar-nav-item-active')}
+        >
+          <Target className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
+          <span>Goals</span>
+        </NavLink>
+
+        <NavLink
+          to="/journal"
+          className={cn('sidebar-nav-item', isActive('/journal') && 'sidebar-nav-item-active')}
+        >
+          <PenTool className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
+          <span>Journal</span>
+        </NavLink>
+
+        <NavLink
           to="/payments"
           className={cn('sidebar-nav-item', isActive('/payments') && 'sidebar-nav-item-active')}
         >
@@ -159,11 +213,27 @@ export function Sidebar() {
         </NavLink>
 
         <NavLink
+          to="/clients"
+          className={cn('sidebar-nav-item', isActive('/clients') && 'sidebar-nav-item-active')}
+        >
+          <Users className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
+          <span>Clients</span>
+        </NavLink>
+
+        <NavLink
           to="/notes"
           className={cn('sidebar-nav-item', isActive('/notes') && 'sidebar-nav-item-active')}
         >
           <BookOpen className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
           <span>Remember Book</span>
+        </NavLink>
+
+        <NavLink
+          to="/weekly-review"
+          className={cn('sidebar-nav-item', isActive('/weekly-review') && 'sidebar-nav-item-active')}
+        >
+          <BarChart3 className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
+          <span>Weekly Review</span>
         </NavLink>
       </nav>
 

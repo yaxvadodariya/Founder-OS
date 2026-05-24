@@ -12,6 +12,7 @@ import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
 import { DarkModeToggle } from '../DarkModeToggle';
 import { Sidebar } from './Sidebar';
+import { CommandBar } from '../CommandBar';
 
 const mobileNav = [
   { name: 'Home', href: '/', icon: LayoutDashboard },
@@ -77,6 +78,7 @@ export function AppLayout() {
   return (
     <div className="flex min-h-screen bg-[var(--color-canvas)] text-[var(--color-ink)] font-sans">
       <Sidebar />
+      <CommandBar />
 
       <div className="flex-1 flex flex-col min-h-screen min-w-0 lg:pl-[252px]">
         <div className="app-shell flex flex-col flex-1 min-h-0 min-w-0 lg:min-h-[calc(100vh-1.5rem)]">
