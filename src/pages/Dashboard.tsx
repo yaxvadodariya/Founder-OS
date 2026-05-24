@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStore } from '../store/useStore';
 import { formatCurrency } from '../lib/utils';
-import { format, isToday, subDays, startOfMonth, endOfMonth, subMonths, isWithinInterval } from 'date-fns';
+import { format, isToday, subDays, startOfMonth, endOfMonth, subMonths, isWithinInterval, addMonths } from 'date-fns';
 import { 
   Wallet, 
   FolderKanban, 
@@ -16,7 +16,7 @@ import {
   Megaphone,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { Link } from 'react-router-dom';
 
 import { TransactionModal } from '../components/TransactionModal';
@@ -105,6 +105,84 @@ export function Dashboard() {
 
   const showTaskAlert = pendingTasksToday > 0;
 
+  const COLORS = ['#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#EC4899', '#F59E0B', '#6366F1'];
+
+  const spendingBreakdownData = React.useMemo(() => {
+    const expenseTransactions = store.transactions.filter(t => t.type === 'expense');
+    const groups: Record<string, number> = {};
+    
+    expenseTransactions.forEach(t => {
+      const cat = t.categoryDetail || 'Uncategorized';
+      groups[cat] = (groups[cat] || 0) + t.amount;
+    });
+    
+    const sorted = Object.entries(groups)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+      
+    if (sorted.length <= 5) {
+      return sorted;
+    }
+    
+    const top = sorted.slice(0, 4);
+    const otherValue = sorted.slice(4).reduce((sum, item) => sum + item.value, 0);
+    top.push({ name: 'Other', value: otherValue });
+    return top;
+  }, [store.transactions]);
+
+  const averageMonthlyIncome = React.useMemo(() => {
+    const incomeTransactions = store.transactions.filter(t => t.type === 'income');
+    if (incomeTransactions.length === 0) return 0;
+    
+    const monthlyTotals: Record<string, number> = {};
+    incomeTransactions.forEach(t => {
+      const monthStr = t.date.substring(0, 7); // YYYY-MM
+      monthlyTotals[monthStr] = (monthlyTotals[monthStr] || 0) + t.amount;
+    });
+    
+    const values = Object.values(monthlyTotals);
+    if (values.length === 0) return 0;
+    return values.reduce((sum, val) => sum + val, 0) / values.length;
+  }, [store.transactions]);
+
+  const forecastData = React.useMemo(() => {
+    const data = [];
+    const startOffset = -2;
+    const endOffset = 3;
+    
+    for (let i = startOffset; i <= endOffset; i++) {
+      const monthDate = addMonths(today, i);
+      const monthStr = format(monthDate, 'yyyy-MM');
+      const monthLabel = format(monthDate, 'MMM yyyy');
+      
+      const actualIncome = store.transactions
+        .filter(t => t.type === 'income' && t.date.substring(0, 7) === monthStr)
+        .reduce((sum, t) => sum + t.amount, 0);
+        
+      const projectIncome = store.projects
+        .filter(p => {
+          if (p.status !== 'active') return false;
+          const deadlineMonth = p.deadline.substring(0, 7);
+          if (i === 0) {
+            return deadlineMonth === monthStr || p.deadline < format(today, 'yyyy-MM-dd');
+          }
+          return deadlineMonth === monthStr;
+        })
+        .reduce((sum, p) => sum + p.amountPending, 0);
+        
+      const projectedIncome = averageMonthlyIncome + projectIncome;
+      
+      data.push({
+        name: monthLabel,
+        actual: i <= 0 ? actualIncome : null,
+        projected: i >= 0 ? projectedIncome : null,
+      });
+    }
+    return data;
+  }, [store.transactions, store.projects, averageMonthlyIncome, today]);
+
+  const isDarkMode = store.isDarkMode;
+
   return (
     <PageShell>
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
@@ -144,8 +222,13 @@ export function Dashboard() {
 
       <section className="section-panel">
         <h2 className="section-label">Quick Access</h2>
-        <div className="quick-access-grid grid grid-cols-1 lg:grid-cols-4 lg:gap-3 mt-3 lg:mt-4">
-          <DualBalanceCard personalBalance={personalBalance} currentBalance={currentBalance} isHidden={isHidden} />
+        <div className={cn(
+          "quick-access-grid grid grid-cols-1 lg:gap-3 mt-3 lg:mt-4",
+          (store.dashboardWidgets?.balanceCard ?? true) ? "lg:grid-cols-4" : "lg:grid-cols-3"
+        )}>
+          {(store.dashboardWidgets?.balanceCard ?? true) && (
+            <DualBalanceCard personalBalance={personalBalance} currentBalance={currentBalance} isHidden={isHidden} />
+          )}
           <StatCard 
             title="Active Projects" 
             value={activeProjectsCount.toString()} 
@@ -180,55 +263,57 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-6">
         <div className="lg:col-span-2 space-y-7 lg:space-y-6">
-          <section className="section-panel section-panel-flat lg:!p-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-              <div className="flex items-center justify-between sm:justify-start gap-4">
-                <h2 className="section-label">Financial Overview</h2>
-                <Link to="/finance/personal" className="section-link sm:hidden">View all →</Link>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="segmented-control">
-                  {(['7d', '14d', '30d'] as ChartRange[]).map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setChartRange(r)}
-                      className={cn('segmented-item', chartRange === r && 'segmented-item-active')}
-                    >
-                      {r}
-                    </button>
-                  ))}
+          {(store.dashboardWidgets?.chart ?? true) && (
+            <section className="section-panel section-panel-flat lg:!p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div className="flex items-center justify-between sm:justify-start gap-4">
+                  <h2 className="section-label">Financial Overview</h2>
+                  <Link to="/finance/personal" className="section-link sm:hidden">View all →</Link>
                 </div>
-                <Link to="/finance/personal" className="section-link hidden sm:inline">View all →</Link>
+                <div className="flex items-center gap-2">
+                  <div className="segmented-control">
+                    {(['7d', '14d', '30d'] as ChartRange[]).map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setChartRange(r)}
+                        className={cn('segmented-item', chartRange === r && 'segmented-item-active')}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                  <Link to="/finance/personal" className="section-link hidden sm:inline">View all →</Link>
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ChartMetricCard
-                title="Total Income"
-                icon={<Tag className="h-4 w-4" />}
-                current={incomeThisMonth}
-                previous={incomeLastMonth}
-                pct={pctChange(incomeThisMonth, incomeLastMonth)}
-                dataKey="income"
-                prevKey="incomePrev"
-                chartData={chartData}
-                isHidden={isHidden}
-              />
-              <ChartMetricCard
-                title="Total Expenses"
-                icon={<Banknote className="h-4 w-4" />}
-                current={expenseThisMonth}
-                previous={expenseLastMonth}
-                pct={pctChange(expenseThisMonth, expenseLastMonth)}
-                dataKey="expense"
-                prevKey="expensePrev"
-                chartData={chartData}
-                isHidden={isHidden}
-                invertTrend
-              />
-            </div>
-          </section>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <ChartMetricCard
+                  title="Total Income"
+                  icon={<Tag className="h-4 w-4" />}
+                  current={incomeThisMonth}
+                  previous={incomeLastMonth}
+                  pct={pctChange(incomeThisMonth, incomeLastMonth)}
+                  dataKey="income"
+                  prevKey="incomePrev"
+                  chartData={chartData}
+                  isHidden={isHidden}
+                />
+                <ChartMetricCard
+                  title="Total Expenses"
+                  icon={<Banknote className="h-4 w-4" />}
+                  current={expenseThisMonth}
+                  previous={expenseLastMonth}
+                  pct={pctChange(expenseThisMonth, expenseLastMonth)}
+                  dataKey="expense"
+                  prevKey="expensePrev"
+                  chartData={chartData}
+                  isHidden={isHidden}
+                  invertTrend
+                />
+              </div>
+            </section>
+          )}
 
           <section className="section-panel section-panel-nested">
             <div className="flex justify-between items-center mb-3 lg:mb-4">
@@ -268,6 +353,112 @@ export function Dashboard() {
               )}
             </div>
           </section>
+
+          {/* Spending Breakdown and Revenue Forecast widgets */}
+          {((store.dashboardWidgets?.spendingBreakdown ?? true) || (store.dashboardWidgets?.revenueForecast ?? true)) && (
+            <div className={cn(
+              "grid grid-cols-1 gap-7 lg:gap-6",
+              (store.dashboardWidgets?.spendingBreakdown ?? true) && (store.dashboardWidgets?.revenueForecast ?? true)
+                ? "md:grid-cols-2"
+                : "grid-cols-1"
+            )}>
+              {(store.dashboardWidgets?.spendingBreakdown ?? true) && (
+                <section className="section-panel section-panel-flat lg:!p-5">
+                  <h2 className="section-label mb-3">Spending Breakdown</h2>
+                  {spendingBreakdownData.length === 0 ? (
+                    <p className="text-xs text-[var(--color-ink-muted)] text-center py-8">
+                      No expense data recorded. Start adding transactions to see your spending breakdown.
+                    </p>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="h-44 w-44 shrink-0 flex items-center justify-center">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={spendingBreakdownData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={45}
+                              outerRadius={65}
+                              paddingAngle={3}
+                              dataKey="value"
+                            >
+                              {spendingBreakdownData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex-1 w-full space-y-2">
+                        {spendingBreakdownData.map((item, index) => {
+                          const totalSpent = spendingBreakdownData.reduce((sum, i) => sum + i.value, 0);
+                          const percent = totalSpent > 0 ? (item.value / totalSpent) * 100 : 0;
+                          return (
+                            <div key={item.name} className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                <span className="text-[var(--color-ink-secondary)] truncate">{item.name}</span>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0 font-medium text-[var(--color-ink)] ml-2">
+                                <span><HiddenValue isHidden={isHidden}>{formatCurrency(item.value)}</HiddenValue></span>
+                                <span className="text-[var(--color-ink-muted)] text-[10px] font-normal">({percent.toFixed(0)}%)</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {(store.dashboardWidgets?.revenueForecast ?? true) && (
+                <section className="section-panel section-panel-flat lg:!p-5">
+                  <div className="flex justify-between items-center mb-1">
+                    <h2 className="section-label">Revenue Forecast</h2>
+                  </div>
+                  <p className="text-[11px] text-[var(--color-ink-muted)] mb-3">
+                    Projected income based on active project deadlines & monthly average.
+                  </p>
+                  <div className="h-44 w-full -mx-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={forecastData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#9CA3AF' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: '#9CA3AF' }} width={30} />
+                        <Tooltip 
+                          content={<ChartTooltip />} 
+                          cursor={{ stroke: isDarkMode ? '#2A2A2E' : '#E5E7EB', strokeDasharray: '4 4' }} 
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="actual" 
+                          stroke="#3B82F6" 
+                          name="Actual"
+                          strokeWidth={2} 
+                          dot={{ r: 3, fill: '#3B82F6' }} 
+                          activeDot={{ r: 5 }} 
+                          connectNulls
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="projected" 
+                          stroke="#F97316" 
+                          name="Projected"
+                          strokeWidth={2} 
+                          strokeDasharray="4 4" 
+                          dot={{ r: 3, fill: '#F97316' }} 
+                          activeDot={{ r: 5 }} 
+                          connectNulls
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </section>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-7 lg:space-y-6">
@@ -300,74 +491,78 @@ export function Dashboard() {
             </div>
           </section>
 
-          <section className="section-panel section-panel-flat">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="section-label">Today&apos;s Focus</h2>
-              <Link to="/tasks" className="section-link">View all →</Link>
-            </div>
-            
-            <div className="design-card p-0 lg:p-4">
-              <div className="space-y-0.5">
-                {store.tasks
-                  .filter(t => !t.completed)
-                  .sort((a, b) => {
-                    if (a.priority === 'high') return -1;
-                    if (b.priority === 'high') return 1;
-                    return 0;
-                  })
-                  .slice(0, 4)
-                  .map(task => (
-                  <div key={task.id} className="flex items-start gap-3 p-2.5 hover:bg-[var(--color-surface-hover)] rounded-[10px] transition-colors">
-                    <button 
-                      onClick={() => store.toggleTaskCompletion(task.id)}
-                      className={cn(
-                        "mt-0.5 flex-shrink-0 h-5 w-5 rounded border border-[var(--color-border-subtle)] flex items-center justify-center transition-colors",
-                        task.completed ? "bg-[var(--color-positive)] border-[var(--color-positive)]" : "bg-[var(--color-surface)]"
-                      )}
-                    >
-                      {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
-                    </button>
-                    <div>
-                      <p className={cn("text-sm font-normal", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
-                        {task.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {task.priority === 'high' && <span className="status-badge status-badge-warning">High</span>}
-                        {task.projectId && <span className="status-badge status-badge-neutral">Project Work</span>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {(store.dashboardWidgets?.tasksSummary ?? true) && (
+            <section className="section-panel section-panel-flat">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="section-label">Today&apos;s Focus</h2>
+                <Link to="/tasks" className="section-link">View all →</Link>
               </div>
-            </div>
-          </section>
-
-          <section className="section-panel section-panel-flat">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="section-label">Upcoming Bills</h2>
-              <Link to="/payments" className="section-link">View all →</Link>
-            </div>
-            <div className="design-card p-0 lg:p-4">
-              <div className="space-y-4">
-                {upcomingPayments.map(payment => (
-                  <div key={payment.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-[10px] bg-[var(--color-surface-muted)] border border-[var(--color-border-soft)] flex items-center justify-center text-[var(--color-ink-muted)]">
-                        <BellRing className="h-4 w-4" />
-                      </div>
+              
+              <div className="design-card p-0 lg:p-4">
+                <div className="space-y-0.5">
+                  {store.tasks
+                    .filter(t => !t.completed)
+                    .sort((a, b) => {
+                      if (a.priority === 'high') return -1;
+                      if (b.priority === 'high') return 1;
+                      return 0;
+                    })
+                    .slice(0, 4)
+                    .map(task => (
+                    <div key={task.id} className="flex items-start gap-3 p-2.5 hover:bg-[var(--color-surface-hover)] rounded-[10px] transition-colors">
+                      <button 
+                        onClick={() => store.toggleTaskCompletion(task.id)}
+                        className={cn(
+                          "mt-0.5 flex-shrink-0 h-5 w-5 rounded border border-[var(--color-border-subtle)] flex items-center justify-center transition-colors",
+                          task.completed ? "bg-[var(--color-positive)] border-[var(--color-positive)]" : "bg-[var(--color-surface)]"
+                        )}
+                      >
+                        {task.completed && <CheckSquare className="h-3 w-3 text-white" />}
+                      </button>
                       <div>
-                        <p className="text-sm font-medium text-[var(--color-ink)]">{payment.name}</p>
-                        <p className="text-xs text-[var(--color-ink-muted)]">Due on {payment.dayOfMonth}th</p>
+                        <p className={cn("text-sm font-normal", task.completed ? "text-[var(--color-ink-muted)] line-through" : "text-[var(--color-ink)]")}>
+                          {task.title}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          {task.priority === 'high' && <span className="status-badge status-badge-warning">High</span>}
+                          {task.projectId && <span className="status-badge status-badge-neutral">Project Work</span>}
+                        </div>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-[var(--color-ink)] tabular-nums">
-                      {formatCurrency(payment.amount)}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
+
+          {(store.dashboardWidgets?.upcomingPayments ?? true) && (
+            <section className="section-panel section-panel-flat">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="section-label">Upcoming Bills</h2>
+                <Link to="/payments" className="section-link">View all →</Link>
+              </div>
+              <div className="design-card p-0 lg:p-4">
+                <div className="space-y-4">
+                  {upcomingPayments.map(payment => (
+                    <div key={payment.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-[10px] bg-[var(--color-surface-muted)] border border-[var(--color-border-soft)] flex items-center justify-center text-[var(--color-ink-muted)]">
+                          <BellRing className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-[var(--color-ink)]">{payment.name}</p>
+                          <p className="text-xs text-[var(--color-ink-muted)]">Due on {payment.dayOfMonth}th</p>
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-[var(--color-ink)] tabular-nums">
+                        {formatCurrency(payment.amount)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </div>
       

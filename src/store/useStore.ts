@@ -71,6 +71,7 @@ interface StoreState {
   isDarkMode: boolean;
   currency: string;
   balanceDisplayMode: 'net-worth' | 'liquid-cash';
+  taxRate: number;
   
   // Actions
   setUser: (user: User) => void;
@@ -80,6 +81,7 @@ interface StoreState {
   toggleDarkMode: () => void;
   setCurrency: (currency: string) => void;
   setBalanceDisplayMode: (mode: 'net-worth' | 'liquid-cash') => void;
+  setTaxRate: (rate: number) => void;
   
   addTransaction: (ts: Transaction, skipNotify?: boolean) => void;
   updateTransaction: (id: string, t: Partial<Transaction>) => void;
@@ -176,6 +178,7 @@ export const useStore = create<StoreState>()(
       isDarkMode: false,
       currency: getBrowserCurrency(),
       balanceDisplayMode: 'net-worth',
+      taxRate: 20,
       invoices: [] as Invoice[],
       activeTimer: null as { id: string; type: 'project' | 'task'; startTime: string } | null,
       lastError: null,
@@ -188,6 +191,7 @@ export const useStore = create<StoreState>()(
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setCurrency: (currency) => set({ currency }),
       setBalanceDisplayMode: (mode) => set({ balanceDisplayMode: mode }),
+      setTaxRate: (taxRate) => set({ taxRate }),
       
       addTransaction: async (ts, skipNotify) => {
         if (!auth.currentUser) return;

@@ -85,6 +85,24 @@ export function Settings() {
                <option value="liquid-cash">Liquid Cash Only</option>
              </select>
            </div>
+
+           <div className="w-full flex items-center justify-between p-4 transition-colors">
+             <div className="flex items-center gap-3">
+               <div className="p-2 rounded-[10px] bg-[var(--color-surface-muted)] text-[var(--color-ink)]">
+                 <Shield className="w-5 h-5" />
+               </div>
+               <span className="text-sm font-medium text-[var(--color-ink)]">Income Tax Rate (%)</span>
+             </div>
+             <input
+               type="number"
+               min="0"
+               max="100"
+               value={store.taxRate ?? 20}
+               onChange={(e) => store.setTaxRate(Math.max(0, Math.min(100, Number(e.target.value))))}
+               className="w-20 text-right text-sm font-medium text-[var(--color-ink)] bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] rounded-[10px] px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-muted)]"
+             />
+           </div>
+
            <button
              onClick={() => store.toggleDarkMode()}
              className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-surface-hover)] transition-colors"

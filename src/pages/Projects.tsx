@@ -7,6 +7,7 @@ import { Plus, MoreVertical, Calendar, CheckCircle2, Clock } from 'lucide-react'
 import { ProjectStatus } from '../types';
 import { ProjectModal } from '../components/ProjectModal';
 import { TaskModal } from '../components/TaskModal';
+import { ProposalModal } from '../components/ProposalModal';
 import { PageShell } from '../components/layout/PageShell';
 
 export function Projects() {
@@ -17,7 +18,9 @@ export function Projects() {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isProposalOpen, setIsProposalOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<any>(null);
+  const [projectForProposal, setProjectForProposal] = useState<any>(null);
   const [selectedProjectIdForTask, setSelectedProjectIdForTask] = useState<string>('');
 
   React.useEffect(() => {
@@ -129,6 +132,18 @@ export function Projects() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            setProjectForProposal(project);
+                            setIsProposalOpen(true);
+                            setOpenMenuId(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-hover)] transition-colors border-t border-[var(--color-border-soft)]"
+                        >
+                          Generate Proposal
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             store.updateProject(project.id, { status: project.status === 'completed' ? 'active' : 'completed' });
                             setOpenMenuId(null);
                           }}
@@ -219,6 +234,15 @@ export function Projects() {
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         defaultProjectId={selectedProjectIdForTask}
+      />
+
+      <ProposalModal
+        isOpen={isProposalOpen}
+        onClose={() => {
+          setIsProposalOpen(false);
+          setProjectForProposal(null);
+        }}
+        project={projectForProposal}
       />
     </PageShell>
   );

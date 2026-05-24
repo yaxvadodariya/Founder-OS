@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, FileText, CheckCircle2, ChevronRight, CheckSquare,
 import { ProjectModal } from '../components/ProjectModal';
 import { TaskModal } from '../components/TaskModal';
 import { SidePanel } from '../components/SidePanel';
+import { ProposalModal } from '../components/ProposalModal';
 import { auth } from '../lib/firebase';
 
 import { jsPDF } from "jspdf";
@@ -20,6 +21,7 @@ export function ProjectDetails() {
   
   const [isProjectModalOpen, setIsProjectModalOpen] = React.useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = React.useState(false);
+  const [isProposalModalOpen, setIsProposalModalOpen] = React.useState(false);
   const [isAddingMilestone, setIsAddingMilestone] = React.useState(false);
   const [milestoneName, setMilestoneName] = React.useState('');
   const [milestoneAmount, setMilestoneAmount] = React.useState('');
@@ -384,6 +386,14 @@ export function ProjectDetails() {
           )}>
             {project.status}
           </span>
+          <button
+            onClick={() => setIsProposalModalOpen(true)}
+            className="btn-secondary text-xs flex items-center gap-1.5"
+            title="Generate Proposal"
+          >
+            <FileText className="h-4.5 w-4.5" />
+            <span>Proposal</span>
+          </button>
           <button 
             onClick={() => setIsProjectModalOpen(true)}
             className="inline-flex items-center justify-center p-2 text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-[10px] hover:bg-[var(--color-surface-hover)] transition-colors shadow-[var(--shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-border-subtle)]"
@@ -898,6 +908,12 @@ export function ProjectDetails() {
         isOpen={isTaskModalOpen} 
         onClose={() => setIsTaskModalOpen(false)} 
         defaultProjectId={project.id}
+      />
+
+      <ProposalModal
+        isOpen={isProposalModalOpen}
+        onClose={() => setIsProposalModalOpen(false)}
+        project={project}
       />
 
       {isAddingMilestone && (

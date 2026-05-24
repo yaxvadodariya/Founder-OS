@@ -8,6 +8,8 @@ import { FinanceCategory } from '../types';
 import { TransactionModal } from '../components/TransactionModal';
 import { HiddenValue } from '../components/HiddenValue';
 import { PageShell } from '../components/layout/PageShell';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 export function Finance() {
   const { type } = useParams<{ type: string }>();
@@ -41,6 +43,110 @@ export function Finance() {
     setIsModalOpen(true);
   };
 
+  const exportPLStatement = () => {
+    try {
+      const doc = new jsPDF();
+      const currentYear = new Date().getFullYear();
+      
+      const allCategoryTx = store.transactions.filter(t => t.category === currentCategory);
+      
+      const incomeMap: Record<string, number> = {};
+      const expenseMap: Record<string, number> = {};
+      
+      allCategoryTx.forEach(t => {
+        const amt = t.amount;
+        const cat = t.categoryDetail || 'General';
+        if (t.type === 'income') {
+          incomeMap[cat] = (incomeMap[cat] || 0) + amt;
+        } else {
+          expenseMap[cat] = (expenseMap[cat] || 0) + amt;
+        }
+      });
+      
+      const incomeRows = Object.entries(incomeMap).map(([cat, amt]) => [cat, formatCurrency(amt)]);
+      const expenseRows = Object.entries(expenseMap).map(([cat, amt]) => [cat, formatCurrency(amt)]);
+      
+      const totalInc = Object.values(incomeMap).reduce((sum, a) => sum + a, 0);
+      const totalExp = Object.values(expenseMap).reduce((sum, a) => sum + a, 0);
+      const netProf = totalInc - totalExp;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(24, 24, 27);
+      doc.text('Profit & Loss Statement', 14, 22);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(113, 113, 122);
+      doc.text(`Type: ${currentCategory.toUpperCase()} | Generated: ${format(new Date(), 'MMMM d, yyyy')}`, 14, 28);
+      
+      let currentY = 38;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(16, 185, 129);
+      doc.text('1. Revenue / Income', 14, currentY);
+      currentY += 4;
+      
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [['Category', 'Amount']],
+        body: [
+          ...incomeRows,
+          [{ content: 'Total Revenue', styles: { fontStyle: 'bold' } }, { content: formatCurrency(totalInc), styles: { fontStyle: 'bold' } }]
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 },
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 12;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(239, 68, 68);
+      doc.text('2. Cost / Operating Expenses', 14, currentY);
+      currentY += 4;
+      
+      (doc as any).autoTable({
+        startY: currentY,
+        head: [['Category', 'Amount']],
+        body: [
+          ...expenseRows,
+          [{ content: 'Total Operating Expenses', styles: { fontStyle: 'bold' } }, { content: formatCurrency(totalExp), styles: { fontStyle: 'bold' } }]
+        ],
+        theme: 'striped',
+        headStyles: { fillColor: [239, 68, 68], textColor: [255, 255, 255] },
+        margin: { left: 14, right: 14 },
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 12;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(30, 41, 59);
+      doc.text('3. Net Profit / Loss Summary', 14, currentY);
+      currentY += 4;
+      
+      (doc as any).autoTable({
+        startY: currentY,
+        body: [
+          ['Total Revenue', formatCurrency(totalInc)],
+          ['Total Expenses', `(${formatCurrency(totalExp)})`],
+          [{ content: 'Net Profit / Loss', styles: { fontStyle: 'bold', fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }, { content: formatCurrency(netProf), styles: { fontStyle: 'bold', textColor: netProf >= 0 ? [21, 128, 61] : [185, 28, 28], fillColor: netProf >= 0 ? [240, 253, 244] : [254, 242, 242] } }]
+        ],
+        theme: 'plain',
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 11 }
+      });
+      
+      doc.save(`PL_Statement_${currentCategory}_${currentYear}.pdf`);
+    } catch (e) {
+      console.error('Error generating PDF:', e);
+      alert('Failed to export P&L. Please try again.');
+    }
+  };
+
   return (
     <PageShell className="lg:pb-0">
       <header className="page-block flex flex-row justify-between items-center gap-4">
@@ -48,17 +154,29 @@ export function Finance() {
           <h1 className="page-title">Finance</h1>
           <p className="page-subtitle hidden sm:block">Manage your {currentCategory} finances</p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setTransactionToEdit(null);
-            setIsModalOpen(true);
-          }}
-          className="btn-primary"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Transaction</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {transactions.length > 0 && (
+            <button
+              type="button"
+              onClick={exportPLStatement}
+              className="btn-secondary"
+            >
+              <FileText className="h-4 w-4" />
+              <span>Export P&L</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setTransactionToEdit(null);
+              setIsModalOpen(true);
+            }}
+            className="btn-primary"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Transaction</span>
+          </button>
+        </div>
       </header>
 
       <div className="page-block segmented-control segmented-control-full">
@@ -103,6 +221,33 @@ export function Finance() {
                 <HiddenValue isHidden={isHidden}>{formatCurrency(totalExpense)}</HiddenValue>
               </p>
               <ArrowDownRight className="h-4 w-4 text-red-500 shrink-0" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="page-block">
+        <h2 className="section-label mb-3">Tax Estimation</h2>
+        <div className="design-card p-4 lg:p-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-[var(--color-border-soft)]">
+            <div>
+              <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Estimated Total Tax ({store.taxRate}%)</p>
+              <p className="text-2xl font-bold text-[var(--color-ink)] mt-2">
+                {formatCurrency(totalIncome * ((store.taxRate ?? 20) / 100))}
+              </p>
+              <p className="text-[11px] text-[var(--color-ink-muted)] mt-1">Based on total income of {formatCurrency(totalIncome)}</p>
+            </div>
+            <div className="pt-4 md:pt-0 md:pl-6">
+              <p className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">Est. Quarterly Payment</p>
+              <p className="text-2xl font-bold text-orange-500 mt-2">
+                {formatCurrency((totalIncome * ((store.taxRate ?? 20) / 100)) / 4)}
+              </p>
+              <p className="text-[11px] text-[var(--color-ink-muted)] mt-1">4 equal payments per fiscal year</p>
+            </div>
+            <div className="pt-4 md:pt-0 md:pl-6 flex flex-col justify-center">
+              <p className="text-xs text-[var(--color-ink-secondary)] leading-relaxed">
+                Tax estimates are calculated automatically. You can adjust your tax rate percentage in the <strong>Settings</strong> page to match your local tax bracket.
+              </p>
             </div>
           </div>
         </div>
