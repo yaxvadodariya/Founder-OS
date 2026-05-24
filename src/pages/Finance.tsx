@@ -136,7 +136,7 @@ export function Finance() {
                     className="list-row w-full"
                   >
                     <div className={cn(
-                      'flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center',
+                      'flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center',
                       t.type === 'income' 
                         ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive-text)]' 
                         : 'bg-[var(--color-negative-soft)] text-[var(--color-negative-text)]'
@@ -144,14 +144,14 @@ export function Finance() {
                       {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                     </div>
                     <div className="list-row-body">
-                      <p className="list-row-title">{t.description}</p>
+                      <p className="list-row-title font-semibold">{t.description}</p>
                       <p className="list-row-meta">
                         {format(new Date(t.date), 'MMM d, yyyy')} · {t.categoryDetail}
                       </p>
                     </div>
                     <span className={cn(
-                      'list-row-aside',
-                      t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--color-ink)]'
+                      'list-row-aside font-semibold tabular-nums',
+                      t.type === 'income' ? 'text-[var(--color-positive-text)]' : 'text-[var(--color-ink)]'
                     )}>
                       <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+${currencySymbol}` : `-${currencySymbol}`}>
                         {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
@@ -175,16 +175,16 @@ export function Finance() {
                     {transactions.map((t) => (
                       <tr 
                         key={t.id} 
-                        className="hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => openTransaction(t)}
                       >
-                        <td className="whitespace-nowrap text-[var(--color-ink-muted)]">
+                        <td className="whitespace-nowrap text-sm text-[var(--color-ink-muted)]">
                           {format(new Date(t.date), 'MMM dd, yyyy')}
                         </td>
                         <td>
-                          <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex items-center gap-3.5 min-w-0">
                             <div className={cn(
-                              'flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center',
+                              'flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center',
                               t.type === 'income' 
                                 ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive-text)]' 
                                 : 'bg-[var(--color-negative-soft)] text-[var(--color-negative-text)]'
@@ -192,8 +192,8 @@ export function Finance() {
                               {t.type === 'income' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm font-medium text-[var(--color-ink)] truncate">{t.description}</div>
-                              <div className="text-xs text-[var(--color-ink-muted)]">{t.paymentMethod}</div>
+                              <div className="text-sm font-semibold text-[var(--color-ink)] truncate">{t.description}</div>
+                              <div className="text-xs text-[var(--color-ink-muted)] mt-0.5">{t.paymentMethod}</div>
                             </div>
                           </div>
                         </td>
@@ -201,8 +201,8 @@ export function Finance() {
                           <span className="status-badge status-badge-neutral">{t.categoryDetail}</span>
                         </td>
                         <td className={cn(
-                          'whitespace-nowrap text-right font-medium',
-                          t.type === 'income' ? 'text-emerald-600' : 'text-[var(--color-ink)]'
+                          'whitespace-nowrap text-right font-semibold tabular-nums text-sm',
+                          t.type === 'income' ? 'text-[var(--color-positive-text)]' : 'text-[var(--color-ink)]'
                         )}>
                           <HiddenValue isHidden={isHidden} bulletCount={4} prefix={t.type === 'income' ? `+ ${currencySymbol} ` : `- ${currencySymbol} `}>
                             {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}

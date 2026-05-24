@@ -68,13 +68,13 @@ export function Payments() {
                     key={payment.id}
                     type="button"
                     onClick={() => openPayment(payment)}
-                    className={cn('list-row w-full', !payment.active && 'opacity-60')}
+                    className={cn('list-row w-full', !payment.active && 'opacity-50')}
                   >
-                    <div className="flex-shrink-0 h-9 w-9 rounded-full bg-[var(--color-surface-muted)] flex items-center justify-center border border-[var(--color-border-soft)]">
-                      <RefreshCw className="h-4 w-4 text-[var(--color-ink-muted)]" />
+                    <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-[var(--color-surface-muted)] flex items-center justify-center border border-[var(--color-border-soft)]">
+                      <RefreshCw className="h-4 w-4 text-[var(--color-ink-secondary)]" />
                     </div>
                     <div className="list-row-body">
-                      <p className="list-row-title">{payment.name}</p>
+                      <p className="list-row-title font-semibold">{payment.name}</p>
                       <p className="list-row-meta">
                         {payment.frequency === 'monthly' && payment.dayOfMonth
                           ? `${payment.dayOfMonth}th of month`
@@ -83,9 +83,11 @@ export function Payments() {
                       </p>
                     </div>
                     <div className="list-row-aside flex flex-col items-end gap-1">
-                      <HiddenValue isHidden={isHidden} bulletCount={4}>
-                        {formatCurrency(payment.amount)}
-                      </HiddenValue>
+                      <span className="font-semibold tabular-nums">
+                        <HiddenValue isHidden={isHidden} bulletCount={4}>
+                          {formatCurrency(payment.amount)}
+                        </HiddenValue>
+                      </span>
                       <span className={cn('status-badge', payment.active ? 'status-badge-success' : 'status-badge-neutral')}>
                         {payment.active ? 'Active' : 'Paused'}
                       </span>
@@ -109,41 +111,43 @@ export function Payments() {
                     {payments.map(payment => (
                       <tr
                         key={payment.id}
-                        className={cn('cursor-pointer hover:bg-[var(--color-surface-muted)]', !payment.active && 'opacity-60')}
+                        className={cn('cursor-pointer', !payment.active && 'opacity-50')}
                         onClick={() => openPayment(payment)}
                       >
                         <td>
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="h-9 w-9 rounded-full bg-[var(--color-surface-muted)] flex items-center justify-center shrink-0">
-                              <RefreshCw className="h-4 w-4 text-[var(--color-ink-muted)]" />
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="h-10 w-10 rounded-xl bg-[var(--color-surface-muted)] flex items-center justify-center shrink-0 border border-[var(--color-border-soft)]">
+                              <RefreshCw className="h-4 w-4 text-[var(--color-ink-secondary)]" />
                             </div>
                             <div className="min-w-0">
-                              <div className="text-sm font-medium text-[var(--color-ink)]">{payment.name}</div>
-                              <div className="text-xs text-[var(--color-ink-muted)] flex items-center mt-0.5">
-                                <BellRing className="h-3 w-3 mr-1 shrink-0" />
-                                Remind {payment.reminderDays[0]} days before
+                              <div className="text-sm font-semibold text-[var(--color-ink)] truncate">{payment.name}</div>
+                              <div className="text-xs text-[var(--color-ink-muted)] flex items-center gap-1 mt-0.5">
+                                <BellRing className="h-3 w-3 shrink-0" />
+                                Remind {payment.reminderDays[0]}d before
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="whitespace-nowrap text-[var(--color-ink-secondary)]">
-                          <div className="flex items-center text-sm">
-                            <CalendarIcon className="h-4 w-4 mr-1.5 shrink-0" />
+                        <td className="whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 text-sm text-[var(--color-ink)]">
+                            <CalendarIcon className="h-3.5 w-3.5 text-[var(--color-ink-muted)] shrink-0" />
                             {payment.frequency === 'monthly' && payment.dayOfMonth
                               ? `${payment.dayOfMonth}th of month`
                               : 'Custom'}
                           </div>
-                          <div className="text-xs text-[var(--color-ink-muted)] mt-0.5">
-                            Started {format(new Date(payment.startDate), 'MMM yyyy')}
+                          <div className="text-[11px] text-[var(--color-ink-muted)] mt-0.5 ml-5">
+                            Since {format(new Date(payment.startDate), 'MMM yyyy')}
                           </div>
                         </td>
                         <td>
                           <span className="status-badge status-badge-neutral">{payment.category}</span>
                         </td>
-                        <td className="text-right font-medium whitespace-nowrap">
-                          <HiddenValue isHidden={isHidden} bulletCount={4}>
-                            {formatCurrency(payment.amount)}
-                          </HiddenValue>
+                        <td className="text-right whitespace-nowrap">
+                          <span className="text-sm font-semibold tabular-nums text-[var(--color-ink)]">
+                            <HiddenValue isHidden={isHidden} bulletCount={4}>
+                              {formatCurrency(payment.amount)}
+                            </HiddenValue>
+                          </span>
                         </td>
                         <td className="text-right">
                           <span className={cn('status-badge', payment.active ? 'status-badge-success' : 'status-badge-neutral')}>
