@@ -646,15 +646,17 @@ function StatCard({
   icon, 
   badge,
   subText,
+  gradientClass,
 }: { 
   title: string; 
   value: React.ReactNode; 
   icon: React.ReactNode; 
   badge?: React.ReactNode;
   subText?: string;
+  gradientClass?: string;
 }) {
   return (
-    <div className="chart-card h-full flex flex-col justify-between">
+    <div className={cn("chart-card h-full flex flex-col justify-between", gradientClass && `bg-gradient-to-br ${gradientClass}`)}>
       <div className="chart-card-head flex items-center justify-between">
         <span className="text-xs font-semibold text-[var(--color-ink-muted)] uppercase tracking-wider">{title}</span>
         <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center shrink-0">

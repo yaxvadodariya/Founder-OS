@@ -22,6 +22,9 @@ export function Budgets() {
 
   const budgets = store.budgets.filter(b => b.month === selectedMonth);
 
+  const getSpent = (category: string) =>
+    monthExpenses.filter(t => t.category === category).reduce((acc, t) => acc + t.amount, 0);
+
   const totalBudgetLimit = budgets.reduce((acc, b) => acc + b.monthlyLimit, 0);
   const totalBudgetSpent = budgets.reduce((acc, b) => acc + getSpent(b.category), 0);
   const totalRemaining = Math.max(0, totalBudgetLimit - totalBudgetSpent);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from '../store/useStore';
-import { formatCurrency } from '../lib/utils';
+import { cn, formatCurrency } from '../lib/utils';
 import { format, startOfWeek, endOfWeek, isWithinInterval, subWeeks, addWeeks } from 'date-fns';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, CheckSquare, Clock, DollarSign, BarChart3 } from 'lucide-react';
 import { PageShell } from '../components/layout/PageShell';

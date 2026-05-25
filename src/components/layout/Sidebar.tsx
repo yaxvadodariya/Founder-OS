@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ElementType } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,15 +9,16 @@ import {
   BookOpen,
   Settings,
   ChevronDown,
+  ChevronsUpDown,
   LogOut,
-  Layers,
   Flame,
   Target,
   PenTool,
-  PieChart,
   Users,
   BarChart3,
   Search,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
@@ -28,20 +29,23 @@ function NavItem({
   to,
   label,
   isActive,
+  icon: Icon,
   badge,
 }: {
   to: string;
   label: string;
   isActive: boolean;
-  badge?: { value: number; tone: 'orange' | 'green' };
+  icon?: ElementType;
+  badge?: { value: number | string; tone: 'orange' | 'green' };
 }) {
   return (
     <NavLink
       to={to}
       className={cn('sidebar-nav-item', isActive && 'sidebar-nav-item-active')}
     >
-      <span className="truncate">{label}</span>
-      {badge && badge.value > 0 && (
+      {Icon && <Icon className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />}
+      <span className="flex-1 truncate">{label}</span>
+      {badge && (
         <span
           className={cn(
             'nav-count-badge',
@@ -55,24 +59,26 @@ function NavItem({
   );
 }
 
+function openCommandBar() {
+  // Trigger the existing CommandBar (which listens for ⌘K / Ctrl+K on window)
+  window.dispatchEvent(
+    new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true })
+  );
+}
+
 export function Sidebar() {
   const location = useLocation();
   const store = useStore();
   const user = store.user;
+  const isDarkMode = store.isDarkMode;
 
-  const isFinanceRoute = location.pathname.startsWith('/finance') || location.pathname.startsWith('/budgets');
+  const isFinanceRoute =
+    location.pathname.startsWith('/finance') || location.pathname.startsWith('/budgets');
   const [financeOpen, setFinanceOpen] = useState(isFinanceRoute);
-
-  const isBusinessRoute = location.pathname.startsWith('/clients');
-  const [businessOpen, setBusinessOpen] = useState(isBusinessRoute);
 
   useEffect(() => {
     if (isFinanceRoute) setFinanceOpen(true);
   }, [isFinanceRoute]);
-
-  useEffect(() => {
-    if (isBusinessRoute) setBusinessOpen(true);
-  }, [isBusinessRoute]);
 
   const pendingTasks = store.tasks.filter((t) => {
     if (t.completed || !t.dueDate) return false;
@@ -83,44 +89,73 @@ export function Sidebar() {
   const upcomingPayments = store.recurringPayments.filter((p) => p.active).length;
 
   const today = format(new Date(), 'yyyy-MM-dd');
-  const habitsToday = store.habits.filter(h => h.active && (h.completedDates || []).includes(today)).length;
-  const totalActiveHabits = store.habits.filter(h => h.active).length;
+  const habitsToday = store.habits.filter(
+    (h) => h.active && (h.completedDates || []).includes(today)
+  ).length;
+  const totalActiveHabits = store.habits.filter((h) => h.active).length;
 
   const isActive = (href: string) =>
     location.pathname === href ||
     (href !== '/' && location.pathname.startsWith(href));
 
+  const initial = (user?.name || 'F').charAt(0).toUpperCase();
+
   return (
     <aside className="sidebar hidden lg:flex">
-      <div className="px-5 pt-6 pb-5">
-        <div className="sidebar-logo" aria-hidden>
-          <div className="sidebar-logo-mark" />
-        </div>
+      {/* Workspace Switcher */}
+      <div className="px-4 pt-5 pb-3">
+        <button type="button" className="workspace-switcher focus-ring" aria-label="Workspace">
+          <span className="workspace-switcher-mark" aria-hidden />
+          <span className="flex-1 min-w-0">
+            <span className="block workspace-switcher-name truncate">Founder OS</span>
+            <span className="block workspace-switcher-plan truncate">Personal workspace</span>
+          </span>
+          <ChevronsUpDown className="h-3.5 w-3.5 workspace-switcher-chev" strokeWidth={2} />
+        </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5">
-        <NavLink
-          to="/"
-          className={cn('sidebar-nav-item', location.pathname === '/' && 'sidebar-nav-item-active')}
+      {/* Search Trigger */}
+      <div className="px-4 pb-3">
+        <button
+          type="button"
+          onClick={openCommandBar}
+          className="sidebar-search focus-ring"
+          aria-label="Open command bar"
         >
-          <LayoutDashboard className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Dashboard</span>
-        </NavLink>
+          <Search className="h-4 w-4" strokeWidth={1.75} />
+          <span className="sidebar-search-label">Search…</span>
+          <span className="flex items-center gap-0.5">
+            <span className="kbd">⌘</span>
+            <span className="kbd">K</span>
+          </span>
+        </button>
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 pb-4">
+        <p className="sidebar-section-label">Workspace</p>
+
+        <NavItem
+          to="/"
+          label="Dashboard"
+          icon={LayoutDashboard}
+          isActive={location.pathname === '/'}
+        />
 
         <div>
           <button
             type="button"
             onClick={() => setFinanceOpen((o) => !o)}
             className={cn(
-              'sidebar-group-trigger',
+              'sidebar-group-trigger focus-ring',
               (financeOpen || isFinanceRoute) && 'sidebar-group-trigger-open'
             )}
           >
-            <Wallet className="h-[18px] w-[18px] shrink-0 stroke-[1.5] text-[var(--color-ink-muted)]" />
+            <Wallet className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
             <span className="flex-1 text-left">Finance</span>
             <ChevronDown
               className={cn(
-                'h-4 w-4 shrink-0 text-[var(--color-ink-muted)] transition-transform duration-200',
+                'h-4 w-4 shrink-0 transition-transform duration-200',
                 financeOpen && 'rotate-180'
               )}
             />
@@ -131,146 +166,119 @@ export function Sidebar() {
               <div className="sidebar-tree-item">
                 <NavItem
                   to="/finance/personal"
-                  label="Personal Finance"
+                  label="Personal"
                   isActive={isActive('/finance/personal')}
                 />
               </div>
               <div className="sidebar-tree-item">
                 <NavItem
                   to="/finance/business"
-                  label="Business Finance"
+                  label="Business"
                   isActive={isActive('/finance/business')}
                 />
               </div>
               <div className="sidebar-tree-item">
-                <NavItem
-                  to="/budgets"
-                  label="Budgets"
-                  isActive={isActive('/budgets')}
-                />
+                <NavItem to="/budgets" label="Budgets" isActive={isActive('/budgets')} />
               </div>
             </div>
           )}
         </div>
 
-        <NavLink
+        <p className="sidebar-section-label">Operations</p>
+
+        <NavItem
           to="/projects"
-          className={cn('sidebar-nav-item', isActive('/projects') && 'sidebar-nav-item-active')}
-        >
-          <FolderKanban className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Projects</span>
-        </NavLink>
-
-        <NavLink
+          label="Projects"
+          icon={FolderKanban}
+          isActive={isActive('/projects')}
+        />
+        <NavItem
           to="/tasks"
-          className={cn('sidebar-nav-item', isActive('/tasks') && 'sidebar-nav-item-active')}
-        >
-          <CheckSquare className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span className="flex-1">Tasks</span>
-          {pendingTasks > 0 && (
-            <span className="nav-count-badge nav-count-badge-orange">{pendingTasks}</span>
-          )}
-        </NavLink>
-
-        <NavLink
+          label="Tasks"
+          icon={CheckSquare}
+          isActive={isActive('/tasks')}
+          badge={pendingTasks > 0 ? { value: pendingTasks, tone: 'orange' } : undefined}
+        />
+        <NavItem
           to="/habits"
-          className={cn('sidebar-nav-item', isActive('/habits') && 'sidebar-nav-item-active')}
-        >
-          <Flame className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span className="flex-1">Habits</span>
-          {totalActiveHabits > 0 && (
-            <span className={cn('nav-count-badge', habitsToday === totalActiveHabits ? 'nav-count-badge-green' : 'nav-count-badge-orange')}>
-              {habitsToday}/{totalActiveHabits}
-            </span>
-          )}
-        </NavLink>
+          label="Habits"
+          icon={Flame}
+          isActive={isActive('/habits')}
+          badge={
+            totalActiveHabits > 0
+              ? {
+                  value: `${habitsToday}/${totalActiveHabits}`,
+                  tone: habitsToday === totalActiveHabits ? 'green' : 'orange',
+                }
+              : undefined
+          }
+        />
+        <NavItem to="/goals" label="Goals" icon={Target} isActive={isActive('/goals')} />
 
-        <NavLink
-          to="/goals"
-          className={cn('sidebar-nav-item', isActive('/goals') && 'sidebar-nav-item-active')}
-        >
-          <Target className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Goals</span>
-        </NavLink>
+        <p className="sidebar-section-label">Records</p>
 
-        <NavLink
-          to="/journal"
-          className={cn('sidebar-nav-item', isActive('/journal') && 'sidebar-nav-item-active')}
-        >
-          <PenTool className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Journal</span>
-        </NavLink>
-
-        <NavLink
+        <NavItem to="/journal" label="Journal" icon={PenTool} isActive={isActive('/journal')} />
+        <NavItem
           to="/payments"
-          className={cn('sidebar-nav-item', isActive('/payments') && 'sidebar-nav-item-active')}
-        >
-          <BellRing className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span className="flex-1">Payments</span>
-          {upcomingPayments > 0 && (
-            <span className="nav-count-badge nav-count-badge-green">{upcomingPayments}</span>
-          )}
-        </NavLink>
-
-        <NavLink
-          to="/clients"
-          className={cn('sidebar-nav-item', isActive('/clients') && 'sidebar-nav-item-active')}
-        >
-          <Users className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Clients</span>
-        </NavLink>
-
-        <NavLink
+          label="Payments"
+          icon={BellRing}
+          isActive={isActive('/payments')}
+          badge={upcomingPayments > 0 ? { value: upcomingPayments, tone: 'green' } : undefined}
+        />
+        <NavItem to="/clients" label="Clients" icon={Users} isActive={isActive('/clients')} />
+        <NavItem
           to="/notes"
-          className={cn('sidebar-nav-item', isActive('/notes') && 'sidebar-nav-item-active')}
-        >
-          <BookOpen className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Remember Book</span>
-        </NavLink>
+          label="Remember Book"
+          icon={BookOpen}
+          isActive={isActive('/notes')}
+        />
 
-        <NavLink
+        <p className="sidebar-section-label">Insights</p>
+
+        <NavItem
           to="/weekly-review"
-          className={cn('sidebar-nav-item', isActive('/weekly-review') && 'sidebar-nav-item-active')}
-        >
-          <BarChart3 className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Weekly Review</span>
-        </NavLink>
+          label="Weekly Review"
+          icon={BarChart3}
+          isActive={isActive('/weekly-review')}
+        />
+        <NavItem
+          to="/settings"
+          label="Settings"
+          icon={Settings}
+          isActive={isActive('/settings')}
+        />
       </nav>
 
-      <div className="px-3 pb-5 pt-2 space-y-0.5 border-t border-[var(--color-border-soft)] mx-3">
-        <NavLink
-          to="/settings"
-          className={cn('sidebar-nav-item', isActive('/settings') && 'sidebar-nav-item-active')}
-        >
-          <Settings className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Settings</span>
-        </NavLink>
-        <button
-          type="button"
-          onClick={() => logOut()}
-          className="sidebar-nav-item text-[var(--color-ink-muted)] hover:text-[var(--color-negative)]"
-        >
-          <LogOut className="h-[18px] w-[18px] shrink-0 stroke-[1.5]" />
-          <span>Sign out</span>
-        </button>
-      </div>
-
-      {user && (
-        <div className="px-5 pb-6 pt-2">
-          <div className="flex items-center gap-2.5 px-2">
-            <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center text-xs font-semibold text-[var(--color-ink-secondary)] shrink-0">
-              {user.name?.charAt(0) || 'F'}
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-[var(--color-ink)] truncate">{user.name}</p>
-              <p className="text-[10px] text-[var(--color-ink-muted)] truncate flex items-center gap-1">
-                <Layers className="h-2.5 w-2.5" />
-                Founder OS
-              </p>
-            </div>
+      {/* Profile Card */}
+      <div className="px-4 pb-5 pt-2">
+        <div className="sidebar-profile-card">
+          <div className="sidebar-profile-avatar" aria-hidden>
+            {initial}
           </div>
+          <div className="sidebar-profile-meta">
+            <p className="sidebar-profile-name truncate">{user?.name || 'Founder'}</p>
+            <p className="sidebar-profile-email truncate">{user?.email || 'Personal workspace'}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => store.toggleDarkMode()}
+            className="sidebar-profile-action focus-ring"
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDarkMode ? 'Light mode' : 'Dark mode'}
+          >
+            {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => logOut()}
+            className="sidebar-profile-action focus-ring"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
-      )}
+      </div>
     </aside>
   );
 }
