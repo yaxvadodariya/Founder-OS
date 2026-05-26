@@ -20,6 +20,9 @@ export function Budgets() {
     t.type === 'expense' && isWithinInterval(new Date(t.date), { start: monthStart, end: monthEnd })
   );
 
+  const getSpent = (category: string) =>
+    monthExpenses.filter(t => t.categoryDetail === category).reduce((acc, t) => acc + t.amount, 0);
+
   const budgets = store.budgets.filter(b => b.month === selectedMonth);
 
   const totalBudgetLimit = budgets.reduce((acc, b) => acc + b.monthlyLimit, 0);
