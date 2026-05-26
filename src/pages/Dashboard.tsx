@@ -189,6 +189,11 @@ export function Dashboard() {
       {/* Top Welcome Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
         <div>
+          <nav className="breadcrumbs">
+            <span>Workspace</span>
+            <ArrowUpRight className="rotate-45" />
+            <span className="breadcrumb-current">Dashboard</span>
+          </nav>
           <h1 className="page-title">Hey {user?.name.split(' ')[0]} 👋</h1>
           <div className="flex items-center gap-2 mt-1">
             <p className="page-subtitle">{format(today, 'EEEE, MMMM do, yyyy')}</p>

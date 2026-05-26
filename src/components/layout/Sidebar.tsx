@@ -10,14 +10,11 @@ import {
   Settings,
   ChevronDown,
   LogOut,
-  Layers,
   Flame,
   Target,
   PenTool,
-  PieChart,
   Users,
   BarChart3,
-  Search,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useStore } from '../../store/useStore';
@@ -256,17 +253,17 @@ export function Sidebar() {
       </div>
 
       {user && (
-        <div className="px-5 pb-6 pt-2">
-          <div className="flex items-center gap-2.5 px-2">
-            <div className="h-8 w-8 rounded-full bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center text-xs font-semibold text-[var(--color-ink-secondary)] shrink-0">
+        <div className="px-3 pb-5 pt-2">
+          <div className="sidebar-account">
+            <div className="sidebar-account-avatar">
               {user.name?.charAt(0) || 'F'}
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-[var(--color-ink)] truncate">{user.name}</p>
-              <p className="text-[10px] text-[var(--color-ink-muted)] truncate flex items-center gap-1">
-                <Layers className="h-2.5 w-2.5" />
-                Founder OS
-              </p>
+            <div className="min-w-0 flex-1">
+              <div className="sidebar-account-name">
+                <span className="truncate">{user.name}</span>
+                <span className="sidebar-pro-pill">PRO</span>
+              </div>
+              <p className="sidebar-account-email truncate">{user.email || 'Founder OS'}</p>
             </div>
           </div>
         </div>
