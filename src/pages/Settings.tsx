@@ -41,7 +41,7 @@ export function Settings() {
               <p className="text-sm tracking-tight text-[var(--color-ink-secondary)]">{user?.email}</p>
             </div>
           </div>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-orange-100 text-orange-800 dark:bg-orange-950/20 dark:text-orange-400">PRO MEMBER</span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 dark:bg-indigo-500/15 dark:text-indigo-400 dark:border-indigo-400/20">PRO MEMBER</span>
         </div>
 
         {/* Preferences */}
