@@ -51,7 +51,7 @@ export function Budgets() {
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="input-field text-sm"
           />
-          <button type="button" onClick={() => { setBudgetToEdit(null); setIsModalOpen(true); }} className="btn-primary">
+          <button type="button" onClick={() => { setBudgetToEdit(null); setIsModalOpen(true); }} className="btn-primary whitespace-nowrap">
             <Plus className="h-4 w-4" /><span>New Budget</span>
           </button>
         </div>
