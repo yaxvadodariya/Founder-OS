@@ -607,8 +607,8 @@ function ChartMetricCard({
   const isPositive = invertTrend ? pct <= 0 : pct >= 0;
   const pctLabel = `${pct >= 0 ? '↑' : '↓'} ${Math.abs(pct).toFixed(2)}% vs last month`;
 
-  const activeLineColor = isDarkMode ? '#546fed' : '#405cf2';
-  const prevLineColor = isDarkMode ? '#31353f' : '#cdd0d5';
+  const activeLineColor = isDarkMode ? '#31353f' : '#cdd0d5';
+  const prevLineColor = isDarkMode ? '#546fed' : '#405cf2';
   const cursorColor = isDarkMode ? '#20232d' : '#e2e4e9';
 
   return (
