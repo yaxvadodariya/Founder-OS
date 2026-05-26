@@ -216,45 +216,43 @@ export function Dashboard() {
 
       {/* Quick Access stats grid */}
       <section className="section-panel">
-        <h2 className="section-label">Quick Access</h2>
+        <div className="flex items-center justify-between mb-3 lg:mb-4">
+          <h2 className="section-label">Quick Access</h2>
+          <Link to="/finance/personal" className="section-link">View all →</Link>
+        </div>
         <div className={cn(
-          "quick-access-grid grid grid-cols-1 gap-4 mt-3 lg:mt-4",
+          "quick-access-grid grid grid-cols-1 gap-4",
           (store.dashboardWidgets?.balanceCard ?? true) ? "lg:grid-cols-4" : "lg:grid-cols-3"
         )}>
           {(store.dashboardWidgets?.balanceCard ?? true) && (
             <DualBalanceCard personalBalance={personalBalance} currentBalance={currentBalance} isHidden={isHidden} currencySymbol={currencySymbol} />
           )}
-          <StatCard 
-            title="Active Projects" 
-            value={activeProjectsCount.toString()} 
-            icon={<FolderKanban className="h-4 w-4 text-emerald-600" />}
-            badge={<span className="status-badge status-badge-success">On track</span>}
-            subText="All operations nominal"
-            gradientClass="from-emerald-500/5 to-transparent border-emerald-500/10"
+          <HeroMetricCard
+            eyebrow="Active Projects"
+            icon={<FolderKanban className="h-3.5 w-3.5" />}
+            value={activeProjectsCount.toString()}
+            delta={activeProjectsCount > 0 ? `${activeProjectsCount} in flight` : 'Nothing in flight'}
+            deltaTone={activeProjectsCount > 0 ? 'positive' : 'neutral'}
+            footerText={activeProjectsCount > 0 ? 'Operations running' : 'All clear'}
+            footerLink={{ label: 'View all', to: '/projects' }}
           />
-          <StatCard 
-            title="Tasks Due Today" 
-            value={pendingTasksToday.toString()} 
-            icon={<CheckSquare className="h-4 w-4 text-orange-500" />}
-            badge={
-              <span className={cn("status-badge", pendingTasksToday > 0 ? "status-badge-warning" : "status-badge-success")}>
-                {pendingTasksToday > 0 ? 'Action needed' : 'All clear'}
-              </span>
-            }
-            subText={pendingTasksToday > 0 ? "Review pending tasks" : "No urgent items today"}
-            gradientClass="from-orange-500/5 to-transparent border-orange-500/10"
+          <HeroMetricCard
+            eyebrow="Tasks Due Today"
+            icon={<CheckSquare className="h-3.5 w-3.5" />}
+            value={pendingTasksToday.toString()}
+            delta={pendingTasksToday > 0 ? `${pendingTasksToday} need attention` : 'All clear'}
+            deltaTone={pendingTasksToday > 0 ? 'negative' : 'positive'}
+            footerText={pendingTasksToday > 0 ? 'Review pending' : 'No urgent items'}
+            footerLink={{ label: 'Open tasks', to: '/tasks' }}
           />
-          <StatCard 
-            title="Upcoming Bills" 
-            value={upcomingPayments.length.toString()} 
-            icon={<BellRing className="h-4 w-4 text-purple-500" />}
-            badge={
-              <span className={cn("status-badge", upcomingPaymentsAmount > 0 ? "status-badge-neutral" : "status-badge-success")}>
-                {upcomingPaymentsAmount > 0 ? 'Scheduled' : 'All caught up'}
-              </span>
-            }
-            subText={upcomingPaymentsAmount > 0 ? "Payments arriving soon" : "All caught up"}
-            gradientClass="from-purple-500/5 to-transparent border-purple-500/10"
+          <HeroMetricCard
+            eyebrow="Upcoming Bills"
+            icon={<BellRing className="h-3.5 w-3.5" />}
+            value={upcomingPayments.length.toString()}
+            delta={upcomingPaymentsAmount > 0 ? `${formatCurrency(upcomingPaymentsAmount)} scheduled` : 'Caught up'}
+            deltaTone="neutral"
+            footerText={upcomingPaymentsAmount > 0 ? 'Arriving soon' : 'No bills due'}
+            footerLink={{ label: 'Manage', to: '/payments' }}
           />
         </div>
       </section>
@@ -319,39 +317,52 @@ export function Dashboard() {
           {/* Active Projects List */}
           <section className="section-panel">
             <div className="flex justify-between items-center mb-3 lg:mb-4">
-              <h2 className="section-label">Active Projects</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="section-label">Active Projects</h2>
+                <span className="text-[10px] font-semibold text-[var(--color-ink-muted)] bg-[var(--color-surface-muted)] px-1.5 py-0.5 rounded-md">
+                  {store.projects.filter(p => p.status === 'active').length}
+                </span>
+              </div>
               <Link to="/projects" className="section-link">View all →</Link>
             </div>
             
-            <div className="space-y-3">
-              {store.projects.filter(p => p.status === 'active').map(project => (
-                <div key={project.id} className="design-card p-5 hover:shadow-md transition-all">
-                  <div className="flex justify-between items-start mb-3 gap-3">
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-semibold text-[var(--color-ink)] truncate">{project.name}</h3>
-                      <p className="text-xs text-[var(--color-ink-secondary)] mt-0.5">{project.clientName}</p>
+            <div className="design-card divide-y divide-[var(--color-border-soft)] overflow-hidden">
+              {store.projects.filter(p => p.status === 'active').map(project => {
+                const progressTone = project.progress >= 80 ? 'positive' : project.progress >= 40 ? 'neutral' : 'warning';
+                const progressColor = progressTone === 'positive' ? 'bg-emerald-500' : progressTone === 'warning' ? 'bg-orange-500' : 'bg-[var(--color-accent)]';
+                return (
+                  <Link
+                    key={project.id}
+                    to={`/projects/${project.id}`}
+                    className="flex items-center gap-4 p-4 hover:bg-[var(--color-surface-hover)] transition-colors group"
+                  >
+                    <div className="h-10 w-10 rounded-[10px] bg-[var(--color-surface-muted)] border border-[var(--color-border-subtle)] flex items-center justify-center text-sm font-bold text-[var(--color-ink-secondary)] shrink-0">
+                      {project.name.charAt(0)}
                     </div>
-                    <span className="status-badge status-badge-neutral shrink-0 font-semibold tabular-nums">
-                      {formatCurrency(project.value)}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1.5 font-medium">
-                      <span className="text-[var(--color-ink-muted)]">Progress</span>
-                      <span className="text-[var(--color-ink)]">{project.progress}%</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-3 mb-1.5">
+                        <h3 className="text-sm font-semibold text-[var(--color-ink)] truncate group-hover:text-[var(--color-accent)] transition-colors">
+                          {project.name}
+                        </h3>
+                        <span className="text-xs font-semibold text-[var(--color-ink)] tabular-nums shrink-0">
+                          {formatCurrency(project.value)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[11px] text-[var(--color-ink-muted)] truncate">{project.clientName}</span>
+                        <span className="text-[var(--color-border-soft)]">•</span>
+                        <span className="text-[11px] text-[var(--color-ink-muted)]">{project.progress}% complete</span>
+                      </div>
+                      <div className="progress-track">
+                        <div className={cn('h-full rounded-full transition-all duration-500', progressColor)} style={{ width: `${project.progress}%` }} />
+                      </div>
                     </div>
-                    <div className="progress-track">
-                      <div className="progress-fill" style={{ width: `${project.progress}%` }} />
-                    </div>
-                    <div className="progress-labels">
-                      <span>Started</span>
-                      <span>{project.progress}% complete</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                    <ArrowUpRight className="h-4 w-4 text-[var(--color-ink-muted)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
+                );
+              })}
               {store.projects.filter(p => p.status === 'active').length === 0 && (
-                <p className="text-sm text-[var(--color-ink-muted)] text-center py-6">No active projects.</p>
+                <p className="text-sm text-[var(--color-ink-muted)] text-center py-8">No active projects.</p>
               )}
             </div>
           </section>
@@ -645,6 +656,56 @@ function ChartMetricCard({
   );
 }
 
+function HeroMetricCard({
+  eyebrow,
+  icon,
+  value,
+  delta,
+  deltaTone = 'neutral',
+  footerText,
+  footerLink,
+}: {
+  eyebrow: string;
+  icon: React.ReactNode;
+  value: React.ReactNode;
+  delta?: string;
+  deltaTone?: 'positive' | 'negative' | 'neutral';
+  footerText?: string;
+  footerLink?: { label: string; to: string };
+}) {
+  return (
+    <div className="hero-metric-card h-full">
+      <div className="hero-metric-eyebrow">
+        <span className="hero-metric-eyebrow-label">
+          {icon}
+          <span>{eyebrow}</span>
+        </span>
+      </div>
+      <div>
+        <p className="hero-metric-value">{value}</p>
+        {delta && (
+          <p className={cn(
+            'hero-metric-delta mt-1',
+            deltaTone === 'positive' && 'hero-metric-delta-positive',
+            deltaTone === 'negative' && 'hero-metric-delta-negative',
+          )}>{delta}</p>
+        )}
+      </div>
+      {(footerText || footerLink) && (
+        <div className="hero-metric-footer mt-auto">
+          <span className="inline-flex items-center gap-1.5">
+            <Sparkles className="h-3 w-3" />
+            {footerText}
+          </span>
+          {footerLink && (
+            <Link to={footerLink.to} className="hero-metric-footer-link">{footerLink.label}</Link>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StatCard({ 
   title, 
   value, 
@@ -686,32 +747,30 @@ function DualBalanceCard({ personalBalance, currentBalance, isHidden, currencySy
   const footerValue = isNetWorth ? personalBalance : currentBalance;
 
   return (
-    <div className="chart-card h-full flex flex-col justify-between">
+    <div className="hero-metric-card h-full">
+      <div className="hero-metric-eyebrow">
+        <span className="hero-metric-eyebrow-label">
+          <Wallet className="h-3.5 w-3.5" />
+          <span>{mainLabel}</span>
+        </span>
+        <button
+          type="button"
+          onClick={() => store.setBalanceDisplayMode(isNetWorth ? 'liquid-cash' : 'net-worth')}
+          className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)] hover:underline transition-all focus:outline-none cursor-pointer"
+        >
+          Switch
+        </button>
+      </div>
       <div>
-        <div className="flex items-center justify-between">
-          <div className="chart-card-head !text-[var(--color-ink-muted)]">
-            <Wallet className="h-4 w-4 text-[var(--color-accent)]" />
-            <span>{mainLabel}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => store.setBalanceDisplayMode(isNetWorth ? 'liquid-cash' : 'net-worth')}
-            className="px-2.5 py-0.5 text-xs font-semibold text-[var(--color-accent)] border border-[var(--color-border-subtle)] rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors focus:outline-none cursor-pointer"
-          >
-            Switch
-          </button>
-        </div>
-        <p className="text-3xl font-bold text-[var(--color-ink)] tracking-tight mt-4">
+        <p className="hero-metric-value">
           <HiddenValue isHidden={isHidden}>{formatCurrency(mainValue)}</HiddenValue>
         </p>
       </div>
-      <div className="mt-auto pt-3 border-t border-[var(--color-border-soft)]">
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-xs text-[var(--color-ink-secondary)]">{footerLabel}</span>
-          <span className="font-semibold text-[var(--color-ink)] tabular-nums">
-            <HiddenValue isHidden={isHidden} bulletCount={4} prefix={currencySymbol}>{formatCurrency(footerValue)}</HiddenValue>
-          </span>
-        </div>
+      <div className="hero-metric-footer mt-auto">
+        <span className="text-[var(--color-ink-muted)]">{footerLabel}</span>
+        <span className="font-semibold text-[var(--color-ink)] tabular-nums">
+          <HiddenValue isHidden={isHidden} bulletCount={4} prefix={currencySymbol}>{formatCurrency(footerValue)}</HiddenValue>
+        </span>
       </div>
     </div>
   );
